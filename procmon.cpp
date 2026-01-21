@@ -232,9 +232,13 @@ namespace TimeProc
 	}
 }
 
-namespace UsingCpuProc
+class UsingCpuProc
 {
-	Result getUllTime(const HANDLE& hProcess, ULARGE_INTEGER& TimeUsingProc)
+
+
+	time_t PREV_TIME;
+
+	Result getTimeUsingCpu(const HANDLE& hProcess, ULARGE_INTEGER& TimeUsingCpu)
 	{
 		FILETIME CreationTimeProcess = { };
 		FILETIME ExitTimeProcess = { };
@@ -248,147 +252,50 @@ namespace UsingCpuProc
 		KernelUnatedTime = { KernelTimeProcess.dwLowDateTime, KernelTimeProcess.dwHighDateTime };
 		UserUnatedTime = { UserTimeProcess.dwLowDateTime, UserTimeProcess.dwHighDateTime };
 
-		TimeUsingProc.QuadPart = KernelUnatedTime.QuadPart + UserUnatedTime.QuadPart;
+		TimeUsingCpu.QuadPart = KernelUnatedTime.QuadPart + UserUnatedTime.QuadPart;
 
 		return Result::successful;
 	}
 
 	// Загруженность процессора за всё время существования
-	Result getTotalUsingCpu(unsigned long num_cores, vec_t<ContainerProcess>& ContainerProcesses, vec_t<HandleRAII>& Handles)
+	Result getTotalUsingCpu(unsigned long num_cores, ContainerProcess current_process, HandleRAII& hProcess)
 	{
-		int ErrorCode = 1;
+		ULARGE_INTEGER TimeUsingCpu = { };
+		ULARGE_INTEGER TimeCreateCpu = { };
+		double total_using_cpu = 0.0;
 
-		double TotalWorkTimeProcessor = 0;
+		TimeCreateCpu.QuadPart = current_process.worktime.all_seconds * 10E7;
+		if(getTimeUsingCpu(hProcess.get(), TimeUsingCpu) == Result::failure || TimeCreateCpu.QuadPart == 0) return Result::failure;
 
-		// Общее время жизни для текущего процесса
-		ULARGE_INTEGER ullTime = { };
-
-		double UsingCpu = 0;
-
-		for (size_t index = 0; index < ContainerProcesses.size(); ++index)
-		{
-			// Ощее время работы процессора
-			TotalWorkTimeProcessor = static_cast<double>(ContainerProcesses[index].worktime.all_seconds);
-
-			if (getUllTime(Handles[index].get(), ullTime) == Result::failure)
-			{
-				ContainerProcesses[index].totalusingcpu = -1;
-				continue;
-			}
-
-			// Проверка на ноль
-			if (TotalWorkTimeProcessor <= 0)
-			{
-				ContainerProcesses[index].totalusingcpu = -1;
-				continue;
-			}
-
-			// Загруженность за всё время и перевол секунд в 10ns
-			TotalWorkTimeProcessor *= 1.0E7;
-
-			UsingCpu = ullTime.QuadPart / (TotalWorkTimeProcessor * num_cores);
-
-			UsingCpu *= 100.0;
-
-			if (UsingCpu <= 0)
-			{
-				ContainerProcesses[index].totalusingcpu = -1;
-				continue;
-			}
-
-			ContainerProcesses[index].totalusingcpu = UsingCpu;
-		}
-
-		return Result::successful;
+		total_using_cpu = static_cast<double>(TimeUsingCpu.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(TimeCreateCpu.QuadPart));
+		total_using_cpu *= 100;
 	}
 
 	// Загруженность за конкретный интервал времени
-	Result getIntervalUsingCpu(unsigned long num_cores, long long IntervalWorkTimeProcessor, vec_t<ContainerProcess>& ContainerProcesses, vec_t<HandleRAII>& Handles)
+	Result getIntervalUsingCpu(unsigned long num_cores, long long IntervalWorkTimeProcessor, HandleRAII& hProcess)
 	{
-		vec_t<int> IndexesNotCorrectTimes = { };
+		ULARGE_INTEGER TimeUsingCpu = { };
+		double interval_using_cpu = 0.0;
 
-		vec_t<ULONGLONG> vec_StartTimeProc{ };
-		vec_t<ULONGLONG> vec_EndTimeProc{ };
+		if (getTimeUsingCpu(hProcess.get(), TimeUsingCpu) == Result::failure || PREV_TIME == 0) return Result::failure;
 
-		// Перераспределение памяти
-		vec_StartTimeProc.resize(ContainerProcesses.size());
-		vec_EndTimeProc.resize(ContainerProcesses.size());
+		interval_using_cpu = static_cast<double>(TimeUsingCpu.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(PREV_TIME));
 
-		for (int index = 0; index < ContainerProcesses.size(); ++index)
-		{
-			// Получение текущей загруженности процессора
-			ULARGE_INTEGER ullTime = { };
-			
-			if (getUllTime(Handles[index].get(), ullTime) == Result::failure)
-			{
-				IndexesNotCorrectTimes.push_back(index);
-				continue;
-			}
-
-			vec_StartTimeProc[index] = ullTime.QuadPart;
-
-			// Очищение структуры
-			ullTime = { };
-		}
-
-		// Пауза на определенное время
-		std::this_thread::sleep_for(std::chrono::milliseconds(IntervalWorkTimeProcessor));
-
-		for (int index = 0; index < ContainerProcesses.size(); ++index)
-		{
-			if (std::find(IndexesNotCorrectTimes.begin(), IndexesNotCorrectTimes.end(), index) != IndexesNotCorrectTimes.end())
-			{
-				ContainerProcesses[index].intervalusingcpu = -1;
-				continue;
-			}
-
-			// Получение загрузки процессора через определнный интервал
-			ULARGE_INTEGER ullTime = { };
-
-			if (getUllTime(Handles[index].get(), ullTime) == Result::failure)
-			{
-				ContainerProcesses[index].intervalusingcpu = -1;
-				continue;
-			}
-
-			vec_EndTimeProc[index] = ullTime.QuadPart;
-
-			// Очищение структуры
-			ullTime = { };
-		}
-
-		// Перевод ms в 10ns
-		IntervalWorkTimeProcessor *= static_cast<long long>(1.0E4);
-
-		for (size_t index = 0; index < ContainerProcesses.size(); ++index)
-		{
-			if (IntervalWorkTimeProcessor <= 0 || std::find(IndexesNotCorrectTimes.begin(), IndexesNotCorrectTimes.end(), index) != IndexesNotCorrectTimes.end())
-			{
-				ContainerProcesses[index].intervalusingcpu = -1;
-				continue;
-			}
-
-			// Текущее использование CPU
-			double UsingCpu = (static_cast<double>(vec_EndTimeProc[index]) - static_cast<double>(vec_StartTimeProc[index])) / 
-				(static_cast<double>(IntervalWorkTimeProcessor) * static_cast<double>(num_cores));
-
-			// Перевод в проценты проценты
-			UsingCpu *= 100.0;
-
-			if (UsingCpu <= 0)
-			{
-				ContainerProcesses[index].intervalusingcpu = -1;
-				continue;
-			}
-
-			ContainerProcesses[index].intervalusingcpu = UsingCpu;
-		}
-
-		return Result::successful;
+		interval_using_cpu *= 100;
+		
+		auto now = std::chrono::system_clock::now();
+		PREV_TIME = std::chrono::system_clock::to_time_t(now);
 	}
 
+public:
+	UsingCpuProc() noexcept = default;
 
-	Result get(vec_t<ContainerProcess>& process, long long IntervalWorkTimeProcessor, vec_t<HandleRAII>& Handles)
+	UsingCpuProc(time_t current_time) noexcept
+	{
+		PREV_TIME = current_time - PREV_TIME;
+	}
+
+	Result get(ContainerProcess& current_process, long long IntervalWorkTimeProcessor, HandleRAII& Handle)
 	{
 		int ErrorCode = 1;
 
@@ -396,16 +303,16 @@ namespace UsingCpuProc
 		unsigned long num_cores = std::thread::hardware_concurrency();
 
 		// ОБщее использоание CPU
-		if (getTotalUsingCpu(num_cores, process, Handles) == Result::failure)
+		if (getTotalUsingCpu(num_cores, current_process, Handle) == Result::failure)
 			return Result::failure;
 
 		// За определенный интервал времени
-		if(getIntervalUsingCpu(num_cores, IntervalWorkTimeProcessor, process, Handles) == Result::failure)
+		if (getIntervalUsingCpu(num_cores, IntervalWorkTimeProcessor, Handle) == Result::failure)
 			return Result::failure;
 
 		return Result::successful;
 	}
-}
+};
 
 namespace MemoryProc
 {
@@ -456,9 +363,13 @@ namespace ManageProgramm
 		return Result::successful;
 	}
 
-	Result getInformationAboutProcesses(const DWORD cbNeeded, const DWORD cProcesses, vec_t<DWORD>& aProcesses, size_t num_thread, DWORD MaxProcessesOnOneThread, 
-		vec_t<vec_t<ContainerProcess>>& AllProcesses, const unsigned int max_threads)
+	Result getInformationAboutProcesses(DWORD cbNeeded, DWORD cProcesses, vec_t<DWORD> aProcesses, size_t num_thread, vec_t<vec_t<ContainerProcess>>& AllProcesses, 
+		const unsigned int max_threads, vec_t<UsingCpuProc>& using_cpu_processors)
 	{
+		DWORD MaxProcessesOnOneThread = cProcesses / max_threads;
+		UsingCpuProc using_cpu_proc;
+		vec_t<UsingCpuProc> using_cpu_processors = { };
+
 		// Информация о процессах
 		vec_t<HandleRAII> Handles;
 		ContainerProcess Process = { };
@@ -498,46 +409,53 @@ namespace ManageProgramm
 			if(MemoryProc::get(hProcess, Process) == Result::failure)
 				Process.memory = NULL;
 
+			// Получение процента загрузки процессора для процесса, за всё время и за укзанный интервал
+			if (using_cpu_proc.get(AllProcesses[num_thread][index], 1000, Handles[index]) == Result::successful)
+			{
+				using_cpu_processors.push_back(using_cpu_proc);
+			}
+
+
 			Handles.push_back(std::move(Handle));
 			AllProcesses[num_thread].push_back(std::move(Process));
 		}
-		
-		// Получение процента загрузки процессора для процесса, за всё время и за укзанный интервал
-		if (UsingCpuProc::get(AllProcesses[num_thread], 1000, Handles) == Result::failure)
-			return Result::failure;
 
 		return Result::successful;
 	}
 
-	void start_programm()
+	void start_threads(vec_t<vec_t<ContainerProcess>>& AllProcesses)
 	{
-		const unsigned int max_threads = std::thread::hardware_concurrency() / 2;
-
-		DWORD cbNeeded;
-		DWORD cProcesses;
+		DWORD cbNeeded, cProcesses;
 		vec_t<DWORD> aProcesses;
-		vec_t<vec_t<ContainerProcess>> AllProcesses(max_threads);
+
+		const unsigned int max_threads = std::thread::hardware_concurrency() / 2;
 
 		getParametersProcessor(cbNeeded, cProcesses, aProcesses);
 
-		DWORD MaxProcessesOnOneThread = cProcesses / max_threads;
+		AllProcesses.reserve(max_threads);
 
 		vec_t<std::thread> threads;
 		threads.resize(max_threads);
 
-		AllProcesses.reserve(cProcesses);
-
 		for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 		{
-			threads[num_thread] = std::thread([cbNeeded, cProcesses, &aProcesses, num_thread, MaxProcessesOnOneThread, &AllProcesses, max_threads]() 
-			{ 
-					getInformationAboutProcesses(cbNeeded, cProcesses, aProcesses, num_thread, MaxProcessesOnOneThread, AllProcesses, max_threads); 
-			});
+			threads[num_thread] = std::thread(getInformationAboutProcesses(cbNeeded, cProcesses, aProcesses, num_thread, AllProcesses, max_threads));
 		}
 
 		for (auto& th : threads)
 		{
 			th.join();
+		}
+	}
+
+	void start_programm(vec_t<vec_t<ContainerProcess>>& AllProcesses)
+	{
+		time_t sleep_interval_thread = 1000;
+
+		while (true)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_interval_thread));
+			start_threads(AllProcesses);
 		}
 	};
 }
@@ -546,7 +464,8 @@ int main()
 {
 	auto start = std::chrono::steady_clock::now();
 
-	ManageProgramm::start_programm();
+	vec_t<vec_t<ContainerProcess>> AllProcesses;
+	ManageProgramm::start_programm(AllProcesses);
 
 	auto diff = std::chrono::steady_clock::now() - start;
 
