@@ -5,7 +5,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(${PROJECT_NAME}
-    "procmon.cpp"
-    "macro.h"
-    "include_libraries.h"
+	"main.cpp"
+	"macro.h"
+	"libraries.h"
+	"NameSpaces.cpp" 
+	"HandleRAII.cpp" 
+	"HandleRAII.h" 
+	"UsingCpu.cpp" 
+	"UsingCpu.h" 
+	"Process.cpp" 
+	"NameSpaces.h" 
 )
