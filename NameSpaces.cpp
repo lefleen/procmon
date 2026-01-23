@@ -66,13 +66,6 @@ Result TimeProc::get_create_time_process(const HandleRAII& handle_process, time_
 
 	if (!GetProcessTimes(handle_process.get(), &creation_ftime_process, &exit_ftime_process, &kernel_ftime_process, &user_ftime_process)) return Result::failure;
 
-	// Преобразование в локальное время из UTC
-	if (!FileTimeToLocalFileTime(&creation_ftime_process, &creation_ftime_process) ||
-		!FileTimeToLocalFileTime(&exit_ftime_process, &exit_ftime_process) ||
-		!FileTimeToLocalFileTime(&kernel_ftime_process, &kernel_ftime_process) ||
-		!FileTimeToLocalFileTime(&user_ftime_process, &user_ftime_process))
-		return Result::failure;
-
 	// Преобразование в системное время
 	switch (choose)
 	{
@@ -166,11 +159,23 @@ Result MemoryProc::get(const HandleRAII& handle_process, Process& process)
 
 Result ManageProgramm::get_parameters_processes(DWORD& count_bytes_needed, DWORD& count_processes, vec_t<DWORD>& pids_processes)
 {
-	pids_processes.resize(8192);
+	size_t size = 128;
+	pids_processes.resize(size);
 
 	// Получение PID
-	if (!EnumProcesses(pids_processes.data(), static_cast<DWORD>(pids_processes.size()) * sizeof(DWORD), &count_bytes_needed))
-		return Result::failure;
+	while (true)
+	{
+		if (!EnumProcesses(pids_processes.data(), static_cast<DWORD>(pids_processes.size()) * sizeof(DWORD), &count_bytes_needed))
+			return Result::failure;
+
+		if (pids_processes.size() * sizeof(DWORD) != count_bytes_needed)
+		{
+			break;
+		}
+
+		size *= 2;
+		pids_processes.resize(size);		
+	}
 
 	count_processes = count_bytes_needed / sizeof(DWORD);
 
@@ -192,6 +197,22 @@ Result ManageProgramm::get_start_and_end_points(size_t& start_index_process, siz
 	return Result::successful;
 }
 
+Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, vec_t<DWORD>& pids_processes, 
+	size_t start_index_process, size_t end_index_process) 
+{
+	map_t<DWORD, UsingCpuProc> _using_cpu_processes;
+
+	for (size_t index = start_index_process; index < end_index_process; ++index) 
+	{
+		DWORD pid = pids_processes[index];
+		_using_cpu_processes[pid] = std::move(using_cpu_processes[pid]);
+	}
+
+	using_cpu_processes = std::move(_using_cpu_processes);
+
+	return Result::successful;
+}
+
 Result ManageProgramm::get_information_about_processes(DWORD count_bytes_needed, DWORD count_processes, vec_t<DWORD>& pids_processes,
 	size_t max_threads, size_t num_thread, double pause_interval, vec_t<Process>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_processes)
 {
@@ -199,7 +220,7 @@ Result ManageProgramm::get_information_about_processes(DWORD count_bytes_needed,
 
 	DWORD max_processes_on_this_thread = count_processes / max_threads;
 
-	HandleRAII handle_process;
+	HandleRAII handle_process { };
 
 	size_t start_index_process = 0;
 	size_t end_index_process = 0;
@@ -224,18 +245,21 @@ Result ManageProgramm::get_information_about_processes(DWORD count_bytes_needed,
 		processes.push_back(std::move(current_process));
 	}
 
+	clear_using_cpu_vec(using_cpu_processes, pids_processes, start_index_process, end_index_process);
+
 	return Result::successful;
 }
 
 Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, vec_t<vec_t<Process>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_processes)
 {
-	DWORD count_bytes_needed, count_processes;
-	vec_t<DWORD> pids_processes;
+	DWORD count_bytes_needed = 0, count_processes = 0;
+	vec_t<DWORD> pids_processes { };
 
 	get_parameters_processes(count_bytes_needed, count_processes, pids_processes);
 
-	vec_t<std::thread> threads;
+	vec_t<std::thread> threads { };
 	threads.resize(max_threads);
+	using_cpu_processes.resize(max_threads);
 
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
@@ -259,11 +283,14 @@ Result ManageProgramm::start_programm(time_t interval_pause)
 	vec_t<vec_t<Process>> processes{ };
 	vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_processes{ };
 
-	processes.reserve(max_threads);
+	processes.resize(max_threads);
 	using_cpu_processes.reserve(max_threads);
 
 	while (true)
 	{
+		for (auto& vec : processes)
+			vec.clear();
+
 		start_threads(max_threads, interval_pause, processes, using_cpu_processes);
 		std::this_thread::sleep_for(std::chrono::milliseconds(interval_pause));
 	}
