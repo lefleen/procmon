@@ -1,8 +1,9 @@
 #pragma once
 #include "libraries.h"
 
-	// Получение ID
-Result HandleProc::get(HandleRAII& handle_process, DWORD pid_process)
+
+// Получение ID
+Result WindowsProc::HandleProc::get(HandleRAII& handle_process, DWORD pid_process)
 {
 	// Проверка PID процесса на существование
 	if (pid_process != 0)
@@ -20,7 +21,7 @@ Result HandleProc::get(HandleRAII& handle_process, DWORD pid_process)
 }
 
 	// Получени имени процесса класса
-Result NameProc::get(const HandleRAII& handle_process, DWORD count_bytes_needed, Process& current_process)
+Result WindowsProc::NameProc::get(const HandleRAII& handle_process, DWORD count_bytes_needed, Process& current_process)
 {
 	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
@@ -46,7 +47,7 @@ Result NameProc::get(const HandleRAII& handle_process, DWORD count_bytes_needed,
 }
 
 	// FILETIME в time_t
-Result TimeProc::filetime_to_time_t(time_t& time, const FILETIME f_time)
+Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const FILETIME f_time)
 {
 	ULARGE_INTEGER ull;
 	ull.LowPart = f_time.dwLowDateTime;
@@ -57,7 +58,7 @@ Result TimeProc::filetime_to_time_t(time_t& time, const FILETIME f_time)
 }
 
 	// Получение FILETIME в формате time_t
-Result TimeProc::get_create_time_process(const HandleRAII& handle_process, time_t& create_time_process, const int choose)
+Result WindowsProc::TimeProc::get_create_time_process(const HandleRAII& handle_process, time_t& create_time_process, const int choose)
 {
 	FILETIME creation_ftime_process = { };
 	FILETIME kernel_ftime_process = { };
@@ -80,7 +81,7 @@ Result TimeProc::get_create_time_process(const HandleRAII& handle_process, time_
 }
 
 	// Время работы процесса
-Result TimeProc::calculate_work_time_process(time_t& work_time_process, const time_t create_time_process)
+Result WindowsProc::TimeProc::calculate_work_time_process(time_t& work_time_process, const time_t create_time_process)
 {
 
 	time_t current_time = time(NULL);
@@ -96,7 +97,7 @@ Result TimeProc::calculate_work_time_process(time_t& work_time_process, const ti
 }
 
 	// Преобразование времени в правильные форма
-Result TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
+Result WindowsProc::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
 {
 	// Всё количество секунд
 	output_time.work_time = input_time;
@@ -119,7 +120,7 @@ Result TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
 }
 
 	// Получение времени работы процесса
-Result TimeProc::get(const HandleRAII& handle_process, Process& process)
+Result WindowsProc::TimeProc::get(const HandleRAII& handle_process, Process& process)
 {
 	my_tm tm_work_time_process = { };
 	time_t create_time_process = 0;
@@ -142,7 +143,7 @@ Result TimeProc::get(const HandleRAII& handle_process, Process& process)
 }
 
 	// Получение ОЗУ процессора
-Result MemoryProc::get(const HandleRAII& handle_process, Process& process)
+Result WindowsProc::MemoryProc::get(const HandleRAII& handle_process, Process& process)
 {
 	PROCESS_MEMORY_COUNTERS pmc = { };
 
@@ -157,7 +158,7 @@ Result MemoryProc::get(const HandleRAII& handle_process, Process& process)
 	return Result::successful;
 }
 
-Result ManageProgramm::get_parameters_processes(DWORD& count_bytes_needed, DWORD& count_processes, vec_t<DWORD>& pids_processes)
+Result WindowsProc::ManageOS::get_parameters_processes(DWORD& count_bytes_needed, DWORD& count_processes, vec_t<DWORD>& pids_processes)
 {
 	size_t size = 128;
 	pids_processes.resize(size);
@@ -185,7 +186,7 @@ Result ManageProgramm::get_parameters_processes(DWORD& count_bytes_needed, DWORD
 	return Result::successful;
 }
 
-Result ManageProgramm::get_start_and_end_points(size_t& start_index_process, size_t& end_index_process, const unsigned int max_threads, size_t num_thread,
+Result WindowsProc::ManageOS::get_start_and_end_points(size_t& start_index_process, size_t& end_index_process, const unsigned int max_threads, size_t num_thread,
 	DWORD max_process_on_this_thread, const DWORD count_processes)
 {
 	start_index_process = num_thread * max_process_on_this_thread;
@@ -197,7 +198,7 @@ Result ManageProgramm::get_start_and_end_points(size_t& start_index_process, siz
 	return Result::successful;
 }
 
-Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, vec_t<DWORD>& pids_processes, 
+Result WindowsProc::ManageOS::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, vec_t<DWORD>& pids_processes,
 	size_t start_index_process, size_t end_index_process) 
 {
 	map_t<DWORD, UsingCpuProc> _using_cpu_processes;
@@ -213,7 +214,7 @@ Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu
 	return Result::successful;
 }
 
-Result ManageProgramm::get_information_about_processes(DWORD count_bytes_needed, DWORD count_processes, vec_t<DWORD>& pids_processes,
+Result WindowsProc::ManageOS::get_information_about_processes(DWORD count_bytes_needed, DWORD count_processes, vec_t<DWORD>& pids_processes,
 	size_t max_threads, size_t num_thread, double pause_interval, vec_t<Process>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_processes)
 {
 	DWORD pid = 0;
@@ -250,7 +251,7 @@ Result ManageProgramm::get_information_about_processes(DWORD count_bytes_needed,
 	return Result::successful;
 }
 
-Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, vec_t<vec_t<Process>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_processes)
+Result WindowsProc::ManageOS::start_threads(size_t max_threads, double pause_interval, vec_t<vec_t<Process>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_processes)
 {
 	DWORD count_bytes_needed = 0, count_processes = 0;
 	vec_t<DWORD> pids_processes { };
@@ -276,7 +277,7 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 	return Result::successful;
 }
 
-Result ManageProgramm::start_programm(time_t interval_pause)
+Result WindowsProc::ManageOS::start_programm(time_t interval_pause)
 {
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 
@@ -296,4 +297,13 @@ Result ManageProgramm::start_programm(time_t interval_pause)
 	}
 
 	return Result::successful;
+}
+
+void ManageProgramm::start_programm()
+{
+#ifdef  _WIN32
+	WindowsProc::ManageOS::start_programm();
+#elif defined(__linux__)
+	LinuxProc::ManageOS::start_programm();
+#endif
 }

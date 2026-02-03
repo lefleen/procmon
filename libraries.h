@@ -1,6 +1,16 @@
 #pragma once
+
+#ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
+#include "HandleRAII.h"
+#include "UsingCpu.h"
+#include "Process.h"
+
+#elif defined (__linux__)
+
+#endif
+
 #include <string>
 #include <vector>
 #include <thread>
@@ -29,7 +39,4 @@ struct my_tm
 	time_t work_time;
 };
 
-#include "HandleRAII.h"
-#include "UsingCpu.h"
-#include "Process.h"
 #include "NameSpaces.h"
