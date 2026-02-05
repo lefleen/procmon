@@ -3,16 +3,16 @@
 
 
 // Получение ID
-Result WindowsProc::HandleProc::get(HandleRAII& handle_process, DWORD pid_process)
+Result WindowsProc::HandleProc::get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process)
 {
 	// Проверка PID процесса на существование
 	if (pid_process != 0)
 	{
 		// Хэндл процесса
-		handle_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+		descriptor_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
 			FALSE, pid_process);
 
-		if (!handle_process.get()) return Result::failure;
+		if (!descriptor_process.get()) return Result::failure;
 
 		return Result::successful;
 	}
@@ -21,18 +21,18 @@ Result WindowsProc::HandleProc::get(HandleRAII& handle_process, DWORD pid_proces
 }
 
 	// Получени имени процесса класса
-Result WindowsProc::NameProc::get(const HandleRAII& handle_process, DWORD count_bytes_needed, Process& current_process)
+Result WindowsProc::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, Process& current_process)
 {
 	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
 
-	if (EnumProcessModules(handle_process.get(), &hmodule_process, sizeof(hmodule_process),
+	if (EnumProcessModules(descriptor_process.get(), &hmodule_process, sizeof(hmodule_process),
 		&count_bytes_needed))
 	{
 		wchar_t process_name[256];
 
 		// Получение имени
-		GetModuleBaseNameW(handle_process.get(), hmodule_process, process_name,
+		GetModuleBaseNameW(descriptor_process.get(), hmodule_process, process_name,
 			256);
 
 		// Проверка. не пуста ли строка
@@ -58,14 +58,14 @@ Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const FILETIME f_
 }
 
 	// Получение FILETIME в формате time_t
-Result WindowsProc::TimeProc::get_create_time_process(const HandleRAII& handle_process, time_t& create_time_process, const int choose)
+Result WindowsProc::TimeProc::get_create_time_process(const ProcessDescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
 {
 	FILETIME creation_ftime_process = { };
 	FILETIME kernel_ftime_process = { };
 	FILETIME exit_ftime_process = { };
 	FILETIME user_ftime_process = { };
 
-	if (!GetProcessTimes(handle_process.get(), &creation_ftime_process, &exit_ftime_process, &kernel_ftime_process, &user_ftime_process)) return Result::failure;
+	if (!GetProcessTimes(descriptor_process.get(), &creation_ftime_process, &exit_ftime_process, &kernel_ftime_process, &user_ftime_process)) return Result::failure;
 
 	// Преобразование в системное время
 	switch (choose)
@@ -120,14 +120,14 @@ Result WindowsProc::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& o
 }
 
 	// Получение времени работы процесса
-Result WindowsProc::TimeProc::get(const HandleRAII& handle_process, Process& process)
+Result WindowsProc::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
 	my_tm tm_work_time_process = { };
 	time_t create_time_process = 0;
 	time_t work_time_process = { };
 
 	// Время в формате time_t
-	if (get_create_time_process(handle_process, create_time_process, macCreateTimeProcess) == Result::failure)
+	if (get_create_time_process(descriptor_process, create_time_process, macCreateTimeProcess) == Result::failure)
 		return Result::failure;
 
 	// Время работы процесса
@@ -143,11 +143,11 @@ Result WindowsProc::TimeProc::get(const HandleRAII& handle_process, Process& pro
 }
 
 	// Получение ОЗУ процессора
-Result WindowsProc::MemoryProc::get(const HandleRAII& handle_process, Process& process)
+Result WindowsProc::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
 	PROCESS_MEMORY_COUNTERS pmc = { };
 
-	if (!GetProcessMemoryInfo(handle_process.get(), &pmc, sizeof(pmc))) return Result::failure;
+	if (!GetProcessMemoryInfo(descriptor_process.get(), &pmc, sizeof(pmc))) return Result::failure;
 
 	long double memory = static_cast<long double>(pmc.WorkingSetSize);
 
@@ -221,7 +221,7 @@ Result WindowsProc::ManageOS::get_information_about_processes(DWORD count_bytes_
 
 	DWORD max_processes_on_this_thread = count_processes / max_threads;
 
-	HandleRAII handle_process { };
+	ProcessDescriptorRAII descriptor_process { };
 
 	size_t start_index_process = 0;
 	size_t end_index_process = 0;
@@ -233,13 +233,13 @@ Result WindowsProc::ManageOS::get_information_about_processes(DWORD count_bytes_
 
 	for (size_t index = start_index_process; index < end_index_process; ++index)
 	{
-		if (HandleProc::get(handle_process, pids_processes[index]) == Result::failure) continue;
+		if (HandleProc::get(descriptor_process, pids_processes[index]) == Result::failure) continue;
 		
 		current_process.pid = pids_processes[index];
 		pid = current_process.pid;
-		current_process.update(handle_process, count_bytes_needed);
+		current_process.update(descriptor_process, count_bytes_needed);
 
-		using_cpu_processes[pid].calculate(pause_interval, handle_process, current_process.work_time.work_time);
+		using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time);
 		current_process.interval_using_cpu = using_cpu_processes[pid].get_interaval();
 		current_process.total_using_cpu = using_cpu_processes[pid].get_total();
 
