@@ -23,4 +23,5 @@
 #include "ProcessDescriptorRAII.h"
 #include "UsingCpu.h"
 #include "Process.h"
-#include "NameSpaces.h"
+#include "Windows.h"
+#include "ManageProgramm.h"

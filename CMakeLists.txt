@@ -8,11 +8,11 @@ add_executable(${PROJECT_NAME}
 	"main.cpp"
 	"macro.h"
 	"libraries.h"
-	"NameSpaces.cpp" 
+	"Windows.cpp" 
 	"ProcessDescriptorRAII.cpp" 
 	"ProcessDescriptorRAII.h" 
 	"UsingCpu.cpp" 
 	"UsingCpu.h" 
 	"Process.cpp" 
-	"NameSpaces.h" 
-)
+	"Windows.h" 
+ "ManageProgramm.cpp" "ManageProgramm.h" "Linux.h" "Linux.cpp")

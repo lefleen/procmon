@@ -6,7 +6,7 @@ constexpr descriptor_process_t null_t = nullptr;
 
 #elif defined (__linux__)
 using descriptor_process_t = int;
-constexpr descriptor_process_t null_t = 0;
+constexpr descriptor_process_t null_t = NULL;
 using DWORD = unsigned long;
 
 #endif
