@@ -5,7 +5,9 @@
 #include <psapi.h>
 
 #elif defined (__linux__)
-
+#include <dirent.h>
+#include <sys/resource.h>
+#include <sys/times.h>
 
 #endif
 
