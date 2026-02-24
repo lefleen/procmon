@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <psapi.h>
 
-#elif defined (__linux__)
+#elif defined __linux__
 #include <dirent.h>
 #include <sys/resource.h>
 #include <sys/times.h>
@@ -25,5 +25,13 @@
 #include "ProcessDescriptorRAII.h"
 #include "UsingCpu.h"
 #include "Process.h"
-#include "Windows.h"
 #include "ManageProgramm.h"
+
+#ifdef __WIN32
+#include "Windows.h"
+
+#elif defined __linux__
+#include "Linux.h"
+
+#endif
+

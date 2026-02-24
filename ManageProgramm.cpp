@@ -1,11 +1,5 @@
 #include "libraries.h"
 
-#ifdef _WIN32
-namespace CurrentOS = WindowsProc;
-#elif defined(__linux__)
-namespace CurrentOS = LinuxProc;
-#endif
-
 Result ManageProgramm::get_start_and_end_points(size_t& start_index_process, size_t& end_index_process, const unsigned int max_threads, size_t num_thread,
 	DWORD max_process_on_this_thread, const DWORD count_processes)
 {
@@ -53,8 +47,6 @@ Result ManageProgramm::get_information_about_processes(DWORD count_bytes_needed,
 
 	for (size_t index = start_index_process; index < end_index_process; ++index)
 	{
-		if (CurrentOS::DescriptorProc::get(descriptor_process, pids_processes[index]) == Result::failure) continue;
-
 		current_process.pid = pids_processes[index];
 		pid = current_process.pid;
 		current_process.update(descriptor_process, count_bytes_needed);
