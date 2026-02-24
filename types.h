@@ -2,11 +2,14 @@
 
 #ifdef _WIN32
 using descriptor_process_t = void*;
+using process_time = FILETIME;
+
 constexpr descriptor_process_t null_t = nullptr;
 
 #elif defined (__linux__)
 using descriptor_process_t = int;
 using DWORD = unsigned long;
+using process_time = unsigned long long;
 
 constexpr descriptor_process_t null_t = NULL;
 
