@@ -1,4 +1,6 @@
 #pragma once
+#include <unistd.h>
+
 #include "types.h"
 
 class ProcessDescriptorRAII

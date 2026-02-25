@@ -1,6 +1,9 @@
 #pragma once
+#include <chrono>
+#include <thread>
+
 #include "types.h"
-#include "ProcessDescriptor.h"
+#include "ProcessDescriptorRAII.h"
 
 class UsingCpuProc
 {

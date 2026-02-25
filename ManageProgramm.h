@@ -3,6 +3,13 @@
 
 #include "types.h"
 #include "UsingCpu.h"
+#include "Process.h"
+
+#ifdef __WIN32
+#include "Windows.h"
+#elif defined  __linux__
+#include "Linux.h"
+#endif
 
 namespace ManageProgramm
 {
