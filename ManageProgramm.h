@@ -1,5 +1,8 @@
 #pragma once
-#include "libraries.h"
+#include <thread>
+
+#include "types.h"
+#include "UsingCpu.h"
 
 namespace ManageProgramm
 {

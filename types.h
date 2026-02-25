@@ -1,7 +1,15 @@
 #pragma once
-#include "libraries.h"
+#include <string>
+#include <wstring>
+#include <vector>
+#include <map_t>
+
+#include "macro.h"
 
 #ifdef __WIN32
+#include "windows.h"
+#include "psapi.h"
+
 using descriptor_process_t = void*;
 using process_time = FILETIME;
 

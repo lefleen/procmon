@@ -1,4 +1,4 @@
-#include "libraries.h"
+#include "UsingCpu.h"
 
 Result UsingCpuProc::get_time_using_cpu(const descriptor_process_t& descriptor_process, ULARGE_INTEGER& time_using_cpu)
 {

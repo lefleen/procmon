@@ -1,5 +1,6 @@
 #pragma once
-#include "libraries.h"
+#include "types.h"
+#include "ProcessDescriptor.h"
 
 class UsingCpuProc
 {

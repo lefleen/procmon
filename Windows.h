@@ -1,5 +1,8 @@
 #pragma once
-#include "libraries.h"
+#include <Windows.h>
+#include <psapi.h>
+
+#include "types.h"
 
 namespace WindowsProc
 {
