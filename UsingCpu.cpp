@@ -9,7 +9,7 @@ Result UsingCpuProc::get_time_using_cpu(const descriptor_process_t& descriptor_p
 	ULARGE_INTEGER kernel_unated_time = { };
 	ULARGE_INTEGER user_unated_time = { };
 
-#ifdef (__WIN32)
+#ifdef __WIN32
 	if (!GetProcessTimes(descriptor_process, &creation_time_process, &exit_time_process, &kernel_time_process, &user_time_process)) return Result::failure;
 
 	kernel_unated_time = { kernel_time_process.dwLowDateTime, kernel_time_process.dwHighDateTime };
@@ -17,7 +17,7 @@ Result UsingCpuProc::get_time_using_cpu(const descriptor_process_t& descriptor_p
 
 	time_using_cpu.QuadPart = kernel_unated_time.QuadPart + user_unated_time.QuadPart;
 
-#elif defined (__linux__)
+#elif defined __linux__
     
 
 #endif

@@ -17,7 +17,7 @@ namespace WindowsProc
 
 	namespace TimeProc
 	{
-		Result filetime_to_time_t(time_t& time, const FILETIME f_time);
+		Result filetime_to_time_t(time_t& time, const process_time f_time);
 
 		Result get_create_time_process(const ProcessDescriptorRAII& descriptor_process, time_t& create_time_process, const int choose);
 

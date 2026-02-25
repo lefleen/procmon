@@ -45,11 +45,14 @@ Result WindowsProc::NameProc::get(const ProcessDescriptorRAII& descriptor_proces
 }
 
 	// FILETIME в time_t
-Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const FILETIME f_time)
+Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const process_time f_time)
 {
 	ULARGE_INTEGER ull;
+#ifdef __WIN32
 	ull.LowPart = f_time.dwLowDateTime;
-	ull.HighPart = f_time.dwHighDateTime;
+#elif __linux__
+    ull.QuadPart = f_time.QuadPart;
+#endif
 	time = static_cast<time_t>(ull.QuadPart / 10000000ULL - 11644473600ULL);
 
 	return Result::successful;
@@ -58,10 +61,10 @@ Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const FILETIME f_
 	// Получение FILETIME в формате time_t
 Result WindowsProc::TimeProc::get_create_time_process(const ProcessDescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
 {
-	FILETIME creation_ftime_process = { };
-	FILETIME kernel_ftime_process = { };
-	FILETIME exit_ftime_process = { };
-	FILETIME user_ftime_process = { };
+	process_time creation_ftime_process = { };
+	process_time kernel_ftime_process = { };
+	process_time exit_ftime_process = { };
+	process_time user_ftime_process = { };
 
 	if (!GetProcessTimes(descriptor_process.get(), &creation_ftime_process, &exit_ftime_process, &kernel_ftime_process, &user_ftime_process)) return Result::failure;
 

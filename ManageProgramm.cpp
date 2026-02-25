@@ -1,5 +1,11 @@
 #include "libraries.h"
 
+#ifdef __WIN32
+namespace CurrentOS = WinowsProc;
+#elif defined __linux__
+namespace CurrentOS = LinuxProc;
+#endif
+
 Result ManageProgramm::get_start_and_end_points(size_t& start_index_process, size_t& end_index_process, const unsigned int max_threads, size_t num_thread,
 	DWORD max_process_on_this_thread, const DWORD count_processes)
 {
@@ -68,7 +74,7 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 	DWORD count_bytes_needed = 0, count_processes = 0;
 	vec_t<DWORD> pids_processes{ };
 
-	CurrentOS::ManageOS::get_parameters_processes(count_bytes_needed, count_processes, pids_processes);
+    CurrentOS::ManageOS::get_parameters_processes(count_bytes_needed, count_processes, pids_processes);
 
 	vec_t<std::thread> threads{ };
 	threads.resize(max_threads);
