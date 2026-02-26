@@ -1,12 +1,16 @@
 #pragma once
 #include <windows.h>
 #include <psapi.h>
+#include <time.h>
+#include <chrono>
 
 #include "types.h"
+#include "Process.h"
 
-namespace WindowsProc
+class Process;
+
+namespace ProcmonLogic
 {
-
 	// Получение ID процесса
 	namespace DescriptorProc
 	{
@@ -36,15 +40,8 @@ namespace WindowsProc
 		Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
 	}
 
-	namespace ManageOS
+	namespace Manage
 	{
 		Result get_parameters_processes(parameters_process& params);
 	}
-    
-    struct parameters_process
-    {
-        DWORD& count_bytes_needed;
-        DWORD& count_processes;
-        vec_t<DWORD>& pids_processes;
-    }
 }

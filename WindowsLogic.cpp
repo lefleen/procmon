@@ -1,7 +1,7 @@
-#include "Windows.h"
+#include "WindowsLogic.h"
 
 // Получение ID
-Result WindowsProc::DescriptorProc::get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process)
+Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process)
 {
 	// Проверка PID процесса на существование
 	if (pid_process != 0)
@@ -19,7 +19,7 @@ Result WindowsProc::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proces
 }
 
 	// Получени имени процесса класса
-Result WindowsProc::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, Process& current_process)
+Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, Process& current_process)
 {
 	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
@@ -45,10 +45,10 @@ Result WindowsProc::NameProc::get(const ProcessDescriptorRAII& descriptor_proces
 }
 
 	// FILETIME в time_t
-Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const process_time f_time)
+Result ProcmonLogic::TimeProc::filetime_to_time_t(time_t& time, const process_time f_time)
 {
 	ULARGE_INTEGER ull;
-#ifdef __WIN32
+#ifdef _WIN32
 	ull.LowPart = f_time.dwLowDateTime;
 #elif __linux__
     ull.QuadPart = f_time.QuadPart;
@@ -59,7 +59,7 @@ Result WindowsProc::TimeProc::filetime_to_time_t(time_t& time, const process_tim
 }
 
 	// Получение FILETIME в формате time_t
-Result WindowsProc::TimeProc::get_create_time_process(const ProcessDescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
+Result ProcmonLogic::TimeProc::get_create_time_process(const ProcessDescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
 {
 	process_time creation_ftime_process = { };
 	process_time kernel_ftime_process = { };
@@ -82,7 +82,7 @@ Result WindowsProc::TimeProc::get_create_time_process(const ProcessDescriptorRAI
 }
 
 	// Время работы процесса
-Result WindowsProc::TimeProc::calculate_work_time_process(time_t& work_time_process, const time_t create_time_process)
+Result ProcmonLogic::TimeProc::calculate_work_time_process(time_t& work_time_process, const time_t create_time_process)
 {
 
 	time_t current_time = time(NULL);
@@ -98,7 +98,7 @@ Result WindowsProc::TimeProc::calculate_work_time_process(time_t& work_time_proc
 }
 
 	// Преобразование времени в правильные форма
-Result WindowsProc::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
+Result ProcmonLogic::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
 {
 	// Всё количество секунд
 	output_time.work_time = input_time;
@@ -121,7 +121,7 @@ Result WindowsProc::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& o
 }
 
 	// Получение времени работы процесса
-Result WindowsProc::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
 	my_tm tm_work_time_process = { };
 	time_t create_time_process = 0;
@@ -144,7 +144,7 @@ Result WindowsProc::TimeProc::get(const ProcessDescriptorRAII& descriptor_proces
 }
 
 	// Получение ОЗУ процессора
-Result WindowsProc::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
 	PROCESS_MEMORY_COUNTERS pmc = { };
 
@@ -159,10 +159,10 @@ Result WindowsProc::MemoryProc::get(const ProcessDescriptorRAII& descriptor_proc
 	return Result::successful;
 }
 
-Result WindowsProc::ManageOS::get_parameters_processes(parameters_process& params)
+Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params)
 {
 	size_t size = 128;
-	pids_processes.resize(size);
+	params.pids_processes.resize(size);
 
 	// Получение PID
 	while (true)
@@ -170,13 +170,13 @@ Result WindowsProc::ManageOS::get_parameters_processes(parameters_process& param
 		if (!EnumProcesses(params.pids_processes.data(), static_cast<DWORD>(params.pids_processes.size()) * sizeof(DWORD), &params.count_bytes_needed))
 			return Result::failure;
 
-		if (pids_processes.size() * sizeof(DWORD) != count_bytes_needed)
+		if (params.pids_processes.size() * sizeof(DWORD) != params.count_bytes_needed)
 		{
 			break;
 		}
 
 		size *= 2;
-		pids_processes.resize(size);		
+		params.pids_processes.resize(size);		
 	}
 
 	params.count_processes = params.count_bytes_needed / sizeof(DWORD);

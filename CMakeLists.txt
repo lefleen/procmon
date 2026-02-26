@@ -5,12 +5,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (UNIX)
-set(CURRENT_OS_LOGIC_H "Linux.h")
-set(CURRENT_OS_LOGIC_CPP "Linux.cpp")
+set(CURRENT_OS_LOGIC_H "LinuxLogic.h")
+set(CURRENT_OS_LOGIC_CPP "LinuxLogic.cpp")
 
 elseif(WIN32)
-set(CURRENT_OS_LOGIC_H "Windows.h")
-set(CURRENT_OS_LOGIC_CPP "Windows.cpp")
+set(CURRENT_OS_LOGIC_H "WindowsLogic.h")
+set(CURRENT_OS_LOGIC_CPP "WindowsLogic.cpp")
 
 endif()
 

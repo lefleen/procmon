@@ -1,5 +1,8 @@
 #pragma once
+
+#ifdef __linux__
 #include <unistd.h>
+#endif 
 
 #include "types.h"
 

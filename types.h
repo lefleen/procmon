@@ -5,9 +5,9 @@
 
 #include "macro.h"
 
-#ifdef __WIN32
-#include "windows.h"
-#include "psapi.h"
+#ifdef _WIN32
+#include <windows.h>
+#include <psapi.h>
 
 using descriptor_process_t = void*;
 using process_time = FILETIME;
@@ -42,4 +42,21 @@ struct my_tm
 	time_t num_seconds = 0;
 	time_t work_time;
 };
+
+#ifdef _WIN32
+struct parameters_process
+{
+	DWORD count_bytes_needed;
+	DWORD count_processes;
+	vec_t<DWORD> pids_processes;
+};
+
+#elif defined __linux__
+struct parameters_process
+{
+
+};
+
+#endif
+
 

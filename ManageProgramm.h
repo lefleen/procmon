@@ -5,10 +5,10 @@
 #include "UsingCpu.h"
 #include "Process.h"
 
-#ifdef __WIN32
-#include "Windows.h"
+#ifdef _WIN32
+#include "WindowsLogic.h"
 #elif defined  __linux__
-#include "Linux.h"
+#include "LinuxLogic.h"
 #endif
 
 namespace ManageProgramm
@@ -18,7 +18,7 @@ namespace ManageProgramm
 
 	Result clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, vec_t<DWORD>& pids_processes, size_t start_index_process, size_t end_index_process);
 
-	Result get_information_about_processes(DWORD bytes_needed, DWORD count_processes, vec_t<DWORD>& pids_processes, size_t max_threads, size_t num_thread,
+	Result get_information_about_processes(parameters_process& params, size_t max_threads, size_t num_thread,
 		double pause_interval, vec_t<Process>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_processes);
 
 	Result start_threads(size_t max_threads, double pause_interval, vec_t<vec_t<Process>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_processes);
