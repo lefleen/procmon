@@ -38,6 +38,13 @@ namespace WindowsProc
 
 	namespace ManageOS
 	{
-		Result get_parameters_processes(DWORD& count_bytes_needed, DWORD& count_processes, vec_t<DWORD>& pids_processes);
+		Result get_parameters_processes(parameters_process& params);
 	}
+    
+    struct parameters_process
+    {
+        DWORD& count_bytes_needed;
+        DWORD& count_processes;
+        vec_t<DWORD>& pids_processes;
+    }
 }

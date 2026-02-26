@@ -159,7 +159,7 @@ Result WindowsProc::MemoryProc::get(const ProcessDescriptorRAII& descriptor_proc
 	return Result::successful;
 }
 
-Result WindowsProc::ManageOS::get_parameters_processes(DWORD& count_bytes_needed, DWORD& count_processes, vec_t<DWORD>& pids_processes)
+Result WindowsProc::ManageOS::get_parameters_processes(parameters_process& params)
 {
 	size_t size = 128;
 	pids_processes.resize(size);
@@ -167,7 +167,7 @@ Result WindowsProc::ManageOS::get_parameters_processes(DWORD& count_bytes_needed
 	// Получение PID
 	while (true)
 	{
-		if (!EnumProcesses(pids_processes.data(), static_cast<DWORD>(pids_processes.size()) * sizeof(DWORD), &count_bytes_needed))
+		if (!EnumProcesses(params.pids_processes.data(), static_cast<DWORD>(params.pids_processes.size()) * sizeof(DWORD), &params.count_bytes_needed))
 			return Result::failure;
 
 		if (pids_processes.size() * sizeof(DWORD) != count_bytes_needed)
@@ -179,10 +179,10 @@ Result WindowsProc::ManageOS::get_parameters_processes(DWORD& count_bytes_needed
 		pids_processes.resize(size);		
 	}
 
-	count_processes = count_bytes_needed / sizeof(DWORD);
+	params.count_processes = params.count_bytes_needed / sizeof(DWORD);
 
 	// Если количество процессов равно 0
-	if (!count_processes) return Result::failure;
+	if (!params.count_processes) return Result::failure;
 
 	return Result::successful;
 }
