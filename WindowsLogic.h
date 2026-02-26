@@ -7,8 +7,6 @@
 #include "types.h"
 #include "Process.h"
 
-class Process;
-
 namespace ProcmonLogic
 {
 	// Получение ID процесса
