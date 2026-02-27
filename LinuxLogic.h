@@ -1,4 +1,7 @@
 #pragma once
+#include <dirent.h>
+#include <iostream>
+
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
 #include "Process.h"

@@ -107,7 +107,7 @@ Result ManageProgramm::start_programm()
 
 		start_threads(max_threads, interval_pause, processes, using_cpu_processes);
 		std::this_thread::sleep_for(std::chrono::milliseconds(interval_pause));
-	}
+    }
 
 	return Result::successful;
 }
