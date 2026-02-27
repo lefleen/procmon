@@ -46,6 +46,6 @@ namespace ProcmonLogic
 
     namespace AllData
     {
-        get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& current_process);
+        Result get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& current_process);
     }
 }
