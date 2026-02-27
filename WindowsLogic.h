@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "Process.h"
+#include "ProcessDescriptorRAII.h"
 
 namespace ProcmonLogic
 {
@@ -42,4 +43,9 @@ namespace ProcmonLogic
 	{
 		Result get_parameters_processes(parameters_process& params);
 	}
+
+    namespace AllData
+    {
+        get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& current_process);
+    }
 }

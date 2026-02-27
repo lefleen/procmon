@@ -22,6 +22,7 @@ add_executable(${PROJECT_NAME}
 	"UsingCpu.cpp" 
 	"UsingCpu.h" 
 	"Process.cpp" 
+    "Process.h"
     "ManageProgramm.cpp" 
     "ManageProgramm.h"
     ${CURRENT_OS_LOGIC_CPP}
