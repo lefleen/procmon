@@ -54,7 +54,8 @@ struct parameters_process
 #elif defined __linux__
 struct parameters_process
 {
-
+    DWORD count_processes;
+    vec_t<DWORD> pids_processes;
 };
 
 #endif

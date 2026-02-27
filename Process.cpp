@@ -1,6 +1,6 @@
 #ifdef _WIN32
 #include "WindowsLogic.h"
-#elif defined __linux___
+#elif defined __linux__
 #include "LinuxLogic.h"
 #endif
 
