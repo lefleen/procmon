@@ -14,7 +14,7 @@ Result ProcmonLogic::NameProc::get(ProcessDescriptorRAII& descriptor_process)
 
 bool ProcmonLogic::Manage::_isdigit(const std::string& str_pid)
 {
-    if(str_pid.empty()) return Result::failure;
+    if(str_pid.empty()) return false;
     for(size_t index = 0; index < str_pid.length(); ++index)
         if(str_pid[index] < '0' || str_pid[index] > '9') return false;
     return true;
