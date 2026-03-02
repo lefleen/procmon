@@ -18,7 +18,7 @@ namespace ProcmonLogic
 
 	namespace NameProc
 	{
-		Result get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, Process& current_process);
+		Result get(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& current_process);
 	};
 
 	namespace TimeProc
