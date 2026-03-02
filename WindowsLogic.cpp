@@ -19,13 +19,13 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
 }
 
 	// Получени имени процесса класса
-Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& current_process)
+Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, Process& current_process)
 {
 	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
 
 	if (EnumProcessModules(descriptor_process.get(), &hmodule_process, sizeof(hmodule_process),
-		&params.count_bytes_needed))
+		&count_bytes_needed))
 	{
 		wchar_t process_name[256];
 
@@ -190,7 +190,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 
 Result ProcmonLogic::AllData::get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
-    if (ProcmonLogic::NameProc::get(descriptor_process, params, process) == Result::failure) process.name = L"NoName";
+    if (ProcmonLogic::NameProc::get(descriptor_process, params.count_bytes_needed, process) == Result::failure) process.name = L"NoName";
     if (ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) process.work_time = { };
     if (ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure) process.using_memory = NULL;
 
