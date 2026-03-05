@@ -6,8 +6,19 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
     return Result::successful;
 }
 
-Result ProcmonLogic::NameProc::get(ProcessDescriptorRAII& descriptor_process)
+Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process)
 {
+    const int BUFFER_SIZE = 4096;
+    char buffer[BUFFER_SIZE];
+    std::string path_to_process = "/proc/" + std::to_string(descriptor_process.get()) +  "/stat";
+    int input_file_descriptor = 0;
+
+    std::cout << descriptor_process.get();
+
+    if((input_file_descriptor = open(path_to_process.c_str(), O_RDONLY))) return Result::failure;
+    if(read(input_file_descriptor, &buffer, BUFFER_SIZE)) return Result::failure;
+
+    std::cout << descriptor_process.get() << "\t" << buffer << std::endl;
 
     return Result::successful;
 }
@@ -22,10 +33,10 @@ bool ProcmonLogic::Manage::_isdigit(const std::string& str_pid)
 
 Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params) 
 {
-    const char* path_to_proc = "/proc/";
+    const char* path_to_dir = "/proc/";
 
     dirent* inf_dir = nullptr;
-    std::unique_ptr<DIR, int (*)(DIR*)> dir(opendir(path_to_proc), closedir);
+    std::unique_ptr<DIR, int (*)(DIR*)> dir(opendir(path_to_dir), closedir);
 
     if(dir == nullptr) 
         return Result::failure;
@@ -46,7 +57,10 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     return Result::successful; 
 }
 
-Result ProcmonLogic::AllData::get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
+Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
+    ProcmonLogic::DescriptorProc::get(descriptor_process, pid);
+    if(ProcmonLogic::NameProc::get(descriptor_process) == Result::failure) process.name = L"NoName\0";
+
     return Result::successful;
 }

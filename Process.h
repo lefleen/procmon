@@ -16,4 +16,5 @@ public:
 
 	Process() noexcept = default;
 	Process(const Process&) = default;
+    Process(Process&) = default;
 };

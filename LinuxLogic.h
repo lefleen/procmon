@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <memory>
 #include <iostream>
+#include <fcntl.h>
 
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
@@ -16,7 +17,7 @@ namespace ProcmonLogic
 
      namespace NameProc
      {
-         Result get(ProcessDescriptorRAII& descriptor_process);
+         Result get(const ProcessDescriptorRAII& descriptor_process);
      }
 
      namespace Manage
@@ -28,7 +29,7 @@ namespace ProcmonLogic
 
      namespace AllData 
      {
-         Result get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process);
+         Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process);
      }
 
 }
