@@ -23,8 +23,6 @@ void ProcessDescriptorRAII::CloseDescriptor(descriptor_process_t descriptor_proc
 	if (descriptor_process == null_t) return;
 #ifdef _WIN32
 	CloseHandle(descriptor_process);
-#elif defined(__linux__)
-	close(descriptor_process);
 #endif
 }
 
@@ -32,7 +30,9 @@ ProcessDescriptorRAII& ProcessDescriptorRAII::operator=(descriptor_process_t des
 {
 	if (_descriptor_process != descriptor_process)
 	{
-		CloseDescriptor(_descriptor_process);
+        if(_descriptor_process != null_t)
+  		    CloseDescriptor(_descriptor_process);
+
 		_descriptor_process = descriptor_process;
 	}
 	return *this;

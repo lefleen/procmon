@@ -17,7 +17,7 @@ Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu
 {
 	map_t<DWORD, UsingCpuProc> _using_cpu_processes;
 
-	for (size_t index = start_index_process; index < end_index_process; ++index)
+	for (size_t index = start_index_process; index <end_index_process; ++index)
 	{
 		DWORD pid = pids_processes[index];
 		_using_cpu_processes[pid] = std::move(using_cpu_processes[pid]);
@@ -28,10 +28,10 @@ Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu
 	return Result::successful;
 }
 
-Result ManageProgramm::get_information_about_processes(parameters_process& params,
+Result ManageProgramm::get_information_about_processes( parameters_process& params,
 	size_t max_threads, size_t num_thread, double pause_interval, vec_t<Process>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_processes)
 {
-	DWORD pid = 0;
+   	DWORD pid = 0;
 
 	DWORD max_processes_on_this_thread = params.count_processes / max_threads;
 
@@ -43,12 +43,12 @@ Result ManageProgramm::get_information_about_processes(parameters_process& param
 	size_t num_elements = end_index_process - start_index_process;
 	processes.reserve(num_elements);
 
-	Process current_process;
+    Process current_process;
 
 	for (size_t index = start_index_process; index < end_index_process; ++index)
 	{
 		current_process.pid = params.pids_processes[index];
-		pid = current_process.pid;
+       	pid = current_process.pid;
 		current_process.update(descriptor_process, params);
 
 		using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time);
@@ -67,16 +67,18 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 {
 	parameters_process params { };
 
-    ProcmonLogic::Manage::get_parameters_processes(params);
-
-	vec_t<std::thread> threads{ };
+    vec_t<std::thread> threads{ };
 	threads.resize(max_threads);
 	using_cpu_processes.resize(max_threads);
 
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
+        ProcmonLogic::Manage::get_parameters_processes(params);
+
 		threads[num_thread] = std::thread(get_information_about_processes, std::ref(params),
 			max_threads, num_thread, pause_interval, std::ref(processes[num_thread]), std::ref(using_cpu_processes[num_thread]));
+
+        params.pids_processes.clear();        
 	}
 
 	for (auto& th : threads)

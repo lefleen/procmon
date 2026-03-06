@@ -1,7 +1,6 @@
 #pragma once
 #include <dirent.h>
 #include <memory>
-#include <iostream>
 #include <fcntl.h>
 
 #include "types.h"

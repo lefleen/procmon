@@ -12,10 +12,11 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
     char buffer[BUFFER_SIZE];
     std::string path_to_process = "/proc/" + std::to_string(descriptor_process.get()) +  "/stat";
     int input_file_descriptor = 0;
+    
+    if((input_file_descriptor = open(path_to_process.c_str(), O_RDONLY)) == -1) return Result::failure;
+    if(read(input_file_descriptor, &buffer, BUFFER_SIZE) <= 0) return Result::failure;
 
-    if((input_file_descriptor = open(path_to_process.c_str(), O_RDONLY))) return Result::failure;
-    if(read(input_file_descriptor, &buffer, BUFFER_SIZE)) return Result::failure;
-
+    close(input_file_descriptor);
     return Result::successful;
 }
 
@@ -47,7 +48,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     }
 
     params.count_processes = params.pids_processes.size();
-    
+
     if(!params.count_processes) return Result::failure;
 
     return Result::successful; 
