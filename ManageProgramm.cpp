@@ -17,7 +17,7 @@ Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu
 {
 	map_t<DWORD, UsingCpuProc> _using_cpu_processes;
 
-	for (size_t index = start_index_process; index <end_index_process; ++index)
+	for (size_t index = start_index_process; index < end_index_process; ++index)
 	{
 		DWORD pid = pids_processes[index];
 		_using_cpu_processes[pid] = std::move(using_cpu_processes[pid]);
@@ -48,7 +48,7 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 	for (size_t index = start_index_process; index < end_index_process; ++index)
 	{
 		current_process.pid = params.pids_processes[index];
-       	pid = current_process.pid;
+		pid = current_process.pid;
 		current_process.update(descriptor_process, params);
 
 		using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time);
