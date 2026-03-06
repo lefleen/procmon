@@ -12,7 +12,7 @@ public:
 	double total_using_cpu = 0;
 	double interval_using_cpu = 0;
 
-	Result update(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params);
+	Result update(ProcessDescriptorRAII& descriptor_process, const parameters_process& params);
 
 	Process() noexcept = default;
 	Process(const Process&) = default;

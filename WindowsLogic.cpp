@@ -188,9 +188,9 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 	return Result::successful;
 }
 
-Result ProcmonLogic::AllData::get_all_data_process(const ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
+Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
-    if (ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid)) return Result::failure; 
+    if (ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid) == Result::failure) return Result::failure; 
     if (ProcmonLogic::NameProc::get(descriptor_process, params.count_bytes_needed, process) == Result::failure) process.name = L"NoName";
     if (ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) process.work_time = { };
     if (ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure) process.using_memory = NULL;
