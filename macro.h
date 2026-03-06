@@ -6,7 +6,9 @@ enum class Result
 	failure
 };
 
-#define macCreateTimeProcess		2
-#define macExitTimeProcess			3
-#define macKernelTimeProcess		4
-#define macUserTimeProcess			5
+constexpr int  macCreateTimeProcess = 1001;
+constexpr int  macExitTimeProcess   = 1002;
+constexpr int  macKernelTimeProcess = 1003;
+constexpr int  macUserTimeProcess =   1004;
+
+constexpr int macNameProcess = 2;

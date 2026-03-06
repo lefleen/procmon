@@ -9,6 +9,11 @@
 
 namespace ProcmonLogic 
 {
+     namespace SharedSpace
+     {
+         Result parse_string(const int num_element, const std::string& file_data, std::string& str);
+     }
+
      namespace DescriptorProc
      {
          Result get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process);
@@ -16,7 +21,7 @@ namespace ProcmonLogic
 
      namespace NameProc
      {
-         Result get(const ProcessDescriptorRAII& descriptor_process);
+         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
      }
 
      namespace Manage
@@ -25,7 +30,7 @@ namespace ProcmonLogic
 
           bool _isdigit(const std::string& str_pid);
      }
-
+     
      namespace AllData 
      {
          Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process);

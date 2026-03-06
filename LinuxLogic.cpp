@@ -1,4 +1,5 @@
 #include "LinuxLogic.h"
+#include <iostream>
 
 Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process)
 {
@@ -6,15 +7,37 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
     return Result::successful;
 }
 
-Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process)
+Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const std::string& file_data, std::string& res)
+{
+    if(num_element <= 0) return Result::failure;
+
+    size_t found = 0;
+    int _num_element = num_element;
+
+    while(--_num_element >= 1)
+        found = file_data.find(' ', found + 1);
+
+    if(found == std::string::npos) return Result::failure;
+
+    std::cout << file_data[found + 1] << std::endl;
+
+    return Result::successful;
+}
+
+Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
     const int BUFFER_SIZE = 4096;
     char buffer[BUFFER_SIZE];
     std::string path_to_process = "/proc/" + std::to_string(descriptor_process.get()) +  "/stat";
+    std::string file_data = "";
+    std::string process_name = "";
     int input_file_descriptor = 0;
     
     if((input_file_descriptor = open(path_to_process.c_str(), O_RDONLY)) == -1) return Result::failure;
     if(read(input_file_descriptor, &buffer, BUFFER_SIZE) <= 0) return Result::failure;
+    file_data = std::string(buffer);
+
+    if(ProcmonLogic::SharedSpace::parse_string(macNameProcess, file_data, process_name) == Result::failure) return Result::failure;
 
     close(input_file_descriptor);
     return Result::successful;
@@ -57,7 +80,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
     ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid);
-    if(ProcmonLogic::NameProc::get(descriptor_process) == Result::failure) process.name = L"NoName\0";
+    if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) process.name = L"NoName\0";
 
     return Result::successful;
 }
