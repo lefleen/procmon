@@ -71,14 +71,12 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 	threads.resize(max_threads);
 	using_cpu_processes.resize(max_threads);
 
+	ProcmonLogic::Manage::get_parameters_processes(params);
+
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
-        ProcmonLogic::Manage::get_parameters_processes(params);
-
-		threads[num_thread] = std::thread(get_information_about_processes, std::ref(params),
-			max_threads, num_thread, pause_interval, std::ref(processes[num_thread]), std::ref(using_cpu_processes[num_thread]));
-
-        params.pids_processes.clear();        
+    		threads[num_thread] = std::thread(get_information_about_processes, std::ref(params),
+			max_threads, num_thread, pause_interval, std::ref(processes[num_thread]), std::ref(using_cpu_processes[num_thread]));  
 	}
 
 	for (auto& th : threads)
