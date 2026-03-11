@@ -19,7 +19,7 @@ using DWORD = long long;
 using descriptor_process_t = long long;
 using process_time = unsigned long long;
 
-constexpr descriptor_process_t null_t = 0;
+constexpr descriptor_process_t null_t = -1;
 
 struct ULARGE_INTEGER { unsigned long QuadPart; };
 

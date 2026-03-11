@@ -29,10 +29,8 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
 
     if (found == str_t::npos) return Result::failure;
 
-    first_pos_name += found + 2;
+    first_pos_name = found + 1;
     if((last_pos_name = file_data.find(' ', first_pos_name)) == str_t::npos) return Result::failure;
-
-    last_pos_name -= 1;
 
     num_symbols = last_pos_name - first_pos_name;
     res = file_data.substr(first_pos_name, num_symbols);

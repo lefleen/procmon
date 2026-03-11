@@ -87,14 +87,6 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 			if (get_information_about_processes(params, max_threads, num_thread, pause_interval, processes[num_thread], using_cpu_processes[num_thread]) == Result::failure) 
 				err[num_thread] = true;
 			});
-
-		if (err[num_thread])
-		{
-			processes[num_thread].clear();
-			using_cpu_processes[num_thread].clear();
-			threads[num_thread].detach();
-		}
-
 	}
 
 	for (auto& th : threads)
@@ -103,9 +95,19 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 			th.join();
 	}
 
-	return Result::successful;
+	for (int num_thread = 0; num_thread < max_threads; ++num_thread)
+	{
+		if (err[num_thread])
+		{
+			processes[num_thread].clear();
+			using_cpu_processes[num_thread].clear();
+			threads[num_thread].detach();
+		}
+	}
 
 	delete[] err;
+
+	return Result::successful;
 }
 
 Result ManageProgramm::start_programm()
