@@ -77,7 +77,7 @@ Result UsingCpuProc::update(ProcessDescriptorRAII& descriptor_process)
 	INTERVAL_CPU_TIME = std::chrono::system_clock::to_time_t(now) - OLD_CPU_TIME;
 	OLD_CPU_TIME = std::chrono::system_clock::to_time_t(now);
 
-	get_time_using_cpu(descriptor_process.get(), FULL_TIME_WORK_PROCESS);
+	if(get_time_using_cpu(descriptor_process.get(), FULL_TIME_WORK_PROCESS) == Result::failure) return Result::failure;
 
 	return Result::successful;
 }
@@ -86,6 +86,7 @@ Result UsingCpuProc::calculate(long long pause_interval, ProcessDescriptorRAII& 
 {
 	// Количество количества логических потоков
 	unsigned long num_cores = std::thread::hardware_concurrency();
+	if (num_cores == 0) num_cores = 1;
 
 	// ОБщее использоание CPU
 	if (calculate_total_using_cpu(num_cores, descriptor_process, work_time_process) == Result::failure)

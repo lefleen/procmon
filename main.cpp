@@ -3,7 +3,7 @@
 
 int main() 
 {
-	std::cout << "OK";
-	ManageProgramm::start_programm();
+	while(ManageProgramm::start_programm() == Result::failure);
+
 	return 0;
 }

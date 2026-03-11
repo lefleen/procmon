@@ -31,7 +31,6 @@ Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu
 Result ManageProgramm::get_information_about_processes( parameters_process& params,
 	size_t max_threads, size_t num_thread, double pause_interval, vec_t<Process>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_processes)
 {
-   	DWORD pid = 0;
 
 	DWORD max_processes_on_this_thread = params.count_processes / max_threads;
 
@@ -43,15 +42,17 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 	size_t num_elements = end_index_process - start_index_process;
 	processes.reserve(num_elements);
 
-    Process current_process;
-
 	for (size_t index = start_index_process; index < end_index_process; ++index)
 	{
-		current_process.pid = params.pids_processes[index];
-		pid = current_process.pid;
-		if(current_process.update(descriptor_process, params) == Result::failure) return Result::failure;
+		Process current_process { };
 
-		using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time);
+		current_process.pid = params.pids_processes[index];
+		DWORD pid = current_process.pid;
+
+		if(current_process.update(descriptor_process, params) == Result::failure) continue;
+
+		if(using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time) == Result::failure) continue;
+
 		current_process.interval_using_cpu = using_cpu_processes[pid].get_interaval();
 		current_process.total_using_cpu = using_cpu_processes[pid].get_total();
 
@@ -107,11 +108,13 @@ Result ManageProgramm::start_programm()
 
 	while (true)
 	{
+		if (start_threads(max_threads, interval_pause, processes, using_cpu_processes) == Result::failure)
+			return Result::failure;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(interval_pause));
+		
 		for (auto& vec : processes)
 			vec.clear();
-
-		start_threads(max_threads, interval_pause, processes, using_cpu_processes);
-		std::this_thread::sleep_for(std::chrono::milliseconds(interval_pause));
     }
 
 	return Result::successful;

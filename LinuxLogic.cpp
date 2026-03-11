@@ -103,7 +103,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 
 Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
-    if(ProcmonLogic::NameProc::get(process) == Result::failure) process.name = "NoName\0";
+    if(ProcmonLogic::NameProc::get(process) == Result::failure) return Result::failure;
 
     return Result::successful;
 }
