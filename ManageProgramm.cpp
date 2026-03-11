@@ -105,7 +105,7 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 
 	return Result::successful;
 
-	delete err;
+	delete[] err;
 }
 
 Result ManageProgramm::start_programm()
