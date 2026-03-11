@@ -77,11 +77,24 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 		if(ProcmonLogic::Manage::get_parameters_processes(params) == Result::successful) break;
 	if(count == 6) return Result::failure;
 
+	bool* err = new bool[max_threads];
 
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
-    		threads[num_thread] = std::thread(get_information_about_processes, std::ref(params),
-			max_threads, num_thread, pause_interval, std::ref(processes[num_thread]), std::ref(using_cpu_processes[num_thread]));  
+		err[num_thread] = false;
+
+		threads[num_thread] = std::thread([&params, max_threads, num_thread, pause_interval, &processes, &using_cpu_processes, &err]() {
+			if (get_information_about_processes(params, max_threads, num_thread, pause_interval, processes[num_thread], using_cpu_processes[num_thread]) == Result::failure) 
+				err[num_thread] = true;
+			});
+
+		if (err[num_thread])
+		{
+			processes[num_thread].clear();
+			using_cpu_processes[num_thread].clear();
+			threads[num_thread].detach();
+		}
+
 	}
 
 	for (auto& th : threads)
@@ -91,6 +104,8 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 	}
 
 	return Result::successful;
+
+	delete err;
 }
 
 Result ManageProgramm::start_programm()

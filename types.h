@@ -15,8 +15,8 @@ using process_time = FILETIME;
 constexpr descriptor_process_t null_t = nullptr;
 
 #elif defined __linux__
-using DWORD = unsigned long;
-using descriptor_process_t = DWORD;
+using DWORD = long long;
+using descriptor_process_t = long long;
 using process_time = unsigned long long;
 
 constexpr descriptor_process_t null_t = 0;
@@ -40,7 +40,7 @@ struct my_tm
 	time_t num_hours = 0;
 	time_t num_minutes = 0;
 	time_t num_seconds = 0;
-	time_t work_time;
+	time_t work_time = 0;
 };
 
 #ifdef _WIN32

@@ -13,10 +13,10 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
 
     if (num_element == 2)
     {
-        first_pos_name = file_data.find('(', 0) == std::string::npos);
-        last_pos_name = file_data.find(')', 0) == std::string::npos);
+        first_pos_name = file_data.find('(', 0);
+        last_pos_name = file_data.find(')', 0);
 
-        if (first_pos_name == std::string::npos || last_pos_name == std::string::npos)
+        if (first_pos_name == str_t::npos || last_pos_name == str_t::npos)
             return Result::failure;
 
         res = file_data.substr(first_pos_name + 1, last_pos_name);
@@ -27,11 +27,10 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
     while(--_num_element >= 1)
         found = file_data.find(' ', found + 1);
 
-    first_pos_name += found + 2;
-    last_pos_name = file_data.find(' ', first_pos_name);
+    if (found == str_t::npos) return Result::failure;
 
-    if(first_pos_name == std::string::npos || last_pos_name == std::string::npos)
-        return Result::failure;
+    first_pos_name += found + 2;
+    if((last_pos_name = file_data.find(' ', first_pos_name)) == str_t::npos) return Result::failure;
 
     last_pos_name -= 1;
 
@@ -54,7 +53,8 @@ Result ProcmonLogic::NameProc::get(Process& process)
     
     ssize_t num_elements = 0;
 
-    if((input_file_descriptor = open(path_to_process.c_str(), O_RDONLY)) == -1) return Result::failure;
+    input_file_descriptor = open(path_to_process.c_str(), O_RDONLY);
+    if(input_file_descriptor.get() == -1) return Result::failure;
     if((num_elements = read(input_file_descriptor.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
     file_data = std::string(buffer, static_cast<size_t>(num_elements));
