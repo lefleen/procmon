@@ -49,7 +49,7 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 	{
 		current_process.pid = params.pids_processes[index];
 		pid = current_process.pid;
-		current_process.update(descriptor_process, params);
+		if(current_process.update(descriptor_process, params) == Result::failure) return Result::failure;
 
 		using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time);
 		current_process.interval_using_cpu = using_cpu_processes[pid].get_interaval();
@@ -71,7 +71,11 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 	threads.resize(max_threads);
 	using_cpu_processes.resize(max_threads);
 
-	ProcmonLogic::Manage::get_parameters_processes(params);
+	int count = 0;
+	for (; count <= 5; ++count)
+		if(ProcmonLogic::Manage::get_parameters_processes(params) == Result::successful) break;
+	if(count == 6) return Result::failure;
+
 
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
@@ -93,6 +97,7 @@ Result ManageProgramm::start_programm()
 	size_t interval_pause = 1000;
 
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
+	if (max_threads == 0) max_threads = 1;
 
 	vec_t<vec_t<Process>> processes{ };
 	vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_processes{ };

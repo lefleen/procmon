@@ -14,14 +14,9 @@ namespace ProcmonLogic
          Result parse_string(const int num_element, const std::string& file_data, std::string& str);
      }
 
-     namespace DescriptorProc
-     {
-         Result get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process);
-     }
-
      namespace NameProc
      {
-         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+         Result get(Process& process);
      }
 
      namespace Manage

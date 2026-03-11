@@ -6,6 +6,6 @@
 
 Result Process::update(ProcessDescriptorRAII& descriptor_process, const parameters_process& params)
 {
-    ProcmonLogic::AllData::get_all_data_process(descriptor_process, params, *this);
+    if(ProcmonLogic::AllData::get_all_data_process(descriptor_process, params, *this) == Result::failure);
 	return Result::successful;
 }

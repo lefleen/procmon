@@ -30,13 +30,11 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
 		wchar_t process_name[256];
 
 		// Получение имени
-		GetModuleBaseNameW(descriptor_process.get(), hmodule_process, process_name,
-			256);
+		size_t len = 0;
+		if ((len = GetModuleBaseNameW(descriptor_process.get(), hmodule_process, process_name,
+			256)) == 0) return Result::failure;
 
-		// Проверка. не пуста ли строка
-		if (wcslen(process_name) == 0) return Result::failure;
-
-		current_process.name = process_name;
+		current_process.name = wstr_t(process_name, len);
 
 		return Result::successful;
 	}
@@ -50,6 +48,7 @@ Result ProcmonLogic::TimeProc::filetime_to_time_t(time_t& time, const process_ti
 	ULARGE_INTEGER ull;
 #ifdef _WIN32
 	ull.LowPart = f_time.dwLowDateTime;
+	ull.HighPart = f_time.dwHighDateTime;
 #elif __linux__
     ull.QuadPart = f_time.QuadPart;
 #endif
@@ -71,10 +70,10 @@ Result ProcmonLogic::TimeProc::get_create_time_process(const ProcessDescriptorRA
 	// Преобразование в системное время
 	switch (choose)
 	{
-	case macCreateTimeProcess: filetime_to_time_t(create_time_process, creation_ftime_process); break;
-	case macExitTimeProcess: filetime_to_time_t(create_time_process, exit_ftime_process); break;
-	case macKernelTimeProcess: filetime_to_time_t(create_time_process, kernel_ftime_process); break;
-	case macUserTimeProcess: filetime_to_time_t(create_time_process, user_ftime_process); break;
+	case macCreateTimeProcess: if (filetime_to_time_t(create_time_process, creation_ftime_process) == Result::failure) return Result::failure; break;
+	case macExitTimeProcess: if (filetime_to_time_t(create_time_process, exit_ftime_process) == Result::failure) return Result::failure; break;
+	case macKernelTimeProcess: if (filetime_to_time_t(create_time_process, kernel_ftime_process) == Result::failure) return Result::failure; break;
+	case macUserTimeProcess: if (filetime_to_time_t(create_time_process, user_ftime_process) == Result::failure) return Result::failure; break;
 	default:;
 	}
 
