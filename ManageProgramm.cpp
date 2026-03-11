@@ -101,7 +101,6 @@ Result ManageProgramm::start_threads(size_t max_threads, double pause_interval, 
 		{
 			processes[num_thread].clear();
 			using_cpu_processes[num_thread].clear();
-			threads[num_thread].detach();
 		}
 	}
 
