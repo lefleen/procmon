@@ -3,7 +3,10 @@
 
 int main() 
 {
-	while(ManageProgramm::start_programm() == Result::failure);
+	int count = 0;
+	for (; count <= 5; ++count)
+		if (ManageProgramm::start_programm() == Result::successful) break;
+	if (count == 6) return -1;
 
 	return 0;
 }
