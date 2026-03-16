@@ -101,11 +101,11 @@ Result ProcmonLogic::TimeProc::get_boot_time(long double& work_time_system)
 
 Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process)
 {
-     long num_ticks = 0;
+     long num_ticks_per_second = 0;
      long double work_time_system = 0;
 
-     num_ticks = sysconf(_SC_CLK_TCK);
-     if(num_ticks == -1) return Result::failure;
+     num_ticks_per_second = sysconf(_SC_CLK_TCK);
+     if(num_ticks_per_second == -1) return Result::failure;
 
      if(get_boot_time(work_time_system) == Result::failure) return Result::failure;
 
