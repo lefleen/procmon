@@ -61,7 +61,7 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
 
     if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
-    file_data = std::string(buffer, static_cast<size_t>(num_elements));
+    file_data = str_t(buffer, static_cast<size_t>(num_elements));
     file_data += '\0';
 
     if(ProcmonLogic::SharedSpace::parse_string(macNameProcess, file_data, process_name) == Result::failure) return Result::failure;
@@ -71,8 +71,31 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
     return Result::successful;
 }
 
-Result ProcmonLogic::TimeProc::get_boot_time(const ProcessDescriptorRAII& descriptor_process, long double& work_time_system)
+Result ProcmonLogic::TimeProc::get_boot_time(long double& work_time_system)
 {
+    const int BUFFER_SIZE = 2048;
+    char buffer[BUFFER_SIZE];
+
+    ProcessDescriptorRAII descriptor_process;
+
+    str_t file_path = "/proc/uptime";
+    str_t file_data = "";
+    str_t _work_time_system = "";
+    ssize_t num_elements = 0;
+
+    descriptor_process = open(file_path.c_str(), O_RDONLY);
+    if(descriptor_process.get() == -1) return Result::failure;
+    if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+
+    file_data = str_t(buffer, static_cast<size_t>(num_elements));
+    file_data += '\0';
+
+    int length_substr = file_data.find(' ');
+    if(length_substr == str_t::npos) return Result::failure;
+
+    _work_time_system = file_data.substr(0, length_substr);
+    work_time_system = std::stold(_work_time_system.c_str());
+
     return Result::successful;
 }
 
@@ -83,6 +106,8 @@ Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_proce
 
      num_ticks = sysconf(_SC_CLK_TCK);
      if(num_ticks == -1) return Result::failure;
+
+     if(get_boot_time(work_time_system) == Result::failure) return Result::failure;
 
      return Result::successful;
 }
@@ -125,6 +150,7 @@ Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descri
 {
     if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) return Result::failure;
+    if(ProcmonLogic::TimeProc::get(descriptor_process) == Result::failure) return Result::failure;
 
     return Result::successful;
 }

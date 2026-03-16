@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <memory>
 #include <fcntl.h>
+#include <iostream>
 
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
@@ -26,7 +27,7 @@ namespace ProcmonLogic
 
      namespace TimeProc
      {
-         Result get_boot_time(const ProcessDescriptorRAII& descriptor_process, long double& work_time_system);
+         Result get_boot_time(long double& work_time_system);
 
          Result get(const ProcessDescriptorRAII& descriptor_process);
      }
