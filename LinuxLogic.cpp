@@ -71,6 +71,22 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
     return Result::successful;
 }
 
+Result ProcmonLogic::TimeProc::get_boot_time(const ProcessDescriptorRAII& descriptor_process, long double& work_time_system)
+{
+    return Result::successful;
+}
+
+Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process)
+{
+     long num_ticks = 0;
+     long double work_time_system = 0;
+
+     num_ticks = sysconf(_SC_CLK_TCK);
+     if(num_ticks == -1) return Result::failure;
+
+     return Result::successful;
+}
+
 bool ProcmonLogic::Manage::_isdigit(const str_t& str_pid)
 {
     if(str_pid.empty()) return false;

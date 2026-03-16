@@ -24,6 +24,13 @@ namespace ProcmonLogic
          Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
      }
 
+     namespace TimeProc
+     {
+         Result get_boot_time(const ProcessDescriptorRAII& descriptor_process, long double& work_time_system);
+
+         Result get(const ProcessDescriptorRAII& descriptor_process);
+     }
+
      namespace Manage
      {
           Result get_parameters_processes(parameters_process& params);
