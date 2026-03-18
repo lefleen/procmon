@@ -28,7 +28,7 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
         }
 
         found = last_pos_name;
-        --num_element;
+        --_num_element;
     }
 
     while(--_num_element >= 1)
