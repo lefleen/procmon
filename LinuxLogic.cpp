@@ -14,11 +14,7 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
     if (num_element >= 2)
     {
         first_pos_name = file_data.find('(', 0);
-        last_pos_name = file_data.find(')', 0);
-
-        size_t cur_pos = 0;
-        while((cur_pos = file_data.find(')', cur_pos)) != str_t::npos)
-            last_pos_name = cur_pos;
+        last_pos_name = file_data.rfind(')', 0);
 
         if (first_pos_name == str_t::npos || last_pos_name == str_t::npos)
             return Result::failure;
@@ -31,7 +27,8 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
             return Result::successful;
         }
 
-        found = cur_pos;
+        found = last_pos_name;
+        --num_element;
     }
 
     while(--_num_element >= 1)
