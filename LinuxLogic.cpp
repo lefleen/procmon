@@ -11,27 +11,44 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
     int _num_element = num_element;
     int num_symbols = 0;
 
-    if (num_element == 2)
+    if (num_element >= 2)
     {
         first_pos_name = file_data.find('(', 0);
         last_pos_name = file_data.find(')', 0);
 
+        size_t cur_pos = 0;
+        while((cur_pos = file_data.find(')', cur_pos)) != str_t::npos)
+            last_pos_name = cur_pos;
+
         if (first_pos_name == str_t::npos || last_pos_name == str_t::npos)
             return Result::failure;
 
-        num_symbols = last_pos_name - (first_pos_name + 1);
-        res = file_data.substr(first_pos_name + 1, num_symbols);
+        if(num_element == 2)
+        {
+            num_symbols = last_pos_name - (first_pos_name + 1);
+            res = file_data.substr(first_pos_name + 1, num_symbols);
 
-        return Result::successful;
+            return Result::successful;
+        }
+
+        found = cur_pos;
     }
 
     while(--_num_element >= 1)
-        found = file_data.find(' ', found + 1);
+       found = file_data.find(' ', found + 1);
 
     if (found == str_t::npos) return Result::failure;
 
-    first_pos_name = found + 1;
-    if((last_pos_name = file_data.find(' ', first_pos_name)) == str_t::npos) return Result::failure;
+    if(num_element > 1)
+    {
+        first_pos_name = found + 1;
+        if((last_pos_name = file_data.find(' ', first_pos_name)) == str_t::npos) return Result::failure;
+    }
+    else 
+    {
+        first_pos_name = 0;
+        last_pos_name = file_data.find(' ', 0);
+    }
 
     num_symbols = last_pos_name - first_pos_name;
     res = file_data.substr(first_pos_name, num_symbols);
@@ -59,10 +76,10 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
   
     ssize_t num_elements = 0;
 
+    lseek(descriptor_process.get(), 0, SEEK_SET);
     if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
     file_data = str_t(buffer, static_cast<size_t>(num_elements));
-    file_data += '\0';
 
     if(ProcmonLogic::SharedSpace::parse_string(macNameProcess, file_data, process_name) == Result::failure) return Result::failure;
     
@@ -88,9 +105,8 @@ Result ProcmonLogic::TimeProc::get_working_time_pc(long double& work_time_system
     if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
     file_data = str_t(buffer, static_cast<size_t>(num_elements));
-    file_data += '\0';
 
-    int length_substr = file_data.find(' ');
+    size_t length_substr = file_data.find(' ');
     if(length_substr == str_t::npos) return Result::failure;
 
     _work_time_system = file_data.substr(0, length_substr);
@@ -109,9 +125,10 @@ Result ProcmonLogic::TimeProc::get_start_work_time_proc(const ProcessDescriptorR
     
     str_t res = "";
     str_t file_data = "";
+
+    lseek(descriptor_process.get(), 0, SEEK_SET);
     if((size_file = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
     file_data = str_t(buffer, static_cast<size_t>(size_file));
-    file_data += '\0';
 
     if(SharedSpace::parse_string(NUM_OF_WORK_TIME, file_data, res) == Result::failure) return Result::failure;
     work_time_proc = stold(res);
@@ -130,11 +147,14 @@ Result ProcmonLogic::TimeProc::get_work_time_proc(const long double work_time_sy
     return Result::successful;
 }
 
-Result ProcmonLogic::TimeProc::seconds_to_my_tm(long input_time, struct my_tm& output_time)
+Result ProcmonLogic::TimeProc::seconds_to_my_tm(long double input_time, struct my_tm& output_time)
 {
+    long _input_time = input_time;
+    if(input_time - _input_time >= 0.5) _input_time += 1;
+
     output_time.work_time = input_time;
- 
-    auto chrono_seconds = std::chrono::seconds(input_time);
+
+    auto chrono_seconds = std::chrono::seconds(_input_time);
 
     auto num_days = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) / 24;
     output_time.num_days = num_days.count();
