@@ -223,7 +223,15 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
         str_t str_pid = std::string(inf_dir->d_name);
         if(!_isdigit(str_pid)) continue;
 
-        int pid = std::stoi(str_pid);
+        try
+        {
+            int pid = std::stoi(str_pid);
+        }
+        catch(...)
+        {
+            return Result::failure;
+        }
+
         params.pids_processes.push_back(pid);
     }
 
