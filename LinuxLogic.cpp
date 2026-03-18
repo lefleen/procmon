@@ -73,7 +73,7 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
   
     ssize_t num_elements = 0;
 
-    lseek(descriptor_process.get(), 0, SEEK_SET);
+    if(lseek(descriptor_process.get(), 0, SEEK_SET) == -1) return Result::failure;
     if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
     file_data = str_t(buffer, static_cast<size_t>(num_elements));
@@ -107,7 +107,14 @@ Result ProcmonLogic::TimeProc::get_working_time_pc(long double& work_time_system
     if(length_substr == str_t::npos) return Result::failure;
 
     _work_time_system = file_data.substr(0, length_substr);
-    work_time_system = std::stold(_work_time_system.c_str());
+    try 
+    {
+        work_time_system = std::stold(_work_time_system.c_str());
+    }
+    catch(...)
+    {
+        return Result::failure;
+    }
 
     return Result::successful;
 }
@@ -123,12 +130,19 @@ Result ProcmonLogic::TimeProc::get_start_work_time_proc(const ProcessDescriptorR
     str_t res = "";
     str_t file_data = "";
 
-    lseek(descriptor_process.get(), 0, SEEK_SET);
+    if(lseek(descriptor_process.get(), 0, SEEK_SET) == -1) return Result::failure;
     if((size_file = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
     file_data = str_t(buffer, static_cast<size_t>(size_file));
 
     if(SharedSpace::parse_string(NUM_OF_WORK_TIME, file_data, res) == Result::failure) return Result::failure;
-    work_time_proc = stold(res);
+    try
+    {
+        work_time_proc = stold(res);
+    }
+    catch(...)
+    {
+        return Result::failure;
+    }
 
     return Result::successful;
 }
