@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <memory>
 #include <fcntl.h>
+#include <chrono>
 #include <iostream>
 
 #include "types.h"
@@ -27,9 +28,16 @@ namespace ProcmonLogic
 
      namespace TimeProc
      {
-         Result get_boot_time(long double& work_time_system);
+         Result get_working_time_pc(long double& work_time_system);
 
-         Result get(const ProcessDescriptorRAII& descriptor_process);
+         Result get_start_work_time_proc(const ProcessDescriptorRAII& descriptor_process, long double& res);
+
+         Result get_work_time_proc(const long double work_time_system, const long double start_work_time_proc, long double& work_time_proc);
+
+         Result seconds_to_my_tm(long input_time, struct my_tm& output_time);
+
+         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+
      }
 
      namespace Manage

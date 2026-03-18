@@ -15,6 +15,7 @@ ProcessDescriptorRAII::~ProcessDescriptorRAII()
 
 descriptor_process_t ProcessDescriptorRAII::get() const noexcept
 {
+    lseek(_descriptor_process, 0, SEEK_SET);
 	return _descriptor_process;
 }
 

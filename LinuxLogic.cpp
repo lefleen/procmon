@@ -71,7 +71,7 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
     return Result::successful;
 }
 
-Result ProcmonLogic::TimeProc::get_boot_time(long double& work_time_system)
+Result ProcmonLogic::TimeProc::get_working_time_pc(long double& work_time_system)
 {
     const int BUFFER_SIZE = 2048;
     char buffer[BUFFER_SIZE];
@@ -99,15 +99,72 @@ Result ProcmonLogic::TimeProc::get_boot_time(long double& work_time_system)
     return Result::successful;
 }
 
-Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process)
+Result ProcmonLogic::TimeProc::get_start_work_time_proc(const ProcessDescriptorRAII& descriptor_process, long double& work_time_proc)
 {
-     long num_ticks_per_second = 0;
+    constexpr int NUM_OF_WORK_TIME = 22;
+    const int BUFFER_SIZE = 4096;
+    char buffer[BUFFER_SIZE];
+
+    ssize_t size_file = 0;
+    
+    str_t res = "";
+    str_t file_data = "";
+    if((size_file = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+    file_data = str_t(buffer, static_cast<size_t>(size_file));
+    file_data += '\0';
+
+    if(SharedSpace::parse_string(NUM_OF_WORK_TIME, file_data, res) == Result::failure) return Result::failure;
+    work_time_proc = stold(res);
+
+    return Result::successful;
+}
+
+Result ProcmonLogic::TimeProc::get_work_time_proc(const long double work_time_system, const long double start_work_time_proc, long double& work_time_proc)
+{
+    long double num_ticks_per_second = sysconf(_SC_CLK_TCK);
+    if(num_ticks_per_second == -1) return Result::failure;
+
+    work_time_proc = work_time_system - (start_work_time_proc / num_ticks_per_second);
+    if(work_time_proc < 0) return Result::failure;
+
+    return Result::successful;
+}
+
+Result ProcmonLogic::TimeProc::seconds_to_my_tm(long input_time, struct my_tm& output_time)
+{
+    output_time.work_time = input_time;
+ 
+    auto chrono_seconds = std::chrono::seconds(input_time);
+
+    auto num_days = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) / 24;
+    output_time.num_days = num_days.count();
+
+    auto num_hours = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) % 24;
+    output_time.num_hours = num_hours.count();
+
+    auto num_minutes = std::chrono::duration_cast<std::chrono::minutes>(chrono_seconds) % 60;
+    output_time.num_minutes = num_minutes.count();
+
+    auto num_seconds = std::chrono::duration_cast<std::chrono::seconds>(chrono_seconds) % 60;
+    output_time.num_seconds = num_seconds.count();
+
+    return Result::successful;
+
+}
+
+Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+{
      long double work_time_system = 0;
+     long double start_work_time_proc = 0;
+     long double work_time_proc_in_sec = 0;
+     my_tm work_time_proc = { };
 
-     num_ticks_per_second = sysconf(_SC_CLK_TCK);
-     if(num_ticks_per_second == -1) return Result::failure;
+     if(get_working_time_pc(work_time_system) == Result::failure) return Result::failure;
+     if(get_start_work_time_proc(descriptor_process, start_work_time_proc) == Result::failure) return Result::failure;
+     if(get_work_time_proc(work_time_system, start_work_time_proc, work_time_proc_in_sec) == Result::failure) return Result::failure;
+     if(seconds_to_my_tm(work_time_proc_in_sec, work_time_proc) == Result::failure) return Result::failure; 
 
-     if(get_boot_time(work_time_system) == Result::failure) return Result::failure;
+     process.work_time = work_time_proc;
 
      return Result::successful;
 }
@@ -150,7 +207,6 @@ Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descri
 {
     if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) return Result::failure;
-    if(ProcmonLogic::TimeProc::get(descriptor_process) == Result::failure) return Result::failure;
-
+    if(ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     return Result::successful;
 }
