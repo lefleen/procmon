@@ -14,7 +14,7 @@ Result ProcmonLogic::SharedSpace::parse_string(const int num_element, const str_
     if (num_element >= 2)
     {
         first_pos_name = file_data.find('(', 0);
-        last_pos_name = file_data.rfind(')', 0);
+        last_pos_name = file_data.rfind(')');
 
         if (first_pos_name == str_t::npos || last_pos_name == str_t::npos)
             return Result::failure;
