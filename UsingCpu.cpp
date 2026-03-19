@@ -6,10 +6,14 @@ UsingCpuProc& UsingCpuProc::operator=(UsingCpuProc&& other) noexcept
 
     _interval_using_cpu = other._interval_using_cpu;
     _total_using_cpu = other._total_using_cpu;
-    
+
+    NEW_TIME = other.NEW_TIME;
+    OLD_TIME = other.OLD_TIME;
+
+    FULL_TIME_WORK_PROCESS = other.FULL_TIME_WORK_PROCESS;
 
     return *this;
-};
+}
 
 Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu)
 {
@@ -134,7 +138,7 @@ Result UsingCpuProc::update_new_time()
 Result UsingCpuProc::update_old_time()
 {
     auto now = std::chrono::system_clock::now();
-    NEW_TIME = std::chrono::system_clock::to_time_t(now);
+    OLD_TIME = std::chrono::system_clock::to_time_t(now);
 
     return Result::successful;
 }
