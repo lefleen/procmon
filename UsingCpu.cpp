@@ -1,6 +1,6 @@
 #include "UsingCpu.h"
 
-Result UsingCpuProc::get_time_using_cpu(const descriptor_process_t& descriptor_process, ULARGE_INTEGER& time_using_cpu)
+Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu)
 {
 	process_time creation_time_process = { };
 	process_time exit_time_process = { };
@@ -10,7 +10,7 @@ Result UsingCpuProc::get_time_using_cpu(const descriptor_process_t& descriptor_p
 	ULARGE_INTEGER user_unated_time = { };
 
 #ifdef _WIN32
-	if (!GetProcessTimes(descriptor_process, &creation_time_process, &exit_time_process, &kernel_time_process, &user_time_process)) return Result::failure;
+	if (!GetProcessTimes(descriptor_process.get(), &creation_time_process, &exit_time_process, &kernel_time_process, &user_time_process)) return Result::failure;
 
 	kernel_unated_time = { kernel_time_process.dwLowDateTime, kernel_time_process.dwHighDateTime };
 	user_unated_time = { user_time_process.dwLowDateTime, user_time_process.dwHighDateTime };
@@ -18,7 +18,37 @@ Result UsingCpuProc::get_time_using_cpu(const descriptor_process_t& descriptor_p
 	time_using_cpu.QuadPart = kernel_unated_time.QuadPart + user_unated_time.QuadPart;
 
 #elif defined __linux__
-    
+    constexpr int BUFFER_SIZE = 4096;
+    constexpr int NUM_OF_UTIME = 14;
+    constexpr int NUM_OF_STIME = 15;
+
+    char buffer[BUFFER_SIZE];
+
+    str_t file_data = "";
+    str_t str_system_time_process = "";
+    str_t str_user_time_process = "";
+
+    ssize_t num_elements = 0;
+
+    if(lseek(descriptor_process.get(), 0, SEEK_SET) == -1) return Result::failure;
+    if((num_elements = read(descriptor_process.get(), buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+
+    file_data = str_t(buffer, static_cast<size_t>(num_elements));
+
+    if(ProcmonLogic::SharedSpace::parse_string(NUM_OF_UTIME, file_data, str_user_time_process) == Result::failure) return Result::failure;
+    if(ProcmonLogic::SharedSpace::parse_string(NUM_OF_STIME, file_data, str_system_time_process) == Result::failure) return Result::failure;
+
+    try
+    {
+        user_time_process = std::stoull(str_user_time_process);
+        kernel_time_process = std::stoull(str_system_time_process);
+    }
+    catch(...)
+    {
+        return Result::failure;
+    }
+
+    time_using_cpu.QuadPart = user_time_process + kernel_time_process;
 
 #endif
 
@@ -33,8 +63,10 @@ Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, ProcessD
 
 	double total_using_cpu = 0;
 
-	all_time_after_create.QuadPart = work_time * 1.0E7;
-	if (get_time_using_cpu(descriptor_process.get(), all_time_using_cpu) == Result::failure || all_time_after_create.QuadPart == 0) return Result::failure;
+    if(static_cast<long>(NUM_TICKS) == -1) return Result::failure;
+	all_time_after_create.QuadPart = work_time * NUM_TICKS;
+
+	if (get_time_using_cpu(descriptor_process, all_time_using_cpu) == Result::failure || all_time_after_create.QuadPart == 0) return Result::failure;
 
 	total_using_cpu = static_cast<double>(all_time_using_cpu.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(all_time_after_create.QuadPart));
 	total_using_cpu *= 100;
@@ -48,17 +80,25 @@ Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, ProcessD
 Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, long long pause_interval, ProcessDescriptorRAII& descriptor_process)
 {
 	double interval_using_cpu = 0;
-	double interval_cpu_time = INTERVAL_CPU_TIME * 1.0E7;
+
+    if(static_cast<long>(NUM_TICKS) == -1) return Result::failure;
+
 	ULARGE_INTEGER time_work_process = { };
 
-	if (get_time_using_cpu(descriptor_process.get(), time_work_process) == Result::failure || INTERVAL_CPU_TIME == 0 || OLD_CPU_TIME == 0)
+	if (get_time_using_cpu(descriptor_process, time_work_process) == Result::failure || NEW_TIME == 0 || OLD_TIME == 0)
 	{
-		update(descriptor_process);
+        update_new_time();
+        update_old_time();
+        update_full_time_work_process(descriptor_process);
+
 		return Result::failure;
 	}
 
-	time_work_process.QuadPart -= FULL_TIME_WORK_PROCESS.QuadPart;
+    update_new_time();
+  
+    double interval_cpu_time = (NEW_TIME - OLD_TIME) * NUM_TICKS;
 
+	time_work_process.QuadPart -= FULL_TIME_WORK_PROCESS.QuadPart;
 
 	interval_using_cpu = static_cast<double>(time_work_process.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(interval_cpu_time));
 
@@ -66,20 +106,33 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, lon
 
 	_interval_using_cpu = interval_using_cpu;
 
-	update(descriptor_process);
+	update_old_time();
+    update_full_time_work_process(descriptor_process);
 
 	return Result::successful;
 }
 
-Result UsingCpuProc::update(ProcessDescriptorRAII& descriptor_process)
+Result UsingCpuProc::update_new_time()
 {
 	auto now = std::chrono::system_clock::now();
-	INTERVAL_CPU_TIME = std::chrono::system_clock::to_time_t(now) - OLD_CPU_TIME;
-	OLD_CPU_TIME = std::chrono::system_clock::to_time_t(now);
-
-	if(get_time_using_cpu(descriptor_process.get(), FULL_TIME_WORK_PROCESS) == Result::failure) return Result::failure;
+	NEW_TIME = std::chrono::system_clock::to_time_t(now);
 
 	return Result::successful;
+}
+
+Result UsingCpuProc::update_old_time()
+{
+    auto now = std::chrono::system_clock::now();
+    NEW_TIME = std::chrono::system_clock::to_time_t(now);
+
+    return Result::successful;
+}
+
+Result UsingCpuProc::update_full_time_work_process(const ProcessDescriptorRAII& descriptor_process)
+{
+    if(get_time_using_cpu(descriptor_process, FULL_TIME_WORK_PROCESS) == Result::failure) return Result::failure;
+
+    return Result::successful;
 }
 
 Result UsingCpuProc::calculate(long long pause_interval, ProcessDescriptorRAII& descriptor_process, double work_time_process)
@@ -99,12 +152,12 @@ Result UsingCpuProc::calculate(long long pause_interval, ProcessDescriptorRAII& 
 	return Result::successful;
 }
 
-double UsingCpuProc::get_total() noexcept 
+double UsingCpuProc::get_total() const noexcept 
 {
 	return _total_using_cpu;
 }
 
-double UsingCpuProc::get_interaval() noexcept
+double UsingCpuProc::get_interaval() const noexcept
 {
 	return _interval_using_cpu;
 }

@@ -21,7 +21,7 @@ using process_time = unsigned long long;
 
 constexpr descriptor_process_t null_t = -1;
 
-struct ULARGE_INTEGER { unsigned long QuadPart; };
+struct ULARGE_INTEGER { unsigned long long QuadPart; };
 
 #endif
 
