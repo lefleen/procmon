@@ -41,6 +41,8 @@ class UsingCpuProc
 public:
 	UsingCpuProc() noexcept = default;
 
+    UsingCpuProc& operator=(UsingCpuProc&& other) noexcept;
+
 	double get_total() const noexcept;
 
 	double get_interaval() const noexcept;

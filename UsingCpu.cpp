@@ -1,5 +1,16 @@
 #include "UsingCpu.h"
 
+UsingCpuProc& UsingCpuProc::operator=(UsingCpuProc&& other) noexcept
+{
+    if(this == &other) return *this;
+
+    _interval_using_cpu = other._interval_using_cpu;
+    _total_using_cpu = other._total_using_cpu;
+    
+
+    return *this;
+};
+
 Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu)
 {
 	process_time creation_time_process = { };
