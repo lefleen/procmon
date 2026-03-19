@@ -65,7 +65,7 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
 
 Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
-    const int BUFFER_SIZE = 4096;
+    constexpr int BUFFER_SIZE = 4096;
     char buffer[BUFFER_SIZE];
 
     str_t file_data = "";
@@ -74,7 +74,7 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
     ssize_t num_elements = 0;
 
     if(lseek(descriptor_process.get(), 0, SEEK_SET) == -1) return Result::failure;
-    if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+    if((num_elements = read(descriptor_process.get(), buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
     file_data = str_t(buffer, static_cast<size_t>(num_elements));
 
@@ -87,7 +87,7 @@ Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_proce
 
 Result ProcmonLogic::TimeProc::get_working_time_pc(long double& work_time_system)
 {
-    const int BUFFER_SIZE = 2048;
+    constexpr int BUFFER_SIZE = 2048;
     char buffer[BUFFER_SIZE];
 
     ProcessDescriptorRAII descriptor_process;
@@ -99,7 +99,7 @@ Result ProcmonLogic::TimeProc::get_working_time_pc(long double& work_time_system
 
     descriptor_process = open(file_path.c_str(), O_RDONLY);
     if(descriptor_process.get() == -1) return Result::failure;
-    if((num_elements = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+    if((num_elements = read(descriptor_process.get(), buffer, BUFFER_SIZE)) <= 0) return Result::failure;
 
     file_data = str_t(buffer, static_cast<size_t>(num_elements));
 
@@ -122,7 +122,7 @@ Result ProcmonLogic::TimeProc::get_working_time_pc(long double& work_time_system
 Result ProcmonLogic::TimeProc::get_start_work_time_proc(const ProcessDescriptorRAII& descriptor_process, long double& work_time_proc)
 {
     constexpr int NUM_OF_WORK_TIME = 22;
-    const int BUFFER_SIZE = 4096;
+    constexpr int BUFFER_SIZE = 4096;
     char buffer[BUFFER_SIZE];
 
     ssize_t size_file = 0;
@@ -131,7 +131,7 @@ Result ProcmonLogic::TimeProc::get_start_work_time_proc(const ProcessDescriptorR
     str_t file_data = "";
 
     if(lseek(descriptor_process.get(), 0, SEEK_SET) == -1) return Result::failure;
-    if((size_file = read(descriptor_process.get(), &buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+    if((size_file = read(descriptor_process.get(), buffer, BUFFER_SIZE)) <= 0) return Result::failure;
     file_data = str_t(buffer, static_cast<size_t>(size_file));
 
     if(SharedSpace::parse_string(NUM_OF_WORK_TIME, file_data, res) == Result::failure) return Result::failure;
@@ -200,6 +200,46 @@ Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_proce
      return Result::successful;
 }
 
+Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+{
+    constexpr int NUM_OF_RSS = 24;
+    constexpr int BUFFER_SIZE = 4096;
+
+    long double num_pages = 0;
+    long double num_bytes_in_page = sysconf(_SC_PAGESIZE);
+    long double num_kbytes = 0;
+    long double num_bytes = 0;
+    if(static_cast<long>(num_bytes_in_page == -1)) return Result::failure;
+    char buffer[BUFFER_SIZE];
+
+    str_t file_data = "";
+    str_t res = "";
+
+    ssize_t num_elements = 0;
+
+    if(lseek(descriptor_process.get(), 0, SEEK_SET) == -1) return Result::failure;
+    if((num_elements = read(descriptor_process.get(), buffer, BUFFER_SIZE)) <= 0) return Result::failure;
+    file_data = str_t(buffer, static_cast<size_t>(num_elements));
+
+    if(SharedSpace::parse_string(NUM_OF_RSS, file_data, res) == Result::failure) return Result::failure;
+
+    try 
+    {
+        num_pages = stoi(res);
+    }
+    catch(...)
+    {
+        return Result::failure;
+    }
+
+    num_bytes = num_pages * num_bytes_in_page;
+
+    process.using_memory = num_bytes;
+
+    return Result::successful;
+}
+
+
 bool ProcmonLogic::Manage::_isdigit(const str_t& str_pid)
 {
     if(str_pid.empty()) return false;
@@ -223,9 +263,10 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
         str_t str_pid = std::string(inf_dir->d_name);
         if(!_isdigit(str_pid)) continue;
 
+        int pid = 0;
         try
         {
-            int pid = std::stoi(str_pid);
+            pid = std::stoi(str_pid);
         }
         catch(...)
         {
@@ -242,10 +283,13 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     return Result::successful; 
 }
 
+
 Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
     if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) return Result::failure;
-    return Result::successful;
+    if(ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure) return Result::failure;
+
+    return Result::successful; 
 }

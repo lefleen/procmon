@@ -39,6 +39,11 @@ namespace ProcmonLogic
          Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
 
      }
+     
+     namespace MemoryProc
+     {
+         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+     }
 
      namespace Manage
      {
