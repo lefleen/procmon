@@ -39,7 +39,7 @@ class UsingCpuProc
 
 	Result update_current_time();
 
-    Result get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& time_work_process);
+    Result get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& current_process_cpu_time);
 
 public:
 	UsingCpuProc() noexcept = default;
