@@ -30,7 +30,7 @@ Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_
 	kernel_time_value = { kernel_time_process.dwLowDateTime, kernel_time_process.dwHighDateTime };
 	user_time_value = { user_time_process.dwLowDateTime, user_time_process.dwHighDateTime };
 
-	time_using_cpu.QuadPart = kernel_unated_time.QuadPart + user_unated_time.QuadPart;
+	time_using_cpu.QuadPart = kernel_time_value.QuadPart + user_time_value.QuadPart;
 
 #elif defined __linux__
     constexpr int BUFFER_SIZE = 4096;
