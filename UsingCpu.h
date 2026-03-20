@@ -22,9 +22,9 @@ class UsingCpuProc
 
 #endif
 
-	double NEW_TIME = 0;
-	double OLD_TIME = 0;
-	ULARGE_INTEGER FULL_TIME_WORK_PROCESS = { };
+	double CURRENT_PROCESS_TIME = 0;
+	double PREVIOUS_PROCESS_TIME = 0;
+	ULARGE_INTEGER FULL_PROCESS_TIME = { };
 	
 	double _interval_using_cpu = 0;
 	double _total_using_cpu = 0;
@@ -37,11 +37,9 @@ class UsingCpuProc
 	// «агруженность за конкретный интервал времени
 	Result calculating_interval_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process);
 
-	Result update_new_time();
+	Result update_current_time();
 
-    Result update_old_time();
-
-    Result update_full_time_work_process(const ProcessDescriptorRAII& descriptor_process);
+    Result get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& time_work_process);
 
 public:
 	UsingCpuProc() noexcept = default;

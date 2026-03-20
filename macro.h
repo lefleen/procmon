@@ -3,7 +3,8 @@
 enum class Result
 {
 	successful,
-	failure
+	failure,
+    initialization
 };
 
 constexpr int  macCreateTimeProcess = 1001;
