@@ -71,7 +71,7 @@ Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_
 }
 
 	// Загруженность процессора за всё время существования
-Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process, double work_time)
+Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process, double work_time_process)
 {
 	ULARGE_INTEGER all_time_using_cpu = { };
 	ULARGE_INTEGER all_time_after_create = { };
@@ -79,7 +79,7 @@ Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, ProcessD
 	double total_using_cpu = 0;
 
     if(static_cast<long>(NUM_TICKS) == -1) return Result::failure;
-	all_time_after_create.QuadPart = work_time * NUM_TICKS;
+	all_time_after_create.QuadPart = work_time_process * NUM_TICKS;
 
 	if (get_time_using_cpu(descriptor_process, all_time_using_cpu) == Result::failure || all_time_after_create.QuadPart == 0) return Result::failure;
 
@@ -92,7 +92,7 @@ Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, ProcessD
 }
 
 	// Загруженность за конкретный интервал времени
-Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, long long pause_interval, ProcessDescriptorRAII& descriptor_process)
+Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process)
 {
 	double interval_using_cpu = 0;
 
@@ -110,8 +110,10 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, lon
 	}
 
     update_new_time();
-  
+
     double interval_cpu_time = (NEW_TIME - OLD_TIME) * NUM_TICKS;
+
+    update_old_time();
 
 	time_work_process.QuadPart -= FULL_TIME_WORK_PROCESS.QuadPart;
 
@@ -121,7 +123,6 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, lon
 
 	_interval_using_cpu = interval_using_cpu;
 
-	update_old_time();
     update_full_time_work_process(descriptor_process);
 
 	return Result::successful;
@@ -129,16 +130,18 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, lon
 
 Result UsingCpuProc::update_new_time()
 {
-	auto now = std::chrono::system_clock::now();
-	NEW_TIME = std::chrono::system_clock::to_time_t(now);
+	auto now = std::chrono::steady_clock::now();
+    auto num_seconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
+	NEW_TIME = static_cast<double>(num_seconds.count()) / 1.0E6;
 
 	return Result::successful;
 }
 
 Result UsingCpuProc::update_old_time()
 {
-    auto now = std::chrono::system_clock::now();
-    OLD_TIME = std::chrono::system_clock::to_time_t(now);
+    auto now = std::chrono::steady_clock::now();
+    auto num_seconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
+    OLD_TIME = static_cast<double>(num_seconds.count()) / 1.0E6;
 
     return Result::successful;
 }
@@ -150,7 +153,7 @@ Result UsingCpuProc::update_full_time_work_process(const ProcessDescriptorRAII& 
     return Result::successful;
 }
 
-Result UsingCpuProc::calculate(long long pause_interval, ProcessDescriptorRAII& descriptor_process, double work_time_process)
+Result UsingCpuProc::calculate(ProcessDescriptorRAII& descriptor_process, double work_time_process)
 {
 	// Количество количества логических потоков
 	unsigned long num_cores = std::thread::hardware_concurrency();
@@ -161,7 +164,7 @@ Result UsingCpuProc::calculate(long long pause_interval, ProcessDescriptorRAII& 
 		return Result::failure;
 
 	// За определенный интервал времени
-	if (calculating_interval_using_cpu(num_cores, pause_interval, descriptor_process) == Result::failure)
+	if (calculating_interval_using_cpu(num_cores, descriptor_process) == Result::failure)
 		return Result::failure;
 
 	return Result::successful;

@@ -22,8 +22,8 @@ class UsingCpuProc
 
 #endif
 
-	time_t NEW_TIME = 0;
-	time_t OLD_TIME = 0;
+	double NEW_TIME = 0;
+	double OLD_TIME = 0;
 	ULARGE_INTEGER FULL_TIME_WORK_PROCESS = { };
 	
 	double _interval_using_cpu = 0;
@@ -35,7 +35,7 @@ class UsingCpuProc
 	Result calculate_total_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process, double work_time_process);
 
 	// «агруженность за конкретный интервал времени
-	Result calculating_interval_using_cpu(unsigned long num_cores, long long pause_interval, ProcessDescriptorRAII& descriptor_process);
+	Result calculating_interval_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process);
 
 	Result update_new_time();
 
@@ -54,5 +54,5 @@ public:
 
 	double get_interaval() const noexcept;
 
-	Result calculate(long long pause_interval, ProcessDescriptorRAII& descriptor_process, double work_time_process);
+	Result calculate(ProcessDescriptorRAII& descriptor_process, double work_time_process);
 };

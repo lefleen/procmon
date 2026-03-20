@@ -51,7 +51,7 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 
 		if(current_process.update(descriptor_process, params) == Result::failure) continue;
 
-		if(using_cpu_processes[pid].calculate(pause_interval, descriptor_process, current_process.work_time.work_time) == Result::failure) continue;
+		if(using_cpu_processes[pid].calculate(descriptor_process, current_process.work_time.work_time) == Result::failure) continue;
 
 		current_process.interval_using_cpu = using_cpu_processes[pid].get_interaval();
 		current_process.total_using_cpu = using_cpu_processes[pid].get_total();
