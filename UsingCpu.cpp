@@ -115,10 +115,11 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, Pro
     ULARGE_INTEGER full_time_work_process = FULL_TIME_WORK_PROCESS;
     if(update_full_time_work_process(descriptor_process) == Result::failure) return Result::failure;
 
-    if(interval <= 0 || full_time_work_process.QuadPart <= 0) return Result::failure;
+    if(interval <= 0) return Result::failure;
 
     double interval_cpu_time = interval * NUM_TICKS;
 
+    if((time_work_process.QuadPart < full_time_work_process.QuadPart) == 0) return Result::failure;
 	time_work_process.QuadPart -= full_time_work_process.QuadPart;
 
 	interval_using_cpu = static_cast<double>(time_work_process.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(interval_cpu_time));
