@@ -50,8 +50,8 @@ Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_
 
     file_data = str_t(buffer, static_cast<size_t>(num_elements));
 
-    if(ProcmonLogic::SharedSpace::parse_string(NUM_OF_UTIME, file_data, str_user_time_process) == Result::failure) return Result::failure;
-    if(ProcmonLogic::SharedSpace::parse_string(NUM_OF_STIME, file_data, str_system_time_process) == Result::failure) return Result::failure;
+    if(ProcmonLogic::SharedSpaceLinux::parse_string(NUM_OF_UTIME, file_data, str_user_time_process) == Result::failure) return Result::failure;
+    if(ProcmonLogic::SharedSpaceLinux::parse_string(NUM_OF_STIME, file_data, str_system_time_process) == Result::failure) return Result::failure;
 
     try
     {

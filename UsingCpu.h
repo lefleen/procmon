@@ -4,11 +4,13 @@
 
 #ifdef __linux__
 #include <unistd.h>
+
+#include "SharedSpaceLinux.h"
+
 #endif
 
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
-#include "LinuxLogic.h"
 
 class UsingCpuProc
 {

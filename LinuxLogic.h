@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iostream>
 
+#include "SharedSpaceLinux.h"
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
 #include "Process.h"
