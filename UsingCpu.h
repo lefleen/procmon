@@ -46,6 +46,8 @@ class UsingCpuProc
 public:
 	UsingCpuProc() noexcept = default;
 
+	UsingCpuProc(const UsingCpuProc& other) noexcept = default;
+
     UsingCpuProc& operator=(UsingCpuProc&& other) noexcept;
 
 	double get_total() const noexcept;
