@@ -104,18 +104,22 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, Pro
 	{
         update_new_time();
         update_old_time();
-        update_full_time_work_process(descriptor_process);
+        if(update_full_time_work_process(descriptor_process) == Result::failure) return Result::failure;
 
 		return Result::failure;
 	}
 
     update_new_time();
-
-    double interval_cpu_time = (NEW_TIME - OLD_TIME) * NUM_TICKS;
-
+    double interval = NEW_TIME - OLD_TIME;
     update_old_time();
+    ULARGE_INTEGER full_time_work_process = FULL_TIME_WORK_PROCESS;
+    if(update_full_time_work_process(descriptor_process) == Result::failure) return Result::failure;
 
-	time_work_process.QuadPart -= FULL_TIME_WORK_PROCESS.QuadPart;
+    if(interval <= 0 || full_time_work_process.QuadPart <= 0) return Result::failure;
+
+    double interval_cpu_time = interval * NUM_TICKS;
+
+	time_work_process.QuadPart -= full_time_work_process.QuadPart;
 
 	interval_using_cpu = static_cast<double>(time_work_process.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(interval_cpu_time));
 
@@ -123,16 +127,14 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, Pro
 
 	_interval_using_cpu = interval_using_cpu;
 
-    update_full_time_work_process(descriptor_process);
-
 	return Result::successful;
 }
 
 Result UsingCpuProc::update_new_time()
 {
 	auto now = std::chrono::steady_clock::now();
-    auto num_seconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
-	NEW_TIME = static_cast<double>(num_seconds.count()) / 1.0E6;
+    auto num_nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
+	NEW_TIME = static_cast<double>(num_nanoseconds.count()) / 1.0E9;
 
 	return Result::successful;
 }
@@ -140,8 +142,8 @@ Result UsingCpuProc::update_new_time()
 Result UsingCpuProc::update_old_time()
 {
     auto now = std::chrono::steady_clock::now();
-    auto num_seconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
-    OLD_TIME = static_cast<double>(num_seconds.count()) / 1.0E6;
+    auto num_nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
+    OLD_TIME = static_cast<double>(num_nanoseconds.count()) / 1.0E9;
 
     return Result::successful;
 }
@@ -175,7 +177,7 @@ double UsingCpuProc::get_total() const noexcept
 	return _total_using_cpu;
 }
 
-double UsingCpuProc::get_interaval() const noexcept
+double UsingCpuProc::get_interval() const noexcept
 {
 	return _interval_using_cpu;
 }

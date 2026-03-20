@@ -53,7 +53,7 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 
 		if(using_cpu_processes[pid].calculate(descriptor_process, current_process.work_time.work_time) == Result::failure) continue;
 
-		current_process.interval_using_cpu = using_cpu_processes[pid].get_interaval();
+		current_process.interval_using_cpu = using_cpu_processes[pid].get_interval();
 		current_process.total_using_cpu = using_cpu_processes[pid].get_total();
 
 		processes.push_back(std::move(current_process));

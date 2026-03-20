@@ -52,7 +52,7 @@ public:
 
 	double get_total() const noexcept;
 
-	double get_interaval() const noexcept;
+	double get_interval() const noexcept;
 
 	Result calculate(ProcessDescriptorRAII& descriptor_process, double work_time_process);
 };
