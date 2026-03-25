@@ -19,8 +19,8 @@ Result ManageProgramm::calculate_start_end_points(const unsigned int max_threads
 	return Result::successful;
 }
 
-Result ManageProgramm::get_information_about_processes( parameters_process& params,
-	size_t max_threads, size_t num_thread, vec_t<Process>& processes)
+Result ManageProgramm::get_information_about_processes( parameters_process& params, size_t max_threads, size_t num_thread, vec_t<Process>& processes,
+        map_t<DWORD, UsingCpuProc>& using_cpu_process)
 {
     size_t start_point = 0;
     size_t end_point = 0;
@@ -32,10 +32,12 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 	{
 		Process current_process { };
         ProcessDescriptorRAII descriptor_process { };
+        DWORD pid = params.pids_processes[index];
 
 		current_process.pid = params.pids_processes[index];
 
 		if(current_process.update(descriptor_process, params) == Result::failure) continue;
+        if(using_cpu_process[pid].update(descriptor_process, current_process) == Result::failure) continue;
 
 		processes.push_back(std::move(current_process));
 	}
@@ -43,7 +45,7 @@ Result ManageProgramm::get_information_about_processes( parameters_process& para
 	return Result::successful;
 }
 
-Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<Process>>& processes)
+Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<Process>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process)
 {
 	parameters_process params { };
     vec_t<std::thread> threads(max_threads);
@@ -56,8 +58,8 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<Process>>& 
 
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
-		threads[num_thread] = std::thread([&params, max_threads, num_thread, &processes]() {
-			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread]) == Result::failure) 
+		threads[num_thread] = std::thread([&params, max_threads, num_thread, &processes, &using_cpu_process]() {
+			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread]) == Result::failure) 
                 clear_thread_resources(processes[num_thread]);
 		});
 	}
@@ -79,12 +81,13 @@ Result ManageProgramm::start_programm()
 	if (max_threads == 0) max_threads = 1;
 
 	vec_t<vec_t<Process>> processes{ };
+    vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_process(max_threads);
 
 	processes.resize(max_threads);
 
 	while (true)
 	{
-		if (start_threads(max_threads, processes) == Result::failure)
+		if (start_threads(max_threads, processes, using_cpu_process) == Result::failure)
 			return Result::failure;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));

@@ -230,26 +230,12 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     return Result::successful; 
 }
 
-Result ProcmonLogic::CpuTimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
-{
-    UsingCpuProc using_cpu_processes{ }; 
-    DWORD pid = process.pid;
-
-    if(using_cpu_processes.calculate(descriptor_process, process.work_time.work_time) == Result::failure) return Result::failure;
-
-    process.interval_using_cpu = using_cpu_processes.get_interval();
-    process.total_using_cpu = using_cpu_processes.get_total();
-
-    return Result::successful;
-}
-
 Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
 {
     if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure) return Result::failure;
-    if(ProcmonLogic::CpuTimeProc::get(descriptor_process, process) == Result::failure) return Result::failure;
    
     return Result::successful; 
 }

@@ -45,11 +45,6 @@ namespace ProcmonLogic
 		Result get_parameters_processes(parameters_process& params);
 	}
 
-    namespace CpuTimeProc
-    {
-        Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
-    }
-
     namespace AllData
     {
         Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& current_process);

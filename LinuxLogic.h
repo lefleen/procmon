@@ -54,11 +54,6 @@ namespace ProcmonLogic
           bool _isdigit(const std::string& str_pid);
      }
 
-     namespace CpuTimeProc     
-     {
-         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
-     }
-
      namespace AllData 
      {
          Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process);

@@ -15,6 +15,16 @@ UsingCpuProc& UsingCpuProc::operator=(UsingCpuProc&& other) noexcept
     return *this;
 }
 
+Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, Process& process)
+{
+    if(calculate(descriptor_process, process.work_time.work_time) == Result::failure) return Result::failure;
+
+    process.interval_using_cpu = _interval_using_cpu;;
+    process.total_using_cpu = _total_using_cpu;
+
+    return Result::successful;
+}
+
 Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu)
 {
 	process_time creation_time_process = { };

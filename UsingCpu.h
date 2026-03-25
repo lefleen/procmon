@@ -11,6 +11,7 @@
 
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
+#include "Process.h"
 
 class UsingCpuProc
 {
@@ -47,6 +48,8 @@ public:
 	UsingCpuProc(const UsingCpuProc& other) noexcept = default;
 
     UsingCpuProc& operator=(UsingCpuProc&& other) noexcept;
+
+    Result update(const ProcessDescriptorRAII& descriptor_process, Process& process);
 
 	double get_total() const noexcept;
 
