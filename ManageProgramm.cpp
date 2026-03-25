@@ -6,15 +6,15 @@ void ManageProgramm::clear_thread_resources(T&... containers)
     (containers.clear(), ...);
 }
 
-Result ManageProgramm::get_start_and_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& num_elements)
+Result ManageProgramm::calculate_start_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& start_point, size_t& end_point)
 {
     DWORD max_processes_on_this_thread = count_processes / max_threads;
 
-	size_t start_index_process = num_thread * max_processes_on_this_thread;
-	size_t end_index_process = (num_thread + 1) * max_processes_on_this_thread;
+	start_point = num_thread * max_processes_on_this_thread;
+	end_point = (num_thread + 1) * max_processes_on_this_thread;
 
 	if (num_thread == max_threads - 1)
-		end_index_process += count_processes - max_processes_on_this_thread * max_threads;
+		end_point += count_processes - max_processes_on_this_thread * max_threads;
 
 	return Result::successful;
 }
@@ -22,11 +22,13 @@ Result ManageProgramm::get_start_and_end_points(const unsigned int max_threads, 
 Result ManageProgramm::get_information_about_processes( parameters_process& params,
 	size_t max_threads, size_t num_thread, vec_t<Process>& processes)
 {
-    size_t num_elements = 0;
-	get_start_and_end_points(max_threads, num_thread, params.count_processes, num_elements);
+    size_t start_point = 0;
+    size_t end_point = 0;
+	calculate_start_end_points(max_threads, num_thread, params.count_processes, start_point, end_point);
+    size_t num_elements = end_point - start_point; 
 	processes.reserve(num_elements);
 
-	for (size_t index = 0; index < num_elements; ++index)
+	for (size_t index = start_point; index < end_point; ++index)
 	{
 		Process current_process { };
         ProcessDescriptorRAII descriptor_process { };

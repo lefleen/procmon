@@ -16,7 +16,7 @@ namespace ManageProgramm
     template<typename... T>
     void clear_thread_resources(T&... containers);
 
-	Result get_start_and_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& num_elements);
+	Result calculate_start_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& start_point, size_t& end_point);
 
 	Result get_information_about_processes(parameters_process& params, size_t max_threads, size_t num_thread, vec_t<Process>& processes);
 
