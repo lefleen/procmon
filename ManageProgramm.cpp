@@ -19,7 +19,7 @@ Result ManageProgramm::calculate_start_end_points(const unsigned int max_threads
 	return Result::successful;
 }
 
-Result ManageProgramm::get_information_about_processes( parameters_process& params, size_t max_threads, size_t num_thread, vec_t<Process>& processes,
+Result ManageProgramm::get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<Process>& processes,
         map_t<DWORD, UsingCpuProc>& using_cpu_process)
 {
     size_t start_point = 0;
@@ -60,7 +60,7 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<Process>>& 
 	{
 		threads[num_thread] = std::thread([&params, max_threads, num_thread, &processes, &using_cpu_process]() {
 			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread]) == Result::failure) 
-                clear_thread_resources(processes[num_thread]);
+                clear_thread_resources(processes[num_thread], using_cpu_process[num_thread]);
 		});
 	}
 
