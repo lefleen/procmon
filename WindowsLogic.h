@@ -7,6 +7,7 @@
 #include "types.h"
 #include "Process.h"
 #include "ProcessDescriptorRAII.h"
+#include "UsingCpu.h"
 
 namespace ProcmonLogic
 {
@@ -43,6 +44,11 @@ namespace ProcmonLogic
 	{
 		Result get_parameters_processes(parameters_process& params);
 	}
+
+    namespace CpuTimeProc
+    {
+        Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+    }
 
     namespace AllData
     {

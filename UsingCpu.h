@@ -32,10 +32,10 @@ class UsingCpuProc
 	Result get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu);
 
 	// Загруженность процессора за всё время существования
-	Result calculate_total_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process, double work_time_process);
+	Result calculate_total_using_cpu(unsigned long num_cores, const ProcessDescriptorRAII& descriptor_process, double work_time_process);
 
 	// Загруженность за конкретный интервал времени
-	Result calculating_interval_using_cpu(unsigned long num_cores, ProcessDescriptorRAII& descriptor_process);
+	Result calculating_interval_using_cpu(unsigned long num_cores, const ProcessDescriptorRAII& descriptor_process);
 
 	Result update_current_time();
 
@@ -52,5 +52,5 @@ public:
 
 	double get_interval() const noexcept;
 
-	Result calculate(ProcessDescriptorRAII& descriptor_process, double work_time_process);
+	Result calculate(const ProcessDescriptorRAII& descriptor_process, double work_time_process);
 };
