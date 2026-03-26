@@ -6,6 +6,23 @@ void ManageProgramm::clear_thread_resources(T&... containers)
     (containers.clear(), ...);
 }
 
+Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, const vec_t<DWORD>& pids_processes,
+	size_t start_point, size_t end_point)
+{
+	map_t<DWORD, UsingCpuProc> _using_cpu_processes;
+
+	for (size_t index = start_point; index < end_point; ++index)
+	{
+		DWORD pid = pids_processes[index];
+		_using_cpu_processes[pid] = std::move(using_cpu_processes[pid]);
+	}
+
+	using_cpu_processes = std::move(_using_cpu_processes);
+
+
+	return Result::successful;
+}
+
 Result ManageProgramm::calculate_start_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& start_point, size_t& end_point)
 {
     DWORD max_processes_on_this_thread = count_processes / max_threads;
@@ -32,16 +49,16 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 	{
 		Process current_process { };
         ProcessDescriptorRAII descriptor_process { };
-        DWORD pid = params.pids_processes[index];
 
 		current_process.pid = params.pids_processes[index];
 
-		if(current_process.update(descriptor_process, params) == Result::failure) continue;
-        if(using_cpu_process[pid].update(descriptor_process, current_process) == Result::failure) continue;
+		if (current_process.update(descriptor_process, params) == Result::failure) continue;
+		if (using_cpu_process[current_process.pid].update(descriptor_process, current_process) == Result::failure) continue;
 
 		processes.push_back(std::move(current_process));
 	}
 
+	clear_using_cpu_vec(using_cpu_process, params.pids_processes, start_point, end_point);
 	return Result::successful;
 }
 

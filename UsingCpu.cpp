@@ -17,7 +17,10 @@ UsingCpuProc& UsingCpuProc::operator=(UsingCpuProc&& other) noexcept
 
 Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, Process& process)
 {
-    if(calculate(descriptor_process, process.work_time.work_time) == Result::failure) return Result::failure;
+    Result res = Result::successful;
+
+    if ((res = calculate(descriptor_process, process.work_time.work_time)) == Result::failure) return Result::failure;
+    else if (res == Result::initialization) _interval_using_cpu = 0;
 
     process.interval_using_cpu = _interval_using_cpu;;
     process.total_using_cpu = _total_using_cpu;
@@ -25,7 +28,7 @@ Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, Pro
     return Result::successful;
 }
 
-Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu)
+Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& current_work_time)
 {
 	process_time creation_time_process = { };
 	process_time exit_time_process = { };
@@ -40,7 +43,7 @@ Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_
 	kernel_time_value = { kernel_time_process.dwLowDateTime, kernel_time_process.dwHighDateTime };
 	user_time_value = { user_time_process.dwLowDateTime, user_time_process.dwHighDateTime };
 
-	time_using_cpu.QuadPart = kernel_time_value.QuadPart + user_time_value.QuadPart;
+	current_work_time.QuadPart = kernel_time_value.QuadPart + user_time_value.QuadPart;
 
 #elif defined __linux__
     constexpr int BUFFER_SIZE = 4096;
@@ -73,7 +76,7 @@ Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_
         return Result::failure;
     }
 
-    time_using_cpu.QuadPart = user_time_process + kernel_time_process;
+    current_work_time.QuadPart = user_time_process + kernel_time_process;
 
 #endif
 
@@ -83,7 +86,7 @@ Result UsingCpuProc::get_time_using_cpu(const ProcessDescriptorRAII& descriptor_
 	// Загруженность процессора за всё время существования
 Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, const ProcessDescriptorRAII& descriptor_process, double work_time_process)
 {
-	ULARGE_INTEGER total_process_cpu_time = { };
+	ULARGE_INTEGER current_work_time = { };
 	ULARGE_INTEGER time_after_start = { };
 
 	double total_using_cpu = 0;
@@ -91,9 +94,9 @@ Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, const Pr
     if(static_cast<long>(NUM_TICKS) == -1) return Result::failure;
 	time_after_start.QuadPart = work_time_process * NUM_TICKS;
 
-	if (get_time_using_cpu(descriptor_process, total_process_cpu_time) == Result::failure || time_after_start.QuadPart == 0) return Result::failure;
+	if (get_time_using_cpu(descriptor_process, current_work_time) == Result::failure || time_after_start.QuadPart == 0) return Result::failure;
 
-	total_using_cpu = static_cast<double>(total_process_cpu_time.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(time_after_start.QuadPart));
+	total_using_cpu = static_cast<double>(current_work_time.QuadPart) / (static_cast<double>(num_cores) * static_cast<double>(time_after_start.QuadPart));
 	total_using_cpu *= 100;
 
 	_total_using_cpu = total_using_cpu;
@@ -106,7 +109,7 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, con
 {
 	double cpu_usage = 0;
     double interval_cpu_usage_time = 0;
-    ULARGE_INTEGER current_process_cpu_time;
+    ULARGE_INTEGER current_process_cpu_time { };
 
     if(static_cast<long>(NUM_TICKS) == -1) return Result::failure;
 
@@ -131,18 +134,20 @@ Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, con
 	return Result::successful;
 }
 
-Result UsingCpuProc::get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& current_process_cpu_time)
+Result UsingCpuProc::get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& delta_process_cpu_time)
 {
-    if(get_time_using_cpu(descriptor_process, current_process_cpu_time) == Result::failure) return Result::failure;
+    ULARGE_INTEGER current_work_time { };
+
+    if(get_time_using_cpu(descriptor_process, current_work_time) == Result::failure) return Result::failure;
 
     if(update_current_time() == Result::failure) return Result::failure;
 
     interval_cpu_usage_time = CURRENT_PROCESS_TIME - PREVIOUS_PROCESS_TIME;
 
-    if(FULL_PROCESS_TIME.QuadPart > current_process_cpu_time.QuadPart) return Result::failure;
-    current_process_cpu_time.QuadPart -= FULL_PROCESS_TIME.QuadPart; 
+    if(FULL_PROCESS_TIME.QuadPart <= current_work_time.QuadPart) return Result::failure;
+    delta_process_cpu_time.QuadPart = current_work_time.QuadPart - FULL_PROCESS_TIME.QuadPart; 
 
-    FULL_PROCESS_TIME = current_process_cpu_time;
+    FULL_PROCESS_TIME = current_work_time;
     PREVIOUS_PROCESS_TIME = CURRENT_PROCESS_TIME;
 
     return Result::successful;

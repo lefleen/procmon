@@ -1,6 +1,7 @@
 #pragma once
-#include "ProcessDescriptorRAII.h"
+
 #include "types.h"
+#include "ProcessDescriptorRAII.h"
 
 class Process
 {

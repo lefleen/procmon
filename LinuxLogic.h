@@ -9,7 +9,6 @@
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
 #include "Process.h"
-#include "UsingCpu.h"
 
 namespace ProcmonLogic 
 {

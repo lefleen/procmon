@@ -30,7 +30,7 @@ class UsingCpuProc
 	double _interval_using_cpu = 0;
 	double _total_using_cpu = 0;
 
-	Result get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& time_using_cpu);
+	Result get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& current_work_time);
 
 	// Загруженность процессора за всё время существования
 	Result calculate_total_using_cpu(unsigned long num_cores, const ProcessDescriptorRAII& descriptor_process, double work_time_process);
@@ -40,7 +40,7 @@ class UsingCpuProc
 
 	Result update_current_time();
 
-    Result get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& current_process_cpu_time);
+    Result get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& delta_process_cpu_time);
 
 public:
 	UsingCpuProc() noexcept = default;
