@@ -5,7 +5,7 @@
 #include <chrono>
 
 #include "types.h"
-#include "Process.h"
+#include "DataProcess.h"
 #include "ProcessDescriptorRAII.h"
 
 namespace ProcmonLogic

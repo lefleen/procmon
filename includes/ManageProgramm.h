@@ -1,9 +1,10 @@
 #pragma once
 #include <thread>
 
+#include "DataProcess.h"
 #include "types.h"
 #include "UsingCpu.h"
-#include "Process.h"
+
 
 #ifdef _WIN32
 #include "WindowsLogic.h"

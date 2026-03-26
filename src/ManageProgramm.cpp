@@ -97,10 +97,8 @@ Result ManageProgramm::start_programm()
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
 
-	vec_t<vec_t<Process>> processes{ };
+	vec_t<vec_t<Process>> processes(max_threads);
     vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_process(max_threads);
-
-	processes.resize(max_threads);
 
 	while (true)
 	{

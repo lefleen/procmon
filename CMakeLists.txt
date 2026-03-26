@@ -3,29 +3,22 @@ project(procmon)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(PATH_TO_INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/includes)
+set(PATH_TO_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_executable(${PROJECT_NAME}
-	"main.cpp"
-	"macro.h"
-	"ProcessDescriptorRAII.cpp" 
-	"ProcessDescriptorRAII.h" 
-	"UsingCpu.cpp" 
-	"UsingCpu.h" 
-	"Process.cpp" 
-    "Process.h"
-    "ManageProgramm.cpp" 
-    "ManageProgramm.h"
+	"${PATH_TO_SOURCE_FILES}/main.cpp"
+	"${PATH_TO_SOURCE_FILES}/ProcessDescriptorRAII.cpp" 
+	"${PATH_TO_SOURCE_FILES}/UsingCpu.cpp" 
+	"src/DataProcess.cpp" 
+	"${PATH_TO_SOURCE_FILES}/ManageProgramm.cpp" 
 )
 
-if(UNIX)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LinuxLogic.cpp)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LinuxLogic.h)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SharedSpaceLinux.cpp)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SharedSpaceLinux.h)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_TO_INCLUDE_FILES}/)
+
+if(LINUX)
+    target_sources(${PROJECT_NAME} PRIVATE ${PATH_TO_SOURCE_FILES}/LinuxLogic.cpp)
+    target_sources(${PROJECT_NAME} PRIVATE ${PATH_TO_SOURCE_FILES}/SharedSpaceLinux.cpp)
 elseif(WIN32)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/WindowsLogic.cpp)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/WindowsLogic.h)
+    target_sources(${PROJECT_NAME} PRIVATE ${PATH_TO_SOURCE_FILES}/WindowsLogic.cpp)
 endif()
-
-
-
