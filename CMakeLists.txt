@@ -10,13 +10,13 @@ add_executable(${PROJECT_NAME}
 	"${PATH_TO_SOURCE_FILES}/main.cpp"
 	"${PATH_TO_SOURCE_FILES}/ProcessDescriptorRAII.cpp" 
 	"${PATH_TO_SOURCE_FILES}/UsingCpu.cpp" 
-	"src/DataProcess.cpp" 
+	"${PATH_TO_SOURCE_FILES}/DataProcess.cpp" 
 	"${PATH_TO_SOURCE_FILES}/ManageProgramm.cpp" 
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_TO_INCLUDE_FILES}/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_TO_INCLUDE_FILES})
 
-if(LINUX)
+if(UNIX)
     target_sources(${PROJECT_NAME} PRIVATE ${PATH_TO_SOURCE_FILES}/LinuxLogic.cpp)
     target_sources(${PROJECT_NAME} PRIVATE ${PATH_TO_SOURCE_FILES}/SharedSpaceLinux.cpp)
 elseif(WIN32)
