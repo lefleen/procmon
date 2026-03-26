@@ -49,7 +49,7 @@ public:
 
     UsingCpuProc& operator=(UsingCpuProc&& other) noexcept;
 
-    Result update(const ProcessDescriptorRAII& descriptor_process, Process& process);
+    Result update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process);
 
 	double get_total() const noexcept;
 

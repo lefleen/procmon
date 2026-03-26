@@ -36,7 +36,7 @@ Result ManageProgramm::calculate_start_end_points(const unsigned int max_threads
 	return Result::successful;
 }
 
-Result ManageProgramm::get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<Process>& processes,
+Result ManageProgramm::get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<DataProcess>& processes,
         map_t<DWORD, UsingCpuProc>& using_cpu_process)
 {
     size_t start_point = 0;
@@ -47,7 +47,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 
 	for (size_t index = start_point; index < end_point; ++index)
 	{
-		Process current_process { };
+		DataProcess current_process { };
         ProcessDescriptorRAII descriptor_process { };
 
 		current_process.pid = params.pids_processes[index];
@@ -62,7 +62,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 	return Result::successful;
 }
 
-Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<Process>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process)
+Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process)
 {
 	parameters_process params { };
     vec_t<std::thread> threads(max_threads);
@@ -97,7 +97,7 @@ Result ManageProgramm::start_programm()
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
 
-	vec_t<vec_t<Process>> processes(max_threads);
+	vec_t<vec_t<DataProcess>> processes(max_threads);
     vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_process(max_threads);
 
 	while (true)

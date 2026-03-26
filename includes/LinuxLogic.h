@@ -19,12 +19,12 @@ namespace ProcmonLogic
 
      namespace DescriptorProc
      {
-         Result get(ProcessDescriptorRAII& descriptor_process, Process& process);
+         Result get(ProcessDescriptorRAII& descriptor_process, DataProcess& process);
      }
 
      namespace NameProc
      {
-         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+         Result get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process);
      }
 
      namespace TimeProc
@@ -37,13 +37,13 @@ namespace ProcmonLogic
 
          Result seconds_to_my_tm(long double input_time, struct my_tm& output_time);
 
-         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+         Result get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process);
 
      }
      
      namespace MemoryProc
      {
-         Result get(const ProcessDescriptorRAII& descriptor_process, Process& process);
+         Result get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process);
      }
 
      namespace Manage
@@ -55,7 +55,7 @@ namespace ProcmonLogic
 
      namespace AllData 
      {
-         Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process);
+         Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process);
      }
 
 }

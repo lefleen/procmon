@@ -15,7 +15,7 @@ UsingCpuProc& UsingCpuProc::operator=(UsingCpuProc&& other) noexcept
     return *this;
 }
 
-Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
     Result res = Result::successful;
 
@@ -144,7 +144,7 @@ Result UsingCpuProc::get_interval_cpu_usage_time(const ProcessDescriptorRAII& de
 
     interval_cpu_usage_time = CURRENT_PROCESS_TIME - PREVIOUS_PROCESS_TIME;
 
-    if(FULL_PROCESS_TIME.QuadPart <= current_work_time.QuadPart) return Result::failure;
+    if(current_work_time.QuadPart <= FULL_PROCESS_TIME.QuadPart) return Result::failure;
     delta_process_cpu_time.QuadPart = current_work_time.QuadPart - FULL_PROCESS_TIME.QuadPart; 
 
     FULL_PROCESS_TIME = current_work_time;

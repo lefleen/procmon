@@ -19,7 +19,7 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
 }
 
 	// Получени имени процесса класса
-Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, Process& current_process)
+Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, DataProcess& current_process)
 {
 	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
@@ -120,7 +120,7 @@ Result ProcmonLogic::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& 
 }
 
 	// Получение времени работы процесса
-Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
 	my_tm tm_work_time_process = { };
 	time_t create_time_process = 0;
@@ -143,7 +143,7 @@ Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_proce
 }
 
 	// Получение ОЗУ процессора
-Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
 	PROCESS_MEMORY_COUNTERS pmc = { };
 
@@ -187,7 +187,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 	return Result::successful;
 }                                                                                                                                                                  
 
-Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
+Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process)
 {
     if (ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid) == Result::failure) return Result::failure; 
     if (ProcmonLogic::NameProc::get(descriptor_process, params.count_bytes_needed, process) == Result::failure) return Result::failure;

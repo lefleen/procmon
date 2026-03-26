@@ -3,7 +3,7 @@
 #include "types.h"
 #include "ProcessDescriptorRAII.h"
 
-class Process
+class DataProcess
 {
 public:
 	DWORD pid = 0;
@@ -21,7 +21,6 @@ public:
 
 	Result update(ProcessDescriptorRAII& descriptor_process, const parameters_process& params);
 
-	Process() noexcept = default;
-	Process(const Process&) = default;
-    Process(Process&) = default;
+	DataProcess() noexcept = default;
+	DataProcess(const DataProcess&) = default;
 };

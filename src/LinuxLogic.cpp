@@ -1,6 +1,6 @@
 #include "LinuxLogic.h"
 
-Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
     str_t path_to_process = "/proc/" + std::to_string(process.pid) +  "/stat";
 
@@ -10,7 +10,7 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
     return Result::successful;
 }
 
-Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
     constexpr int BUFFER_SIZE = 4096;
     char buffer[BUFFER_SIZE];
@@ -130,7 +130,7 @@ Result ProcmonLogic::TimeProc::seconds_to_my_tm(long double input_time, struct m
 
 }
 
-Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
      long double work_time_system = 0;
      long double start_work_time_proc = 0;
@@ -147,7 +147,7 @@ Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_proce
      return Result::successful;
 }
 
-Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, Process& process)
+Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
 {
     constexpr int NUM_OF_RSS = 24;
     constexpr int BUFFER_SIZE = 4096;
@@ -230,7 +230,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     return Result::successful; 
 }
 
-Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, Process& process)
+Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process)
 {
     if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure) return Result::failure;
     if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) return Result::failure;
