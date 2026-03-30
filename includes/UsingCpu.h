@@ -47,7 +47,7 @@ public:
 
 	UsingCpuProc(const UsingCpuProc& other) noexcept = default;
 
-    UsingCpuProc& operator=(UsingCpuProc&& other) noexcept;
+    UsingCpuProc& operator=(const UsingCpuProc& other) noexcept;
 
     Result update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process);
 

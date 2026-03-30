@@ -17,7 +17,7 @@ Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu
 		_using_cpu_processes[pid] = std::move(using_cpu_processes[pid]);
 	}
 
-	using_cpu_processes = std::move(_using_cpu_processes);
+	using_cpu_processes = _using_cpu_processes;
 
 
 	return Result::successful;
@@ -55,7 +55,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 		if (current_process.update(descriptor_process, params) == Result::failure) continue;
 		if (using_cpu_process[current_process.pid].update(descriptor_process, current_process) == Result::failure) continue;
 
-		processes.push_back(std::move(current_process));
+		processes.push_back(current_process);
 	}
 
 	clear_using_cpu_vec(using_cpu_process, params.pids_processes, start_point, end_point);
@@ -92,8 +92,6 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 
 Result ManageProgramm::start_programm()
 {
-	size_t interval_pause = 1000;
-
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
 

@@ -1,16 +1,10 @@
 #include "UsingCpu.h"
 
-UsingCpuProc& UsingCpuProc::operator=(UsingCpuProc&& other) noexcept
+UsingCpuProc& UsingCpuProc::operator=(const UsingCpuProc& other) noexcept
 {
     if(this == &other) return *this;
 
-    _interval_using_cpu = other._interval_using_cpu;
-    _total_using_cpu = other._total_using_cpu;
-
-    CURRENT_PROCESS_TIME = other.CURRENT_PROCESS_TIME;
-    PREVIOUS_PROCESS_TIME = other.PREVIOUS_PROCESS_TIME;
-
-    FULL_PROCESS_TIME = other.FULL_PROCESS_TIME;
+    *this = other;
 
     return *this;
 }

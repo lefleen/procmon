@@ -22,5 +22,5 @@ public:
 	Result update(ProcessDescriptorRAII& descriptor_process, const parameters_process& params);
 
 	DataProcess() noexcept = default;
-	DataProcess(const DataProcess&) = default;
+	DataProcess(const DataProcess& other) = default;
 };
