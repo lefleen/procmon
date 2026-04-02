@@ -4,7 +4,11 @@ UsingCpuProc& UsingCpuProc::operator=(const UsingCpuProc& other) noexcept
 {
     if(this == &other) return *this;
 
-    *this = other;
+    CURRENT_PROCESS_TIME = other.CURRENT_PROCESS_TIME;
+    PREVIOUS_PROCESS_TIME = other.PREVIOUS_PROCESS_TIME;
+    FULL_PROCESS_TIME = other.FULL_PROCESS_TIME;
+    _interval_using_cpu = other._interval_using_cpu;
+    _total_using_cpu = other._total_using_cpu;
 
     return *this;
 }
@@ -138,7 +142,7 @@ Result UsingCpuProc::get_interval_cpu_usage_time(const ProcessDescriptorRAII& de
 
     interval_cpu_usage_time = CURRENT_PROCESS_TIME - PREVIOUS_PROCESS_TIME;
 
-    if(current_work_time.QuadPart <= FULL_PROCESS_TIME.QuadPart) return Result::failure;
+    if(current_work_time.QuadPart < FULL_PROCESS_TIME.QuadPart) return Result::failure;
     delta_process_cpu_time.QuadPart = current_work_time.QuadPart - FULL_PROCESS_TIME.QuadPart; 
 
     FULL_PROCESS_TIME = current_work_time;

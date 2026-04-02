@@ -17,9 +17,11 @@ In future versions of the utility, it is planned to add: an interface for Termin
 ```
 git clone https://github.com/lefleen/procmon.git
 cd procmon
-cmake -S . -B
-build cmake --build build
+cmake -S . -B build
+cmake --build build
 ```
+**Add the directory containing the executable file to your `PATH`.**
+
 ## License
 
 Please see the file called [LICENSE](LICENSE). 
