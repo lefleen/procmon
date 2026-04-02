@@ -4,7 +4,9 @@ enum class Result
 {
 	successful,
 	failure,
-    initialization
+    initialization,
+    no_arguments,
+    invalid_arguments
 };
 
 constexpr int  macCreateTimeProcess = 1001;

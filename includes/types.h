@@ -59,5 +59,3 @@ struct parameters_process
 };
 
 #endif
-
-

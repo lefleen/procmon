@@ -6,14 +6,13 @@
 class DataProcess
 {
 public:
-	DWORD pid = 0;
-
 #ifdef _WIN32
 	wstr_t name = L"";
 #elif defined __linux__
     str_t name = "";
 #endif
 
+    DWORD pid = 0;
 	my_tm work_time = { };
 	long double using_memory = 0;
 	double total_using_cpu = 0;
