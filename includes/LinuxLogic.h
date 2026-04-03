@@ -1,4 +1,5 @@
 #pragma once
+
 #include <dirent.h>
 #include <memory>
 #include <fcntl.h>
@@ -12,11 +13,6 @@
 
 namespace ProcmonLogic 
 {
-     namespace SharedSpace
-     {
-         Result parse_string(const int num_element, const std::string& file_data, std::string& str);
-     }
-
      namespace DescriptorProc
      {
          Result get(ProcessDescriptorRAII& descriptor_process, DataProcess& process);
@@ -55,7 +51,7 @@ namespace ProcmonLogic
 
      namespace AllData 
      {
-         Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process);
+         Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process, const ProcmonSettings& procmon_settings);
      }
 
 }

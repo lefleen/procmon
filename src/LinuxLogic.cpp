@@ -230,12 +230,22 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     return Result::successful; 
 }
 
-Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process)
+Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process, const ProcmonSettings& procmon_settings)
 {
-    if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure) return Result::failure;
-    if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) return Result::failure;
-    if(ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) return Result::failure;
-    if(ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure) return Result::failure;
+    if(ProcmonLogic::DescriptorProc::get(descriptor_process, process) == Result::failure)
+        return Result::failure;
+
+    if(procmon_settings.name)
+        if(ProcmonLogic::NameProc::get(descriptor_process, process) == Result::failure) 
+            return Result::failure;
+
+    if (procmon_settings.time)
+        if(ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) 
+            return Result::failure;
+
+    if (procmon_settings.memory)
+        if(ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure)
+            return Result::failure;
    
     return Result::successful; 
 }

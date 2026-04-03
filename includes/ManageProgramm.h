@@ -1,10 +1,11 @@
 #pragma once
+
 #include <thread>
 
 #include "DataProcess.h"
 #include "types.h"
 #include "UsingCpu.h"
-
+#include "settingstypes.h"
 
 #ifdef _WIN32
 #include "WindowsLogic.h"
@@ -22,9 +23,9 @@ namespace ManageProgramm
 
 	Result calculate_start_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& start_point, size_t& end_point);
 
-	Result get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<DataProcess>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_process);
+	Result get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<DataProcess>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_process, const ProcmonSettings& procmon_settings);
 
-	Result start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process);
+	Result start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process, const ProcmonSettings& procmon_settings);
 
-	Result start_programm();
+	Result start_programm(const ProcmonSettings& procmon_settings);
 }

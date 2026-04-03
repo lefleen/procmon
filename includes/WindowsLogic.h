@@ -1,4 +1,5 @@
 #pragma once
+
 #include <windows.h>
 #include <psapi.h>
 #include <time.h>
@@ -46,6 +47,6 @@ namespace ProcmonLogic
 
     namespace AllData
     {
-        Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& current_process);
+        Result get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& current_process, const ProcmonSettings& procmon_settings);
     }
 }

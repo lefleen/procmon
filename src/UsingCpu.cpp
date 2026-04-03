@@ -13,11 +13,11 @@ UsingCpuProc& UsingCpuProc::operator=(const UsingCpuProc& other) noexcept
     return *this;
 }
 
-Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
+Result UsingCpuProc::update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process, const ProcmonSettings& procmon_settings)
 {
     Result res = Result::successful;
 
-    if ((res = calculate(descriptor_process, process.work_time.work_time)) == Result::failure) return Result::failure;
+    if ((res = calculate(descriptor_process, process.work_time.work_time, procmon_settings)) == Result::failure) return Result::failure;
     else if (res == Result::initialization) _interval_using_cpu = 0;
 
     process.interval_using_cpu = _interval_using_cpu;;
@@ -160,7 +160,7 @@ Result UsingCpuProc::update_current_time()
 	return Result::successful;
 }
 
-Result UsingCpuProc::calculate(const ProcessDescriptorRAII& descriptor_process, double work_time_process)
+Result UsingCpuProc::calculate(const ProcessDescriptorRAII& descriptor_process, double work_time_process, const ProcmonSettings& procmon_settings)
 {
 	// Количество количества логических потоков
 	unsigned long num_cores = std::thread::hardware_concurrency();
@@ -168,14 +168,18 @@ Result UsingCpuProc::calculate(const ProcessDescriptorRAII& descriptor_process, 
 
 	// ОБщее использоание CPU
     Result res;
-	if (calculate_total_using_cpu(num_cores, descriptor_process, work_time_process) == Result::failure)
-		return Result::failure;
+    if(procmon_settings.total_cpu && procmon_settings.time)
+	    if (calculate_total_using_cpu(num_cores, descriptor_process, work_time_process) == Result::failure)
+		    return Result::failure;
 
 	// За определенный интервал времени
-	if ((res = calculating_interval_using_cpu(num_cores, descriptor_process)) == Result::failure)
-		return Result::failure;
-    else if(res == Result::initialization)
-        return Result::initialization;
+    if (procmon_settings.interval_cpu)
+    {
+        if ((res = calculating_interval_using_cpu(num_cores, descriptor_process)) == Result::failure)
+            return Result::failure;
+        else if (res == Result::initialization)
+            return Result::initialization;
+    }
 
 	return Result::successful;
 }

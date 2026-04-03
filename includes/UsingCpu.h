@@ -1,4 +1,5 @@
 #pragma once
+
 #include <chrono>
 #include <thread>
 
@@ -49,11 +50,11 @@ public:
 
     UsingCpuProc& operator=(const UsingCpuProc& other) noexcept;
 
-    Result update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process);
+    Result update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process, const ProcmonSettings& procmon_settings);
 
 	double get_total() const noexcept;
 
 	double get_interval() const noexcept;
 
-	Result calculate(const ProcessDescriptorRAII& descriptor_process, double work_time_process);
+	Result calculate(const ProcessDescriptorRAII& descriptor_process, double work_time_process, const ProcmonSettings& procmon_settings);
 };

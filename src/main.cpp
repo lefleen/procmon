@@ -4,18 +4,20 @@
 int main(int argc, const char* argv[]) 
 {
     Result res;
-    ProcmonSettings procmon_settings { };
-    if((res = CommandProcessor::parse_string(procmon_settings, argc, argv)) == Result::failure) return -1; 
-    else if(res == Result::invalid_arguments) 
-    { 
-        /*UserInterface::show_err(res)*/
+    ProcmonSettings procmon_settings = { };
+    if ((res = CommandProcessor::parse_string(procmon_settings, argc, argv)) == Result::failure) return -1;
+    else if (res == Result::invalid_arguments)
+    {
+        UserInterface::ShowHelp::all();
         return -1;
     }
+    else if (res != Result::no_arguments)
+        return 0;
 
     int count = 0;
 
 	for (; count <= 5; ++count)
-		if (ManageProgramm::start_programm() == Result::successful) break;
+		if (ManageProgramm::start_programm(procmon_settings) == Result::successful) break;
 	if (count == 6) return -1;
 
 	return 0;

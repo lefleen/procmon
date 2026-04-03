@@ -37,7 +37,7 @@ Result ManageProgramm::calculate_start_end_points(const unsigned int max_threads
 }
 
 Result ManageProgramm::get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<DataProcess>& processes,
-        map_t<DWORD, UsingCpuProc>& using_cpu_process)
+        map_t<DWORD, UsingCpuProc>& using_cpu_process, const ProcmonSettings& procmon_settings)
 {
     size_t start_point = 0;
     size_t end_point = 0;
@@ -52,8 +52,8 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 
 		current_process.pid = params.pids_processes[index];
 
-		if (current_process.update(descriptor_process, params) == Result::failure) continue;
-		if (using_cpu_process[current_process.pid].update(descriptor_process, current_process) == Result::failure) continue;
+		if (current_process.update(descriptor_process, params, procmon_settings) == Result::failure) continue;
+		if (using_cpu_process[current_process.pid].update(descriptor_process, current_process, procmon_settings) == Result::failure) continue;
 
 		processes.push_back(current_process);
 	}
@@ -62,7 +62,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 	return Result::successful;
 }
 
-Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process)
+Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process, const ProcmonSettings& procmon_settings)
 {
 	parameters_process params { };
     vec_t<std::thread> threads(max_threads);
@@ -75,8 +75,8 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
-		threads[num_thread] = std::thread([&params, max_threads, num_thread, &processes, &using_cpu_process]() {
-			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread]) == Result::failure) 
+		threads[num_thread] = std::thread([&params, max_threads, num_thread, &processes, &using_cpu_process, &procmon_settings]() {
+			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread], procmon_settings) == Result::failure) 
                 clear_thread_resources(processes[num_thread], using_cpu_process[num_thread]);
 		});
 	}
@@ -90,7 +90,7 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 	return Result::successful;
 }
 
-Result ManageProgramm::start_programm()
+Result ManageProgramm::start_programm(const ProcmonSettings& procmon_settings)
 {
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
@@ -100,7 +100,7 @@ Result ManageProgramm::start_programm()
 
 	while (true)
 	{
-		if (start_threads(max_threads, processes, using_cpu_process) == Result::failure)
+		if (start_threads(max_threads, processes, using_cpu_process, procmon_settings) == Result::failure)
 			return Result::failure;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));

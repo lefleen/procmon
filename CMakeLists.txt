@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
 	"${PATH_TO_SOURCE_FILES}/DataProcess.cpp" 
 	"${PATH_TO_SOURCE_FILES}/ManageProgramm.cpp" 
     "${PATH_TO_SOURCE_FILES}/CommandProcessor.cpp"
+	"${PATH_TO_SOURCE_FILES}/UserInterface.cpp"
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_TO_INCLUDE_FILES})

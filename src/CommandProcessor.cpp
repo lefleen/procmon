@@ -1,5 +1,4 @@
 #include "CommandProcessor.h"
-#include <iostream>
 
 Result CommandProcessor::convert_char_to_string(vec_t<str_t>& res, const int argc, const char* argv[])
 {
@@ -25,7 +24,7 @@ Result CommandProcessor::parse_string(ProcmonSettings& procmon_settings, const i
 
         if(option == "--help") 
         {
-            /*UserInterface::show_help()*/;
+            UserInterface::ShowHelp::all();
             return Result::successful;
         }
 
@@ -33,11 +32,17 @@ Result CommandProcessor::parse_string(ProcmonSettings& procmon_settings, const i
         {
             if(index + 2 >= size) return Result::invalid_arguments;
 
+            Result res;
             const str_t metrick = args[index + 1];
             const str_t setting = args[index + 2];
 
-            if(metrick == "name" && Name::set(procmon_settings, setting) == Result::invalid_arguments) return Result::invalid_arguments;
+            if (metrick == "name") res = Name::set(procmon_settings, setting);
+            else if (metrick == "time") res = Time::set(procmon_settings, setting);
+            else if (metrick == "memory") res = Memory::set(procmon_settings, setting);
+            else if (metrick == "total_cpu") res = TotalCPU::set(procmon_settings, setting);
+            else if (metrick == "interval_cpu") res = IntervalCPU::set(procmon_settings, setting);
             else return Result::invalid_arguments;
+            if (res == Result::invalid_arguments) return res;
 
             index += 2;
             continue;
@@ -49,7 +54,11 @@ Result CommandProcessor::parse_string(ProcmonSettings& procmon_settings, const i
 
             const str_t metrick = args[index + 1];
 
-            if(metrick == "name") /*UserInterface::show_name_settings()*/;
+            if (metrick == "name") UserInterface::ShowSettings::name();
+            else if (metrick == "time") UserInterface::ShowSettings::time();
+            else if (metrick == "memory") UserInterface::ShowSettings::memory();
+            else if (metrick == "total_cpu") UserInterface::ShowSettings::total_cpu();
+            else if (metrick == "interval_cpu") UserInterface::ShowSettings::interval_cpu();
             else return Result::invalid_arguments;
 
             index += 1;
@@ -71,3 +80,42 @@ Result CommandProcessor::Name::set(ProcmonSettings& procmon_settings, const str_
     return Result::successful;
 }
 
+Result CommandProcessor::Time::set(ProcmonSettings& procmon_settings, const str_t& setting)
+{
+    if (setting == "on") procmon_settings.time = true;
+    else if (setting == "off")
+    {
+        UserInterface::ShowAssert::time_off();
+        procmon_settings.time = false;
+    }
+    else  return Result::invalid_arguments;
+
+    return Result::successful;
+}
+
+Result CommandProcessor::Memory::set(ProcmonSettings& procmon_settings, const str_t& setting)
+{
+    if (setting == "on") procmon_settings.memory= true;
+    else if (setting == "off") procmon_settings.memory = false;
+    else  return Result::invalid_arguments;
+
+    return Result::successful;
+}
+
+Result CommandProcessor::TotalCPU::set(ProcmonSettings& procmon_settings, const str_t& setting)
+{
+    if (setting == "on") procmon_settings.total_cpu = true;
+    else if (setting == "off") procmon_settings.total_cpu = false;
+    else  return Result::invalid_arguments;
+
+    return Result::successful;
+}
+
+Result CommandProcessor::IntervalCPU::set(ProcmonSettings& procmon_settings, const str_t& setting)
+{
+    if (setting == "on") procmon_settings.interval_cpu = true;
+    else if (setting == "off") procmon_settings.interval_cpu = false;
+    else  return Result::invalid_arguments;
+
+    return Result::successful;
+}
