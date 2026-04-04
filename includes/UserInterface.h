@@ -8,20 +8,20 @@ namespace UserInterface
 {
 	namespace ShowHelp
 	{
-		void all();
+		void full_help();
 	}
 
 	namespace ShowSettings
 	{
-		void name();
+		void name(bool status);
 
-		void time();
+		void time(bool status);
 
-		void memory();
+		void memory(bool status);
 
-		void total_cpu();
+		void total_cpu(bool status);
 
-		void interval_cpu();
+		void interval_cpu(bool status);
 	}
 
 	namespace ShowAssert 

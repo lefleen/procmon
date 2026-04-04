@@ -5,10 +5,10 @@ int main(int argc, const char* argv[])
 {
     Result res;
     ProcmonSettings procmon_settings = { };
-    if ((res = CommandProcessor::parse_string(procmon_settings, argc, argv)) == Result::failure) return -1;
+    if ((res = CommandProcessor::manage(procmon_settings, argc, argv)) == Result::failure) return -1;
     else if (res == Result::invalid_arguments)
     {
-        UserInterface::ShowHelp::all();
+        UserInterface::ShowHelp::full_help();
         return -1;
     }
     else if (res != Result::no_arguments)

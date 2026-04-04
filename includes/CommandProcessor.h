@@ -6,12 +6,38 @@
 
 namespace CommandProcessor
 {   
-    Result convert_char_to_string(vec_t<str_t>& res, const int argc, const char* argv[]);
+    Result manage(ProcmonSettings& procmon_settings, const int argc, const char* argv[]);
 
-    Result parse_string(ProcmonSettings& procmon_settings, const int argc, const char* argv[]);
+    namespace FileUtility 
+    {
+        Result load(ProcmonSettings& procmon_settings);
+
+        Result save(const ProcmonSettings& procmon_settings);
+    }
+
+    namespace ParseUtility
+    {
+        Result convert_char_to_string(vec_t<str_t>& res, const int argc, const char* argv[]);
+
+        Result parse_string(ProcmonSettings& procmon_settings, const int argc, const char* argv[], str_t& option, str_t& metrick, str_t& setting, size_t& index);
+    }
+
+    namespace Command
+    {
+        namespace Set
+        {
+            Result manage(ProcmonSettings& procmon_settings, const str_t& metrick, const str_t& setting);
+        }
+
+        namespace Get
+        {
+            Result manage(const ProcmonSettings& procmon_settings, const str_t& metrick);
+        }
+    }
 
     namespace Name
     {
+        
         Result set(ProcmonSettings& procmon_settings, const str_t& value);
     }
 
