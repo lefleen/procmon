@@ -4,7 +4,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
 { 
     Result res_file_load;
     
-    if ((res_file_load = FileUtility::main_load(procmon_settings)) != Result::successful) 
+    if ((res_file_load = FileUtility::manage(procmon_settings)) != Result::successful) 
         return res_file_load;
 
     size_t size = argc - 1;
@@ -108,30 +108,31 @@ Result CommandProcessor::ParseUtility::parse_string(ProcmonSettings& procmon_set
 
 Result CommandProcessor::ParseUtility::convert_settings_to_string(const ProcmonSettings& procmon_settings, str_t& out)
 {
-    if (procmon_settings.name) out = "Name:on\n";
-    else out = "Name:off\n";
+    if (procmon_settings.name) out = "name:on;\n";
+    else out = "name:off;\n";
 
-    if (procmon_settings.time) out += "Time:on\n";
-    else out += "Time:off\n";
+    if (procmon_settings.time) out += "time:on;\n";
+    else out += "time:off;\n";
 
-    if (procmon_settings.memory) out += "Memory:on\n";
-    else out += "Memory:off\n";
+    if (procmon_settings.memory) out += "memory:on;\n";
+    else out += "memory:off;\n";
 
-    if (procmon_settings.total_cpu) out += "IntervalCPU:on\n";
-    else out += "IntervalCPU:off\n";
+    if (procmon_settings.total_cpu) out += "totalCPU:on;\n";
+    else out += "totalCPU:off;\n";
 
-    if (procmon_settings.interval_cpu) out += "IntervalCPU:on\n";
-    else out += "IntervalCPU:off\n";
+    if (procmon_settings.interval_cpu) out += "intervalCPU:on;\n";
+    else out += "intervalCPU:off;\n";
 
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::save_base_parameters(const ProcmonSettings& procmon_settings, void* h_file)
+Result CommandProcessor::FileUtility::save_base_parameters(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file)
 {
     str_t data = "";
 
     ParseUtility::convert_settings_to_string(procmon_settings, data);
 
+#ifdef _WIN32
     DWORD REAL_SIZE = 0;
     DWORD count_bytes = data.size() * sizeof(char);
 
@@ -139,62 +140,81 @@ Result CommandProcessor::FileUtility::save_base_parameters(const ProcmonSettings
 
     if (!flag) return Result::failure;
 
+#elif defined(__linux__)
+
+#endif
+
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::load_parameters(const ProcmonSettings& procmon_settings, const char* buffer, DWORD REAL_SIZE)
+Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_settings, const str_t& data)
 {
-    str_t data = str_t(buffer, REAL_SIZE);
+    size_t start_line = 0;
 
-    size_t pos = data.find(":");
-    str_t metrick = data.substr(0, pos);
-    std::cout << metrick;
+    while (start_line < data.size())
+    {
+        Result res_set_manage;
+
+        size_t end_line = data.find("\n", start_line);
+
+        str_t line = data.substr(start_line, end_line - start_line);
+        
+        size_t end_metrick = line.find(":", 0);
+        size_t end_setting = line.find(";", end_metrick + 1);
+
+        str_t metrick = line.substr(0, end_metrick);
+        str_t setting = line.substr(end_metrick + 1, end_setting - end_metrick - 1);
+        
+        if((res_set_manage = Command::Set::manage(procmon_settings, metrick, setting)) != Result::successful)
+            return res_set_manage;
+
+        start_line = end_line + 1;
+    }
 
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::main_load(ProcmonSettings& procmon_settings)
+Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings)
 {
     const char* file_name = "procmon_config";
 
-#ifdef _WIN32
-    DWORD BUFFER_SIZE = 1024;
+    const DWORD BUFFER_SIZE = 1024;
     DWORD REAL_SIZE = 0;
-    HANDLE h_file;
-
-    const char* buffer = nullptr;
+    descriptor_process_t h_file;
+    
+#ifdef _WIN32
+    char buffer[BUFFER_SIZE];
 
     h_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
         NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
+    ProcessDescriptorRAII _h_file;
+    _h_file = h_file;
+
     if (GetLastError() != ERROR_ALREADY_EXISTS)
     {
-        Result res;
+        Result res_save_base_parameters;
 
-        if ((res = save_base_parameters(procmon_settings, h_file)) != Result::successful)
-            return res;
-
-        CloseHandle(h_file);
+        if ((res_save_base_parameters = save_base_parameters(procmon_settings, h_file)) != Result::successful)
+            return res_save_base_parameters;
 
         return Result::successful;
     }
 
-   h_file = CreateFile(file_name, GENERIC_WRITE, 0,
-        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    bool flag = ReadFile(h_file, (void*)(buffer), BUFFER_SIZE, &REAL_SIZE, NULL);
+   if (h_file == INVALID_HANDLE_VALUE)
+       return Result::failure;
 
-    if (!flag)
-    {
-        std::cout << "err: " << GetLastError() << std::endl;
-        return Result::failure;
-    }
+   if (!ReadFile(h_file, (void*)(buffer), BUFFER_SIZE, &REAL_SIZE, NULL))
+       return Result::failure;
 
     Result res_load_parameters;
 
-    if ((res_load_parameters = load_parameters(procmon_settings, buffer, REAL_SIZE)) != Result::successful)
+    str_t data = str_t(buffer, REAL_SIZE);
+    if ((res_load_parameters = load_parameters(procmon_settings, data)) != Result::successful)
         return res_load_parameters;
-        
-    CloseHandle(h_file);
+
+#elif defined(__linux__)
+
 #endif
 
     return Result::successful;
@@ -211,11 +231,14 @@ Result CommandProcessor::Command::Set::manage(ProcmonSettings& procmon_settings,
     if (metrick == "name") res = Name::set(procmon_settings, setting);
     else if (metrick == "time") res = Time::set(procmon_settings, setting);
     else if (metrick == "memory") res = Memory::set(procmon_settings, setting);
-    else if (metrick == "TotalCPU") res = TotalCPU::set(procmon_settings, setting);
-    else if (metrick == "IntervalCPU") res = IntervalCPU::set(procmon_settings, setting);
+    else if (metrick == "totalCPU") res = TotalCPU::set(procmon_settings, setting);
+    else if (metrick == "intervalCPU") res = IntervalCPU::set(procmon_settings, setting);
     else return Result::invalid_arguments;
 
     if (res != Result::successful) 
+        return res;
+
+    if ((res = Get::manage(procmon_settings, metrick)) != Result::successful)
         return res;
 
     return Result::successful;
@@ -226,8 +249,8 @@ Result CommandProcessor::Command::Get::manage(const ProcmonSettings& procmon_set
     if (metrick == "name") UserInterface::ShowSettings::name(procmon_settings.name);
     else if (metrick == "time") UserInterface::ShowSettings::time(procmon_settings.time);
     else if (metrick == "memory") UserInterface::ShowSettings::memory(procmon_settings.memory);
-    else if (metrick == "total_cpu") UserInterface::ShowSettings::total_cpu(procmon_settings.total_cpu);
-    else if (metrick == "interval_cpu") UserInterface::ShowSettings::interval_cpu(procmon_settings.interval_cpu);
+    else if (metrick == "totalCPU") UserInterface::ShowSettings::total_cpu(procmon_settings.total_cpu);
+    else if (metrick == "intervalCPU") UserInterface::ShowSettings::interval_cpu(procmon_settings.interval_cpu);
     else return Result::invalid_arguments;
 
     return Result::successful;

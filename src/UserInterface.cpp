@@ -7,7 +7,7 @@ void UserInterface::ShowHelp::full_help()
 
 void UserInterface::ShowSettings::name(bool status) 
 {
-	std::cout << "Name:";
+	std::cout << "name:";
 	if (status) std::cout << "on";
 	else std::cout << "off";
 	std::cout << std::endl;
@@ -15,7 +15,7 @@ void UserInterface::ShowSettings::name(bool status)
 
 void UserInterface::ShowSettings::time(bool status)
 {
-	std::cout << "Time:";
+	std::cout << "time:";
 	if (status) std::cout << "on";
 	else std::cout << "off";
 	std::cout << std::endl;
@@ -23,7 +23,7 @@ void UserInterface::ShowSettings::time(bool status)
 
 void UserInterface::ShowSettings::memory(bool status)
 {
-	std::cout << "Memory:";
+	std::cout << "memory:";
 	if (status) std::cout << "on";
 	else std::cout << "off";
 	std::cout << std::endl;
@@ -31,7 +31,7 @@ void UserInterface::ShowSettings::memory(bool status)
 
 void UserInterface::ShowSettings::total_cpu(bool status)
 {
-	std::cout << "TotalCPU:";
+	std::cout << "totalCPU:";
 	if (status) std::cout << "on";
 	else std::cout << "off";
 	std::cout << std::endl;
@@ -39,7 +39,7 @@ void UserInterface::ShowSettings::total_cpu(bool status)
 
 void UserInterface::ShowSettings::interval_cpu(bool status)
 {
-	std::cout << "IntervalCPU:";
+	std::cout << "intervalCPU:";
 	if (status) std::cout << "on";
 	else std::cout << "off";
 	std::cout << std::endl;

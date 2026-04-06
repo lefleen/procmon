@@ -9,6 +9,7 @@
 #include "types.h"
 #include "settingstypes.h"
 #include "UserInterface.h"
+#include "ProcessDescriptorRAII.h"
 
 namespace CommandProcessor
 {   
@@ -16,13 +17,13 @@ namespace CommandProcessor
 
     namespace FileUtility 
     {
-        Result main_load(ProcmonSettings& procmon_settings);
+        Result manage(ProcmonSettings& procmon_settings);
 
         Result save(const ProcmonSettings& procmon_settings);
 
-        Result save_base_parameters(const ProcmonSettings& procmon_settings, void* h_file);
+        Result save_base_parameters(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file);
 
-        Result load_parameters(const ProcmonSettings& procmon_settings, const char* buffer, DWORD REAL_SIZE);
+        Result load_parameters(ProcmonSettings& procmon_settings, const str_t& data);
     }
 
     namespace ParseUtility
