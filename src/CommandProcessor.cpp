@@ -111,7 +111,7 @@ Result CommandProcessor::ParseUtility::convert_settings_to_string(const ProcmonS
     if (procmon_settings.name) out = "Name:on\n";
     else out = "Name:off\n";
 
-    if (procmon_settings.time) out += "\nTime:on\n";
+    if (procmon_settings.time) out += "Time:on\n";
     else out += "Time:off\n";
 
     if (procmon_settings.memory) out += "Memory:on\n";
@@ -162,7 +162,7 @@ Result CommandProcessor::FileUtility::main_load(ProcmonSettings& procmon_setting
     DWORD REAL_SIZE = 0;
     HANDLE h_file;
 
-    const char* buffer;
+    const char* buffer = nullptr;
 
     h_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
         NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -174,14 +174,18 @@ Result CommandProcessor::FileUtility::main_load(ProcmonSettings& procmon_setting
         if ((res = save_base_parameters(procmon_settings, h_file)) != Result::successful)
             return res;
 
+        CloseHandle(h_file);
+
         return Result::successful;
     }
-    
-    bool flag = ReadFile(h_file, static_cast<void*>(&buffer), BUFFER_SIZE, &REAL_SIZE, NULL);
+
+   h_file = CreateFile(file_name, GENERIC_WRITE, 0,
+        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    bool flag = ReadFile(h_file, (void*)(buffer), BUFFER_SIZE, &REAL_SIZE, NULL);
 
     if (!flag)
     {
-        std::cout << "err" << std::endl;
+        std::cout << "err: " << GetLastError() << std::endl;
         return Result::failure;
     }
 
@@ -189,8 +193,8 @@ Result CommandProcessor::FileUtility::main_load(ProcmonSettings& procmon_setting
 
     if ((res_load_parameters = load_parameters(procmon_settings, buffer, REAL_SIZE)) != Result::successful)
         return res_load_parameters;
-
-    CloseHandle(&h_file);
+        
+    CloseHandle(h_file);
 #endif
 
     return Result::successful;
