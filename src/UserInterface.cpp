@@ -5,6 +5,11 @@ void UserInterface::ShowHelp::full_help()
 	std::cout << "test help" << std::endl;
 }
 
+void UserInterface::ShowHelp::command_help() 
+{
+
+}
+
 void UserInterface::ShowSettings::name(bool status) 
 {
 	std::cout << "name:";

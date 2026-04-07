@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "ProcessDescriptorRAII.h"
+#include "DescriptorRAII.h"
 #include "settingstypes.h"
 
 class DataProcess
@@ -19,7 +19,7 @@ public:
 	double total_using_cpu = 0;
 	double interval_using_cpu = 0;
 
-	Result update(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, const ProcmonSettings& procmon_settings);
+	Result update(DescriptorRAII& descriptor_process, const parameters_process& params, const ProcmonSettings& procmon_settings);
 
 	DataProcess() noexcept = default;
 	DataProcess(const DataProcess& other) = default;

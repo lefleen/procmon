@@ -1,7 +1,7 @@
 #include "WindowsLogic.h"
 
 // Получение ID
-Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_process, DWORD pid_process)
+Result ProcmonLogic::DescriptorProc::get(DescriptorRAII& descriptor_process, DWORD pid_process)
 {
 	// Проверка PID процесса на существование
 	if (pid_process != 0)
@@ -19,7 +19,7 @@ Result ProcmonLogic::DescriptorProc::get(ProcessDescriptorRAII& descriptor_proce
 }
 
 	// Получени имени процесса класса
-Result ProcmonLogic::NameProc::get(const ProcessDescriptorRAII& descriptor_process, DWORD count_bytes_needed, DataProcess& current_process)
+Result ProcmonLogic::NameProc::get(const DescriptorRAII& descriptor_process, DWORD count_bytes_needed, DataProcess& current_process)
 {
 	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
@@ -58,7 +58,7 @@ Result ProcmonLogic::TimeProc::filetime_to_time_t(time_t& time, const process_ti
 }
 
 	// Получение FILETIME в формате time_t
-Result ProcmonLogic::TimeProc::get_create_time_process(const ProcessDescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
+Result ProcmonLogic::TimeProc::get_create_time_process(const DescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
 {
 	process_time creation_ftime_process = { };
 	process_time kernel_ftime_process = { };
@@ -120,7 +120,7 @@ Result ProcmonLogic::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& 
 }
 
 	// Получение времени работы процесса
-Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
+Result ProcmonLogic::TimeProc::get(const DescriptorRAII& descriptor_process, DataProcess& process)
 {
 	my_tm tm_work_time_process = { };
 	time_t create_time_process = 0;
@@ -143,7 +143,7 @@ Result ProcmonLogic::TimeProc::get(const ProcessDescriptorRAII& descriptor_proce
 }
 
 	// Получение ОЗУ процессора
-Result ProcmonLogic::MemoryProc::get(const ProcessDescriptorRAII& descriptor_process, DataProcess& process)
+Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, DataProcess& process)
 {
 	PROCESS_MEMORY_COUNTERS pmc = { };
 
@@ -187,7 +187,7 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 	return Result::successful;
 }                                                                                                                                                                  
 
-Result ProcmonLogic::AllData::get_all_data_process(ProcessDescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process, const ProcmonSettings& procmon_settings)
+Result ProcmonLogic::AllData::get_all_data_process(DescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process, const ProcmonSettings& procmon_settings)
 {
     if (ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid) == Result::failure) return Result::failure; 
 

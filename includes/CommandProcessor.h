@@ -9,7 +9,7 @@
 #include "types.h"
 #include "settingstypes.h"
 #include "UserInterface.h"
-#include "ProcessDescriptorRAII.h"
+#include "DescriptorRAII.h"
 
 namespace CommandProcessor
 {   
@@ -17,11 +17,16 @@ namespace CommandProcessor
 
     namespace FileUtility 
     {
-        Result manage(ProcmonSettings& procmon_settings);
+        const int load_file = 100;
+        const int save_file = 200;
 
-        Result save(const ProcmonSettings& procmon_settings);
+        Result manage(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const int param);
 
-        Result save_base_parameters(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file);
+        Result load(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name);
+
+        Result save(const ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name);
+
+        Result save_parameters_in_file(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file);
 
         Result load_parameters(ProcmonSettings& procmon_settings, const str_t& data);
     }
@@ -45,6 +50,8 @@ namespace CommandProcessor
         namespace Get
         {
             Result manage(const ProcmonSettings& procmon_settings, const str_t& metrick);
+
+            Result programm_config(const ProcmonSettings& procmon_settings, const str_t& metrick);
         }
     }
 

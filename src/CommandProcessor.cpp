@@ -3,13 +3,20 @@
 Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int argc, const char* argv[])
 { 
     Result res_file_load;
-    
-    if ((res_file_load = FileUtility::manage(procmon_settings)) != Result::successful) 
+
+    DescriptorRAII descriptor_file{ };
+    if ((res_file_load = FileUtility::manage(procmon_settings, descriptor_file, FileUtility::load_file)) != Result::successful) 
         return res_file_load;
 
     size_t size = argc - 1;
-    if (size == 0) 
+    if (size == 0)
+    {
+        Result res_get_manage;
+        if ((res_get_manage = Command::Get::manage(procmon_settings, "all")) != Result::successful)
+            return res_get_manage;
+
         return Result::no_arguments;
+    }
     else if (size < 0) 
         return Result::failure;
 
@@ -26,7 +33,9 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
         if ((res_parse_string = ParseUtility::parse_string(procmon_settings, argc, argv, option, metrick, setting, index)) != Result::successful)
             return res_parse_string;
 
-        if (option == "--help")
+
+        
+        if (option == "help")
         {
             UserInterface::ShowHelp::full_help();
         }
@@ -39,6 +48,9 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
 
             if((res = Command::Get::manage(procmon_settings, metrick)) != Result::successful)
                 return res;
+
+            if (setting == "off" && metrick == "time")
+                UserInterface::ShowAssert::time_off();
         }
         else if (option == "get")
         {    
@@ -50,9 +62,11 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     }
 
     Result res_file_save;
-    if(option == "set") 
-        if((res_file_save = FileUtility::save(procmon_settings)) != Result::successful) 
+    if (option == "set")
+    {
+        if ((res_file_save = FileUtility::manage(procmon_settings, descriptor_file, FileUtility::save_file)) != Result::successful)
             return res_file_save;
+    }
 
     return Result::successful;
 }
@@ -78,7 +92,7 @@ Result CommandProcessor::ParseUtility::parse_string(ProcmonSettings& procmon_set
 
     option = args[index];
 
-    if (option == "--help")
+    if (option == "help")
     {
         index += 1;
     }
@@ -126,7 +140,7 @@ Result CommandProcessor::ParseUtility::convert_settings_to_string(const ProcmonS
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::save_base_parameters(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file)
+Result CommandProcessor::FileUtility::save_parameters_in_file(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file)
 {
     str_t data = "";
 
@@ -150,7 +164,7 @@ Result CommandProcessor::FileUtility::save_base_parameters(const ProcmonSettings
 Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_settings, const str_t& data)
 {
     size_t start_line = 0;
-
+    
     while (start_line < data.size())
     {
         Result res_set_manage;
@@ -164,7 +178,8 @@ Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_s
 
         str_t metrick = line.substr(0, end_metrick);
         str_t setting = line.substr(end_metrick + 1, end_setting - end_metrick - 1);
-        
+        if (end_setting == str_t::npos || end_metrick == str_t::npos) break;
+
         if((res_set_manage = Command::Set::manage(procmon_settings, metrick, setting)) != Result::successful)
             return res_set_manage;
 
@@ -174,38 +189,32 @@ Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_s
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings)
+Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name) 
 {
-    const char* file_name = "procmon_config";
+#ifdef _WIN32
+    descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
+        NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (descriptor_file.get() == INVALID_HANDLE_VALUE)
+        return Result::failure;
 
     const DWORD BUFFER_SIZE = 1024;
     DWORD REAL_SIZE = 0;
-    descriptor_process_t h_file;
-    
-#ifdef _WIN32
+
     char buffer[BUFFER_SIZE];
-
-    h_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
-        NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-    ProcessDescriptorRAII _h_file;
-    _h_file = h_file;
 
     if (GetLastError() != ERROR_ALREADY_EXISTS)
     {
         Result res_save_base_parameters;
 
-        if ((res_save_base_parameters = save_base_parameters(procmon_settings, h_file)) != Result::successful)
+        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings, descriptor_file.get())) != Result::successful)
             return res_save_base_parameters;
 
         return Result::successful;
     }
 
-   if (h_file == INVALID_HANDLE_VALUE)
-       return Result::failure;
-
-   if (!ReadFile(h_file, (void*)(buffer), BUFFER_SIZE, &REAL_SIZE, NULL))
-       return Result::failure;
+    if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_SIZE, NULL))
+        return Result::failure;
 
     Result res_load_parameters;
 
@@ -213,15 +222,52 @@ Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings)
     if ((res_load_parameters = load_parameters(procmon_settings, data)) != Result::successful)
         return res_load_parameters;
 
-#elif defined(__linux__)
+#elif define (__linux__)
 
 #endif
 
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::save(const ProcmonSettings& procmon_settings)
+Result CommandProcessor::FileUtility::save(const ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name)
 {
+    descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
+        NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (descriptor_file.get() == INVALID_HANDLE_VALUE)
+    {
+        std::cout << GetLastError() << std::endl;
+        return Result::failure;
+    }
+
+    Result res_save;
+    if ((res_save = save_parameters_in_file(procmon_settings, descriptor_file.get())) != Result::successful)
+        return res_save;
+
+    return Result::successful;
+}
+
+Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const int param)
+{
+    const char* file_name = "procmon_config";
+    
+    if (param == load_file)
+    {
+        Result res_load;
+        if ((res_load = load(procmon_settings, descriptor_file, file_name)) != Result::successful)
+            return res_load;
+    }
+    else if (param == save_file)
+    {
+        Result res_save;
+        if ((res_save = save(procmon_settings, descriptor_file, file_name)) != Result::successful)
+            return res_save;
+    }
+    else return Result::failure;
+
+    if (CloseHandle(descriptor_file.get()) == 0)
+        return Result::failure;
+
     return Result::successful;
 }
 
@@ -238,8 +284,16 @@ Result CommandProcessor::Command::Set::manage(ProcmonSettings& procmon_settings,
     if (res != Result::successful) 
         return res;
 
-    if ((res = Get::manage(procmon_settings, metrick)) != Result::successful)
-        return res;
+    return Result::successful;
+}
+
+Result CommandProcessor::Command::Get::programm_config(const ProcmonSettings& procmon_settings, const str_t& metrick)
+{
+    UserInterface::ShowSettings::name(procmon_settings.name);
+    UserInterface::ShowSettings::time(procmon_settings.time);
+    UserInterface::ShowSettings::memory(procmon_settings.memory);
+    UserInterface::ShowSettings::total_cpu(procmon_settings.total_cpu);
+    UserInterface::ShowSettings::interval_cpu(procmon_settings.interval_cpu);
 
     return Result::successful;
 }
@@ -251,6 +305,7 @@ Result CommandProcessor::Command::Get::manage(const ProcmonSettings& procmon_set
     else if (metrick == "memory") UserInterface::ShowSettings::memory(procmon_settings.memory);
     else if (metrick == "totalCPU") UserInterface::ShowSettings::total_cpu(procmon_settings.total_cpu);
     else if (metrick == "intervalCPU") UserInterface::ShowSettings::interval_cpu(procmon_settings.interval_cpu);
+    else if (metrick == "all") programm_config(procmon_settings, metrick);
     else return Result::invalid_arguments;
 
     return Result::successful;
@@ -268,11 +323,7 @@ Result CommandProcessor::Name::set(ProcmonSettings& procmon_settings, const str_
 Result CommandProcessor::Time::set(ProcmonSettings& procmon_settings, const str_t& setting)
 {
     if (setting == "on") procmon_settings.time = true;
-    else if (setting == "off")
-    {
-        UserInterface::ShowAssert::time_off();
-        procmon_settings.time = false;
-    }
+    else if (setting == "off") procmon_settings.time = false;
     else  return Result::invalid_arguments;
 
     return Result::successful;

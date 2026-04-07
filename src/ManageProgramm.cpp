@@ -48,7 +48,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 	for (size_t index = start_point; index < end_point; ++index)
 	{
 		DataProcess current_process { };
-        ProcessDescriptorRAII descriptor_process { };
+        DescriptorRAII descriptor_process { };
 
 		current_process.pid = params.pids_processes[index];
 

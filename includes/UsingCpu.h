@@ -11,7 +11,7 @@
 #endif
 
 #include "types.h"
-#include "ProcessDescriptorRAII.h"
+#include "DescriptorRAII.h"
 #include "DataProcess.h"
 
 class UsingCpuProc
@@ -31,17 +31,17 @@ class UsingCpuProc
 	double _interval_using_cpu = 0;
 	double _total_using_cpu = 0;
 
-	Result get_time_using_cpu(const ProcessDescriptorRAII& descriptor_process, ULARGE_INTEGER& current_work_time);
+	Result get_time_using_cpu(const DescriptorRAII& descriptor_process, ULARGE_INTEGER& current_work_time);
 
 	// Загруженность процессора за всё время существования
-	Result calculate_total_using_cpu(unsigned long num_cores, const ProcessDescriptorRAII& descriptor_process, double work_time_process);
+	Result calculate_total_using_cpu(unsigned long num_cores, const DescriptorRAII& descriptor_process, double work_time_process);
 
 	// Загруженность за конкретный интервал времени
-	Result calculating_interval_using_cpu(unsigned long num_cores, const ProcessDescriptorRAII& descriptor_process);
+	Result calculating_interval_using_cpu(unsigned long num_cores, const DescriptorRAII& descriptor_process);
 
 	Result update_current_time();
 
-    Result get_interval_cpu_usage_time(const ProcessDescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& delta_process_cpu_time);
+    Result get_interval_cpu_usage_time(const DescriptorRAII& descriptor_process, double& interval_cpu_usage_time, ULARGE_INTEGER& delta_process_cpu_time);
 
 public:
 	UsingCpuProc() noexcept = default;
@@ -50,11 +50,11 @@ public:
 
     UsingCpuProc& operator=(const UsingCpuProc& other) noexcept;
 
-    Result update(const ProcessDescriptorRAII& descriptor_process, DataProcess& process, const ProcmonSettings& procmon_settings);
+    Result update(const DescriptorRAII& descriptor_process, DataProcess& process, const ProcmonSettings& procmon_settings);
 
 	double get_total() const noexcept;
 
 	double get_interval() const noexcept;
 
-	Result calculate(const ProcessDescriptorRAII& descriptor_process, double work_time_process, const ProcmonSettings& procmon_settings);
+	Result calculate(const DescriptorRAII& descriptor_process, double work_time_process, const ProcmonSettings& procmon_settings);
 };

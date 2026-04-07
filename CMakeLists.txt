@@ -8,7 +8,7 @@ set(PATH_TO_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_executable(${PROJECT_NAME}
 	"${PATH_TO_SOURCE_FILES}/main.cpp"
-	"${PATH_TO_SOURCE_FILES}/ProcessDescriptorRAII.cpp" 
+	"src/DescriptorRAII.cpp" 
 	"${PATH_TO_SOURCE_FILES}/UsingCpu.cpp" 
 	"${PATH_TO_SOURCE_FILES}/DataProcess.cpp" 
 	"${PATH_TO_SOURCE_FILES}/ManageProgramm.cpp" 

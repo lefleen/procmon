@@ -9,6 +9,8 @@ namespace UserInterface
 	namespace ShowHelp
 	{
 		void full_help();
+
+		void command_help();
 	}
 
 	namespace ShowSettings
