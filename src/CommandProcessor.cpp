@@ -190,17 +190,16 @@ Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_s
 
 Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name) 
 {
+    const DWORD BUFFER_SIZE = 1024;
+    DWORD REAL_BUFFER_SIZE = 0;
+    const char* buffer;
+
 #ifdef _WIN32
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
         NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (descriptor_file.get() == INVALID_HANDLE_VALUE)
-        return Result::failure;
-
-    const DWORD BUFFER_SIZE = 1024;
-    DWORD REAL_SIZE = 0;
-
-    char buffer[BUFFER_SIZE];
+        return Result::failure;;
 
     if (GetLastError() != ERROR_ALREADY_EXISTS)
     {
@@ -212,18 +211,25 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
         return Result::successful;
     }
 
-    if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_SIZE, NULL))
+    if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_BUFFER_SIZE, NULL))
         return Result::failure;
 
-    Result res_load_parameters;
-
-    str_t data = str_t(buffer, REAL_SIZE);
-    if ((res_load_parameters = load_parameters(procmon_settings, data)) != Result::successful)
-        return res_load_parameters;
-
 #elif defined (__linux__)
+    descriptor_file = open(file_name, O_CREAT | O_RDWR, 00777);
+    if(descriptor_file.get() == -1)
+    {
+        perror("open");
+        return Result::failure; 
+    }
+
+    std::cout << "open OK" << std::endl;
 
 #endif
+
+    Result res_load_parameters;
+    str_t data = str_t(buffer, REAL_BUFFER_SIZE);
+    if ((res_load_parameters = load_parameters(procmon_settings, data)) != Result::successful)
+        return res_load_parameters;
 
     return Result::successful;
 }
@@ -235,17 +241,15 @@ Result CommandProcessor::FileUtility::save(const ProcmonSettings& procmon_settin
         NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (descriptor_file.get() == INVALID_HANDLE_VALUE)
-    {
-        std::cout << GetLastError() << std::endl;
         return Result::failure;
-    }
+
+#elif defined (__linux__)
+
+#endif
 
     Result res_save;
     if ((res_save = save_parameters_in_file(procmon_settings, descriptor_file.get())) != Result::successful)
         return res_save;
-#elif defined (__linux__)
-
-#endif
 
     return Result::successful;
 }

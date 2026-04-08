@@ -3,8 +3,12 @@
 #ifdef _WIN32
 #include <Windows.h>
 #elif defined(__linux__)
+#include <fcntl.h>
+#include <unistd.h>
 
 #endif
+
+#include <iostream>
 
 #include "types.h"
 #include "settingstypes.h"
