@@ -190,9 +190,9 @@ Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_s
 
 Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name) 
 {
-    const DWORD BUFFER_SIZE = 1024;
-    DWORD REAL_BUFFER_SIZE = 0;
-    const char* buffer;
+    const int BUFFER_SIZE = 1024;
+    int REAL_BUFFER_SIZE = 0;
+    char buffer[BUFFER_SIZE];
 
 #ifdef _WIN32
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
@@ -217,12 +217,10 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
 #elif defined (__linux__)
     descriptor_file = open(file_name, O_CREAT | O_RDWR, 00777);
     if(descriptor_file.get() == -1)
-    {
-        perror("open");
-        return Result::failure; 
-    }
+        return Result::failure;
 
-    std::cout << "open OK" << std::endl;
+    if((REAL_BUFFER_SIZE = read(descriptor_file.get(), buffer, BUFFER_SIZE)) == -1)
+        return Result::failure;
 
 #endif
 
