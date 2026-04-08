@@ -30,7 +30,7 @@ namespace CommandProcessor
 
         Result save(const ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name);
 
-        Result save_parameters_in_file(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file);
+        Result save_parameters_in_file(const ProcmonSettings& procmon_settings, const DescriptorRAII& descriptor_file);
 
         Result load_parameters(ProcmonSettings& procmon_settings, const str_t& data);
     }

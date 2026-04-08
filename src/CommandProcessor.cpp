@@ -139,23 +139,25 @@ Result CommandProcessor::ParseUtility::convert_settings_to_string(const ProcmonS
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::save_parameters_in_file(const ProcmonSettings& procmon_settings, const descriptor_process_t h_file)
+Result CommandProcessor::FileUtility::save_parameters_in_file(const ProcmonSettings& procmon_settings, const DescriptorRAII& descriptor_file)
 {
     str_t data = "";
+    int REAL_SIZE = 0;
 
     ParseUtility::convert_settings_to_string(procmon_settings, data);
 
 #ifdef _WIN32
-    DWORD REAL_SIZE = 0;
     DWORD count_bytes = data.size() * sizeof(char);
 
-    bool flag = WriteFile(h_file, data.c_str(), count_bytes, &REAL_SIZE, NULL);
+    bool flag = WriteFile(descriptor_file.get(), data.c_str(), count_bytes, &REAL_SIZE, NULL);
 
     if (!flag) return Result::failure;
 
 #elif defined(__linux__)
+    if((REAL_SIZE = write(descriptor_file.get(), data.c_str(), data.size())) == -1)
+        return Result::failure;
 
-#endif
+#endif 
 
     return Result::successful;
 }
@@ -205,7 +207,7 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
     {
         Result res_save_base_parameters;
 
-        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings, descriptor_file.get())) != Result::successful)
+        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings, descriptor_file)) != Result::successful)
             return res_save_base_parameters;
 
         return Result::successful;
@@ -216,6 +218,12 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
 
 #elif defined (__linux__)
     descriptor_file = open(file_name, O_CREAT | O_RDWR, 00777);
+    if(descriptor_file.get() != EACCES)
+    { 
+        Result res_save_base_parameters;
+        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings, descriptor_file)) != Result::successful)
+            return res_save_base_parameters;
+    }
     if(descriptor_file.get() == -1)
         return Result::failure;
 
@@ -242,11 +250,14 @@ Result CommandProcessor::FileUtility::save(const ProcmonSettings& procmon_settin
         return Result::failure;
 
 #elif defined (__linux__)
+    descriptor_file = open(file_name, O_RDWR | O_TRUNC, 00777);
+    if(descriptor_file.get() == -1) 
+        return Result::failure;
 
 #endif
 
     Result res_save;
-    if ((res_save = save_parameters_in_file(procmon_settings, descriptor_file.get())) != Result::successful)
+    if ((res_save = save_parameters_in_file(procmon_settings, descriptor_file)) != Result::successful)
         return res_save;
 
     return Result::successful;
