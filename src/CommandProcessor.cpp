@@ -218,7 +218,7 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
 
 #elif defined (__linux__)
     descriptor_file = open(file_name, O_CREAT | O_RDWR, 00777);
-    if(descriptor_file.get() != EACCES)
+    if(descriptor_file.get() == EEXIST)
     { 
         Result res_save_base_parameters;
         if ((res_save_base_parameters = save_parameters_in_file(procmon_settings, descriptor_file)) != Result::successful)
