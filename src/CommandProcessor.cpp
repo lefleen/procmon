@@ -142,18 +142,19 @@ Result CommandProcessor::ParseUtility::convert_settings_to_string(const ProcmonS
 Result CommandProcessor::FileUtility::save_parameters_in_file(const ProcmonSettings& procmon_settings, const DescriptorRAII& descriptor_file)
 {
     str_t data = "";
-    int REAL_SIZE = 0;
 
     ParseUtility::convert_settings_to_string(procmon_settings, data);
 
 #ifdef _WIN32
     DWORD count_bytes = data.size() * sizeof(char);
+    DWORD REAL_SIZE = 0;
 
     bool flag = WriteFile(descriptor_file.get(), data.c_str(), count_bytes, &REAL_SIZE, NULL);
 
     if (!flag) return Result::failure;
 
 #elif defined(__linux__)
+    int REAL_SIZE = 0;
     if((REAL_SIZE = write(descriptor_file.get(), data.c_str(), data.size())) == -1)
         return Result::failure;
 
@@ -193,10 +194,11 @@ Result CommandProcessor::FileUtility::load_parameters(ProcmonSettings& procmon_s
 Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name) 
 {
     const int BUFFER_SIZE = 1024;
-    int REAL_BUFFER_SIZE = 0;
     char buffer[BUFFER_SIZE];
 
 #ifdef _WIN32
+    DWORD REAL_BUFFER_SIZE = 0;
+
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
         NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -217,6 +219,8 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
         return Result::failure;
 
 #elif defined (__linux__)
+    int REAL_BUFFER_SIZE = 0;
+
     descriptor_file = open(file_name, O_CREAT | O_RDWR, 00777);
     if(descriptor_file.get() == EEXIST)
     { 
