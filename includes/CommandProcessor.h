@@ -20,7 +20,7 @@ namespace CommandProcessor
         const int load_file = 100;
         const int save_file = 200;
 
-        Result manage(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const int param);
+        Result manage(ProcmonSettings& procmon_settings, const int param);
 
         Result load(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name);
 

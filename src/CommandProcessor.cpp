@@ -4,8 +4,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
 { 
     Result res_file_load;
 
-    DescriptorRAII descriptor_file{ };
-    if ((res_file_load = FileUtility::manage(procmon_settings, descriptor_file, FileUtility::load_file)) != Result::successful) 
+    if ((res_file_load = FileUtility::manage(procmon_settings, FileUtility::load_file)) != Result::successful) 
         return res_file_load;
 
     size_t size = argc - 1;
@@ -64,7 +63,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     Result res_file_save;
     if (option == "set")
     {
-        if ((res_file_save = FileUtility::manage(procmon_settings, descriptor_file, FileUtility::save_file)) != Result::successful)
+        if ((res_file_save = FileUtility::manage(procmon_settings, FileUtility::save_file)) != Result::successful)
             return res_file_save;
     }
 
@@ -222,7 +221,7 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
     if ((res_load_parameters = load_parameters(procmon_settings, data)) != Result::successful)
         return res_load_parameters;
 
-#elif define (__linux__)
+#elif defined (__linux__)
 
 #endif
 
@@ -231,6 +230,7 @@ Result CommandProcessor::FileUtility::load(ProcmonSettings& procmon_settings, De
 
 Result CommandProcessor::FileUtility::save(const ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name)
 {
+#ifdef _WIN32
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
         NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -243,12 +243,17 @@ Result CommandProcessor::FileUtility::save(const ProcmonSettings& procmon_settin
     Result res_save;
     if ((res_save = save_parameters_in_file(procmon_settings, descriptor_file.get())) != Result::successful)
         return res_save;
+#elif defined (__linux__)
+
+#endif
 
     return Result::successful;
 }
 
-Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const int param)
+Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings, const int param)
 {
+    DescriptorRAII descriptor_file{ };
+
     const char* file_name = "procmon_config";
     
     if (param == load_file)
@@ -258,15 +263,13 @@ Result CommandProcessor::FileUtility::manage(ProcmonSettings& procmon_settings, 
             return res_load;
     }
     else if (param == save_file)
+
     {
         Result res_save;
         if ((res_save = save(procmon_settings, descriptor_file, file_name)) != Result::successful)
             return res_save;
     }
     else return Result::failure;
-
-    if (CloseHandle(descriptor_file.get()) == 0)
-        return Result::failure;
 
     return Result::successful;
 }
