@@ -13,8 +13,9 @@
 
 namespace FileUtility
 {
-    const int load_file = 100;
-    const int save_file = 200;
+    const int load_config_file = 100;
+    const int save_config_file = 200;
+    const int save_data_process_file = 300;
 
     Result manage(ProcmonSettings& procmon_settings, map_t<str_t, str_t>& file_config, const int param);
 

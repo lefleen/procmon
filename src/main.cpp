@@ -8,7 +8,6 @@ int main(int argc, const char* argv[])
     if ((res = CommandProcessor::manage(procmon_settings, argc, argv)) == Result::failure) return -1;
     else if (res == Result::invalid_arguments)
     {
-        UserInterface::ShowHelp::full_help();
         return -1;
     }
     else if (res != Result::no_arguments)

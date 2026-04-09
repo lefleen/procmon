@@ -5,7 +5,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     map_t<str_t, str_t> file_config;
 
     Result res_file_load;
-    if ((res_file_load = FileUtility::manage(procmon_settings, file_config, FileUtility::load_file)) != Result::successful) 
+    if ((res_file_load = FileUtility::manage(procmon_settings, file_config, FileUtility::load_config_file)) != Result::successful) 
         return res_file_load;
 
     Result res_set_array_data;
@@ -42,7 +42,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
         
         if (option == "help")
         {
-            UserInterface::ShowHelp::full_help();
+            
         }
         else if (option == "set")
         {
@@ -54,8 +54,8 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
             if((res = Command::Get::manage(procmon_settings, metrick)) != Result::successful)
                 return res;
 
-            if (setting == "off" && metrick == "time")
-                UserInterface::ShowAssert::time_off();
+            if (setting == "off" && metrick == "time");
+                
         }
         else if (option == "get")
         {    
@@ -69,7 +69,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     Result res_file_save;
     if (option == "set")
     {
-        if ((res_file_save = FileUtility::manage(procmon_settings, file_config, FileUtility::save_file)) != Result::successful)
+        if ((res_file_save = FileUtility::manage(procmon_settings, file_config, FileUtility::save_config_file)) != Result::successful)
             return res_file_save;
     }
 
@@ -106,25 +106,11 @@ Result CommandProcessor::Command::Set::manage(ProcmonSettings& procmon_settings,
 
 Result CommandProcessor::Command::Get::programm_config(const ProcmonSettings& procmon_settings, const str_t& metrick)
 {
-    UserInterface::ShowSettings::name(procmon_settings.name);
-    UserInterface::ShowSettings::time(procmon_settings.time);
-    UserInterface::ShowSettings::memory(procmon_settings.memory);
-    UserInterface::ShowSettings::total_cpu(procmon_settings.total_cpu);
-    UserInterface::ShowSettings::interval_cpu(procmon_settings.interval_cpu);
-
     return Result::successful;
 }
 
 Result CommandProcessor::Command::Get::manage(const ProcmonSettings& procmon_settings, const str_t& metrick)
 {
-    if (metrick == "name") UserInterface::ShowSettings::name(procmon_settings.name);
-    else if (metrick == "time") UserInterface::ShowSettings::time(procmon_settings.time);
-    else if (metrick == "memory") UserInterface::ShowSettings::memory(procmon_settings.memory);
-    else if (metrick == "totalCPU") UserInterface::ShowSettings::total_cpu(procmon_settings.total_cpu);
-    else if (metrick == "intervalCPU") UserInterface::ShowSettings::interval_cpu(procmon_settings.interval_cpu);
-    else if (metrick == "all") programm_config(procmon_settings, metrick);
-    else return Result::invalid_arguments;
-
     return Result::successful;
 }
 

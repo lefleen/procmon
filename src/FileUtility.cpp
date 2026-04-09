@@ -133,13 +133,13 @@ Result FileUtility::manage(ProcmonSettings& procmon_settings, map_t<str_t, str_t
 
     const char* file_name = "procmon_config";
 
-    if (param == load_file)
+    if (param == load_config_file)
     {
         Result res_load;
         if ((res_load = load_config(procmon_settings, descriptor_file, file_config, file_name)) != Result::successful)
             return res_load;
     }
-    else if (param == save_file)
+    else if (param == save_config_file)
 
     {
         Result res_save;
