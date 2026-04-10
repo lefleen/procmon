@@ -105,7 +105,5 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
 
 Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick)
 {
-
-
-    return Result::invalid_arguments;
+    return Result::successful;
 }
