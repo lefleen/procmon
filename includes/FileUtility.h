@@ -7,7 +7,7 @@
 #endif
 
 #include "types.h"
-#include "settingstypes.h"
+#include "settings.h"
 #include "DescriptorRAII.h"
 #include "ParseUtility.h"
 
@@ -17,13 +17,13 @@ namespace FileUtility
     const int save_config_file = 200;
     const int save_data_process_file = 300;
 
-    Result manage(ProcmonSettings& procmon_settings, map_t<str_t, str_t>& file_config, const int param);
+    Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param);
 
-    Result load_config(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
+    Result load_config(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
 
-    Result save(const ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name);
+    Result save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, const char* file_name);
 
-    Result save_config_in_file(const ProcmonSettings& procmon_settings, const DescriptorRAII& descriptor_file);
+    Result save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file);
 
-    Result parse_config_line(ProcmonSettings& procmon_settings, const str_t& data, map_t<str_t, str_t>& output_data);
+    Result parse_config_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& data, map_t<str_t, str_t>& output_data);
 }

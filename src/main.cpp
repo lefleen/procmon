@@ -5,7 +5,10 @@ int main(int argc, const char* argv[])
 {
     Result res;
     ProcmonSettings procmon_settings = { };
-    if ((res = CommandProcessor::manage(procmon_settings, argc, argv)) == Result::failure) return -1;
+    vec_t<ProcmonSettingsTable> procmon_settings_table = { };
+    set_table_settings(procmon_settings_table, procmon_settings);
+
+    if ((res = CommandProcessor::manage(procmon_settings_table, argc, argv)) == Result::failure) return -1;
     else if (res == Result::invalid_arguments)
     {
         return -1;

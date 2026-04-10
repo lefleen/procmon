@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "DescriptorRAII.h"
-#include "settingstypes.h"
+#include "settings.h"
 
 class DataProcess
 {

@@ -1,15 +1,15 @@
 #include "CommandProcessor.h"
 
-Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int argc, const char* argv[])
+Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[])
 { 
     map_t<str_t, str_t> file_config;
 
     Result res_file_load;
-    if ((res_file_load = FileUtility::manage(procmon_settings, file_config, FileUtility::load_config_file)) != Result::successful) 
+    if ((res_file_load = FileUtility::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful) 
         return res_file_load;
 
     Result res_set_array_data;
-    if ((res_set_array_data = Command::Set::array_data(procmon_settings, file_config)) != Result::successful)
+    if ((res_set_array_data = Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
         return Result::successful;
 
     file_config.clear();
@@ -19,7 +19,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     if (size == 0)
     {
         Result res_get_manage;
-        if ((res_get_manage = Command::Get::manage(procmon_settings, "all")) != Result::successful)
+        if ((res_get_manage = Command::Get::manage(procmon_settings_table, "all")) != Result::successful)
             return res_get_manage;
 
         return Result::no_arguments;
@@ -37,7 +37,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     {
         Result res_parse_string;
 
-        if ((res_parse_string = ParseUtility::parse_command_string(procmon_settings, argc, argv, option, metrick, setting, index)) != Result::successful)
+        if ((res_parse_string = ParseUtility::parse_command_string(procmon_settings_table, argc, argv, option, metrick, setting, index)) != Result::successful)
             return res_parse_string;
         
         if (option == "help")
@@ -48,10 +48,10 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
         {
             Result res;
 
-            if ((res = Command::Set::manage(procmon_settings, metrick, setting)) != Result::successful)
+            if ((res = Command::Set::manage(procmon_settings_table, metrick, setting)) != Result::successful)
                 return res;
 
-            if((res = Command::Get::manage(procmon_settings, metrick)) != Result::successful)
+            if((res = Command::Get::manage(procmon_settings_table, metrick)) != Result::successful)
                 return res;
 
             if (setting == "off" && metrick == "time");
@@ -61,7 +61,7 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
         {    
             Result res;
 
-            if ((res = Command::Get::manage(procmon_settings, metrick)) != Result::successful)
+            if ((res = Command::Get::manage(procmon_settings_table, metrick)) != Result::successful)
                 return res;
         }
     }
@@ -69,92 +69,43 @@ Result CommandProcessor::manage(ProcmonSettings& procmon_settings, const int arg
     Result res_file_save;
     if (option == "set")
     {
-        if ((res_file_save = FileUtility::manage(procmon_settings, file_config, FileUtility::save_config_file)) != Result::successful)
+        if ((res_file_save = FileUtility::manage(procmon_settings_table, file_config, FileUtility::save_config_file)) != Result::successful)
             return res_file_save;
     }
 
     return Result::successful;
 }
 
-Result CommandProcessor::Command::Set::array_data(ProcmonSettings& procmon_settings, const map_t<str_t, str_t>& file_config)
+Result CommandProcessor::Command::Set::array_data(vec_t<ProcmonSettingsTable>& procmon_settings_table, const map_t<str_t, str_t>& file_config)
 {
     Result res;
     for (auto& itr : file_config)
     {
-        if((res = manage(procmon_settings, itr.first, itr.second)) != Result::successful)
+        if((res = manage(procmon_settings_table, itr.first, itr.second)) != Result::successful)
             return Result::failure;
     }
 
     return Result::successful;
 }
 
-Result CommandProcessor::Command::Set::manage(ProcmonSettings& procmon_settings, const str_t& metrick, const str_t& setting) 
+Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick, const str_t& setting)
 {
-    Result res;
-    if (metrick == "name") res = Name::set(procmon_settings, setting);
-    else if (metrick == "time") res = Time::set(procmon_settings, setting);
-    else if (metrick == "memory") res = Memory::set(procmon_settings, setting);
-    else if (metrick == "totalCPU") res = TotalCPU::set(procmon_settings, setting);
-    else if (metrick == "intervalCPU") res = IntervalCPU::set(procmon_settings, setting);
-    else return Result::invalid_arguments;
+    for (auto& it : procmon_settings_table)
+    {
+        if (it.name == metrick)
+        {
+            if (setting == "on") *it.status = true;
+            else *it.status = false;
+            return Result::successful;
+        }
+    }
 
-    if (res != Result::successful) 
-        return res;
-
-    return Result::successful;
+    return Result::invalid_arguments;
 }
 
-Result CommandProcessor::Command::Get::programm_config(const ProcmonSettings& procmon_settings, const str_t& metrick)
+Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick)
 {
-    return Result::successful;
-}
 
-Result CommandProcessor::Command::Get::manage(const ProcmonSettings& procmon_settings, const str_t& metrick)
-{
-    return Result::successful;
-}
 
-Result CommandProcessor::Name::set(ProcmonSettings& procmon_settings, const str_t& setting)
-{
-    if (setting == "on") procmon_settings.name = true;
-    else if(setting == "off") procmon_settings.name = false;
-    else  return Result::invalid_arguments;
-
-    return Result::successful;
-}
-
-Result CommandProcessor::Time::set(ProcmonSettings& procmon_settings, const str_t& setting)
-{
-    if (setting == "on") procmon_settings.time = true;
-    else if (setting == "off") procmon_settings.time = false;
-    else  return Result::invalid_arguments;
-
-    return Result::successful;
-}
-
-Result CommandProcessor::Memory::set(ProcmonSettings& procmon_settings, const str_t& setting)
-{
-    if (setting == "on") procmon_settings.memory= true;
-    else if (setting == "off") procmon_settings.memory = false;
-    else  return Result::invalid_arguments;
-
-    return Result::successful;
-}
-
-Result CommandProcessor::TotalCPU::set(ProcmonSettings& procmon_settings, const str_t& setting)
-{
-    if (setting == "on") procmon_settings.total_cpu = true;
-    else if (setting == "off") procmon_settings.total_cpu = false;
-    else  return Result::invalid_arguments;
-
-    return Result::successful;
-}
-
-Result CommandProcessor::IntervalCPU::set(ProcmonSettings& procmon_settings, const str_t& setting)
-{
-    if (setting == "on") procmon_settings.interval_cpu = true;
-    else if (setting == "off") procmon_settings.interval_cpu = false;
-    else  return Result::invalid_arguments;
-
-    return Result::successful;
+    return Result::invalid_arguments;
 }

@@ -10,7 +10,7 @@ Result ParseUtility::convert_char_to_string(vec_t<str_t>& res, const int argc, c
     return Result::successful;
 }
 
-Result ParseUtility::parse_command_string(ProcmonSettings& procmon_settings, const int argc, const char* argv[], str_t& option, str_t& metrick, str_t& setting, size_t& index)
+Result ParseUtility::parse_command_string(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[], str_t& option, str_t& metrick, str_t& setting, size_t& index)
 {
     vec_t<str_t> args(argc - 1);
 
@@ -49,22 +49,18 @@ Result ParseUtility::parse_command_string(ProcmonSettings& procmon_settings, con
     return Result::successful;
 }
 
-Result ParseUtility::convert_procmon_settings_to_string(const ProcmonSettings& procmon_settings, str_t& out)
+Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSettingsTable>& procmon_settings_table, str_t& out)
 {
-    if (procmon_settings.name) out = "name:on;\n";
-    else out = "name:off;\n";
+    out = "";
 
-    if (procmon_settings.time) out += "time:on;\n";
-    else out += "time:off;\n";
+    for (auto& it : procmon_settings_table)
+    {
+        out += it.name + ":";
+        if (*it.status == true) out += "on";
+        else out += "off";
+        out += ";\n";
 
-    if (procmon_settings.memory) out += "memory:on;\n";
-    else out += "memory:off;\n";
-
-    if (procmon_settings.total_cpu) out += "totalCPU:on;\n";
-    else out += "totalCPU:off;\n";
-
-    if (procmon_settings.interval_cpu) out += "intervalCPU:on;\n";
-    else out += "intervalCPU:off;\n";
+    }
 
     return Result::successful;
 }

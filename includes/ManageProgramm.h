@@ -5,7 +5,7 @@
 #include "DataProcess.h"
 #include "types.h"
 #include "UsingCpu.h"
-#include "settingstypes.h"
+#include "settings.h"
 
 #ifdef _WIN32
 #include "WindowsLogic.h"

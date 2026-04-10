@@ -1,10 +1,10 @@
 #include "FileUtility.h"
 
-Result FileUtility::save_config_in_file(const ProcmonSettings& procmon_settings, const DescriptorRAII& descriptor_file)
+Result FileUtility::save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file)
 {
     str_t data = "";
 
-    ParseUtility::convert_procmon_settings_to_string(procmon_settings, data);
+    ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data);
 
 #ifdef _WIN32
     DWORD count_bytes = data.size() * sizeof(char);
@@ -24,7 +24,7 @@ Result FileUtility::save_config_in_file(const ProcmonSettings& procmon_settings,
     return Result::successful;
 }
 
-Result FileUtility::parse_config_line(ProcmonSettings& procmon_settings, const str_t& data, map_t<str_t, str_t>& output_data)
+Result FileUtility::parse_config_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& data, map_t<str_t, str_t>& output_data)
 {
     size_t start_line = 0;
 
@@ -51,7 +51,7 @@ Result FileUtility::parse_config_line(ProcmonSettings& procmon_settings, const s
     return Result::successful;
 }
 
-Result FileUtility::load_config(ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name)
+Result FileUtility::load_config(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name)
 {
     const int BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
@@ -69,7 +69,7 @@ Result FileUtility::load_config(ProcmonSettings& procmon_settings, DescriptorRAI
     {
         Result res_save_base_parameters;
 
-        if ((res_save_base_parameters = save_config_in_file(procmon_settings, descriptor_file)) != Result::successful)
+        if ((res_save_base_parameters = save_config_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
             return res_save_base_parameters;
 
         return Result::successful;
@@ -85,7 +85,7 @@ Result FileUtility::load_config(ProcmonSettings& procmon_settings, DescriptorRAI
     if (descriptor_file.get() == EEXIST)
     {
         Result res_save_base_parameters;
-        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings, descriptor_file)) != Result::successful)
+        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
             return res_save_base_parameters;
     }
     if (descriptor_file.get() == -1)
@@ -98,13 +98,13 @@ Result FileUtility::load_config(ProcmonSettings& procmon_settings, DescriptorRAI
 
     Result res_load_parameters;
     str_t data_file = str_t(buffer, REAL_BUFFER_SIZE);
-    if ((res_load_parameters = parse_config_line(procmon_settings, data_file, output_data)) != Result::successful)
+    if ((res_load_parameters = parse_config_line(procmon_settings_table, data_file, output_data)) != Result::successful)
         return res_load_parameters;
 
     return Result::successful;
 }
 
-Result FileUtility::save(const ProcmonSettings& procmon_settings, DescriptorRAII& descriptor_file, const char* file_name)
+Result FileUtility::save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, const char* file_name)
 {
 #ifdef _WIN32
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
@@ -121,13 +121,13 @@ Result FileUtility::save(const ProcmonSettings& procmon_settings, DescriptorRAII
 #endif
 
     Result res_save;
-    if ((res_save = save_config_in_file(procmon_settings, descriptor_file)) != Result::successful)
+    if ((res_save = save_config_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
         return res_save;
 
     return Result::successful;
 }
 
-Result FileUtility::manage(ProcmonSettings& procmon_settings, map_t<str_t, str_t>& file_config, const int param)
+Result FileUtility::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param)
 {
     DescriptorRAII descriptor_file{ };
 
@@ -136,14 +136,14 @@ Result FileUtility::manage(ProcmonSettings& procmon_settings, map_t<str_t, str_t
     if (param == load_config_file)
     {
         Result res_load;
-        if ((res_load = load_config(procmon_settings, descriptor_file, file_config, file_name)) != Result::successful)
+        if ((res_load = load_config(procmon_settings_table, descriptor_file, file_config, file_name)) != Result::successful)
             return res_load;
     }
     else if (param == save_config_file)
 
     {
         Result res_save;
-        if ((res_save = save(procmon_settings, descriptor_file, file_name)) != Result::successful)
+        if ((res_save = save(procmon_settings_table, descriptor_file, file_name)) != Result::successful)
             return res_save;
     }
     else return Result::failure;
