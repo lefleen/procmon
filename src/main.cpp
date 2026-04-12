@@ -10,9 +10,7 @@ int main(int argc, const char* argv[])
 
     if ((res = CommandProcessor::manage(procmon_settings_table, argc, argv)) == Result::failure) return -1;
     else if (res == Result::invalid_arguments)
-    {
         return -1;
-    }
     else if (res != Result::no_arguments)
         return 0;
 
