@@ -1,5 +1,4 @@
 #include "CommandProcessor.h"
-#include <iostream>
 
 Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[])
 { 
