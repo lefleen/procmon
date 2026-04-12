@@ -85,7 +85,7 @@ Result FileUtility::load_config(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     if (descriptor_file.get() == EEXIST)
     {
         Result res_save_base_parameters;
-        if ((res_save_base_parameters = save_parameters_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
+        if ((res_save_base_parameters = save_config_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
             return res_save_base_parameters;
     }
     if (descriptor_file.get() == -1)
