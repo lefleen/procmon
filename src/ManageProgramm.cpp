@@ -144,7 +144,7 @@ Result ManageProgramm::vec_to_str(const vec_t<vec_t<DataProcess>>& processes, co
 Result ManageProgramm::update_data(const vec_t<ProcmonSettingsTable>& procmon_setting_table, const vec_t<vec_t<DataProcess>>& processes) 
 {
 	vec_t<ProcmonSettings> full_processes;
-	wstr_t data = L"|pid\t\t|name\t\t|time\t\t\t|memory\t\t|totalCPU\t\t|intervalCPU\t\t|\n";
+	wstr_t data = L"|pid\t\t|name\t\t|time\t\t|memory\t\t|totalCPU\t\t|intervalCPU\t\t|\n";
 
 	Result res_vec_to_str;
 	if ((res_vec_to_str = vec_to_str(processes, procmon_setting_table, data)) != Result::successful)
