@@ -17,8 +17,7 @@ int main(int argc, const char* argv[])
     int count = 0;
 
 	for (; count <= 5; ++count)
-		if (ManageProgramm::start_programm(procmon_settings) == Result::successful) break;
+		if (ManageProgramm::start_programm(procmon_settings, procmon_settings_table) == Result::successful) break;
 	if (count == 6) return -1;
-
 	return 0;
 }

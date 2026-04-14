@@ -127,7 +127,7 @@ Result FileUtility::save(const vec_t<ProcmonSettingsTable>& procmon_settings_tab
     return Result::successful;
 }
 
-Result FileUtility::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param)
+Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param)
 {
     DescriptorRAII descriptor_file{ };
 

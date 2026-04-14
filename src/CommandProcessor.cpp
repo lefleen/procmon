@@ -2,18 +2,6 @@
 
 Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[])
 { 
-    map_t<str_t, str_t> file_config;
-
-    Result res_file_load;
-    if ((res_file_load = FileUtility::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful) 
-        return res_file_load;
-
-    Result res_set_array_data;
-    if ((res_set_array_data = Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
-        return Result::successful;
-
-    file_config.clear();
-
     size_t size = argc - 1;
     if (size == 0)
     {
@@ -23,8 +11,20 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
         return Result::no_arguments;
     }
-    else if (size < 0) 
+    else if (size < 0)
         return Result::failure;
+
+    map_t<str_t, str_t> file_config;
+
+    Result res_file_load;
+    if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful) 
+        return res_file_load;
+
+    Result res_set_array_data;
+    if ((res_set_array_data = Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
+        return Result::successful;
+
+    file_config.clear();
 
     size_t index = 0;
 
@@ -68,7 +68,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     Result res_file_save;
     if (option == "set")
     {
-        if ((res_file_save = FileUtility::manage(procmon_settings_table, file_config, FileUtility::save_config_file)) != Result::successful)
+        if ((res_file_save = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::save_config_file)) != Result::successful)
             return res_file_save;
     }
 
@@ -94,7 +94,8 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
         if (it.name == metrick)
         {
             if (setting == "on") *it.status = true;
-            else *it.status = false;
+            else if (setting == "off") *it.status = false;
+            else return Result::invalid_arguments;
             return Result::successful;
         }
     }

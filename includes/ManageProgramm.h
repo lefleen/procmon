@@ -6,6 +6,9 @@
 #include "types.h"
 #include "UsingCpu.h"
 #include "settings.h"
+#include "FileUtility.h"
+#include "CommandProcessor.h"
+#include <iostream>
 
 #ifdef _WIN32
 #include "WindowsLogic.h"
@@ -27,5 +30,11 @@ namespace ManageProgramm
 
 	Result start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process, const ProcmonSettings& procmon_settings);
 
-	Result start_programm(const ProcmonSettings& procmon_settings);
+	Result update_config(vec_t<ProcmonSettingsTable>& procmon_settings_table);
+
+	Result vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettings>& procmon_settings, str_t& data);
+
+	Result update_data(const vec_t<ProcmonSettings>& procon_settings, const vec_t<vec_t<DataProcess>>& processes);
+
+	Result start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table);
 }

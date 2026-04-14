@@ -90,7 +90,40 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 	return Result::successful;
 }
 
-Result ManageProgramm::start_programm(const ProcmonSettings& procmon_settings)
+Result ManageProgramm::update_config(vec_t<ProcmonSettingsTable>& procmon_settings_table)
+{
+	map_t<str_t, str_t> file_config{ };
+
+	Result res_file_load;
+	if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful)
+		return res_file_load;
+
+	Result res_set_config;
+	if ((res_set_config = CommandProcessor::Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
+		return Result::failure;
+
+	return Result::successful;
+}
+
+Result ManageProgramm::vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettings>& procmon_settings, str_t& data)
+{
+	for (auto& it_1 : processes)
+	{
+		for (auto& it_2 : it_1)
+		{
+			
+		}
+	}
+}
+
+Result ManageProgramm::update_data(const vec_t<ProcmonSettings>& procon_settings, const vec_t<vec_t<DataProcess>>& processes) 
+{
+	vec_t<ProcmonSettings> full_processes;
+	std::string data = "";
+
+}
+
+Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table)
 {
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
@@ -100,6 +133,10 @@ Result ManageProgramm::start_programm(const ProcmonSettings& procmon_settings)
 
 	while (true)
 	{
+		Result res_update_config;
+		if ((res_update_config = update_config(procmon_settings_table)) != Result::successful)
+			return res_update_config;
+
 		if (start_threads(max_threads, processes, using_cpu_process, procmon_settings) == Result::failure)
 			return Result::failure;
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef _WIN32
 #include <Windows.h>
 #elif defined(__linux__)
@@ -17,7 +19,10 @@ namespace FileUtility
     const int save_config_file = 200;
     const int save_data_process_file = 300;
 
-    Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param);
+    namespace Config
+    {
+        Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param);
+    }
 
     Result load_config(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
 
