@@ -32,11 +32,11 @@ namespace ManageProgramm
 
 	Result update_config(vec_t<ProcmonSettingsTable>& procmon_settings_table);
 
-	Result vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettingsTable>& procmon_setting_table, wstr_t& data);
+	Result vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonDataTable>& procmon_setting_table, str_t& data);
 
-	Result update_data(const vec_t<ProcmonSettingsTable>& procon_settings, const vec_t<vec_t<DataProcess>>& processes);
+	Result update_data(const vec_t<ProcmonDataTable>& procon_settings, const vec_t<vec_t<DataProcess>>& processes);
 
-	Result set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_setting_table, const DataProcess& process, wstr_t& data);
+	Result set_data_settings(const vec_t<ProcmonDataTable>& procmon_setting_table, const DataProcess& process, str_t& data);
 
 	Result start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table);
 }

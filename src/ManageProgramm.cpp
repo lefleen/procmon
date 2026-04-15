@@ -105,35 +105,31 @@ Result ManageProgramm::update_config(vec_t<ProcmonSettingsTable>& procmon_settin
 	return Result::successful;
 }
 
-Result ManageProgramm::set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_setting_table, const DataProcess& process, wstr_t& data) 
+Result ManageProgramm::set_data_settings(const vec_t<ProcmonDataTable>& procmon_data_table, const DataProcess& process, str_t& data) 
 {
-	data += L"|" + std::to_wstring(process.pid) + L"\t\t|";
-	for (size_t index = 0; index < procmon_setting_table.size(); ++index)
+	data += "|" + std::to_string(process.pid) + "\t\t|";
+	for (size_t index = 0; index < procmon_data_table.size(); ++index)
 	{
-		if ((*procmon_setting_table[index].status))
+		if ((*procmon_data_table[index].status))
 		{
-			if (procmon_setting_table[index].name == "name") data += process.name + L"\t\t|";
-			else if (procmon_setting_table[index].name == "time") data += std::to_wstring(process.work_time.work_time) + L"\t\t|";
-			else if (procmon_setting_table[index].name == "memory") data += std::to_wstring(process.using_memory) + L"\t\t|";
-			else if (procmon_setting_table[index].name == "totalCPU") data += std::to_wstring(process.total_using_cpu) + L"\t\t|";
-			else if (procmon_setting_table[index].name == "intervalCPU") data += std::to_wstring(process.interval_using_cpu) + L"\t\t|";
-			else return Result::invalid_arguments;
+			//procmon_data_table[index].add_element(data, )
+			data += "\t\t|";
 		}
-		else data += L"off\t\t|";
+		else data += "off\t\t|";
 	}
-	data += L"\n";
+	data += "\n";
 
 	return Result::successful;
 }
 
-Result ManageProgramm::vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettingsTable>& procmon_setting_table, wstr_t& data)
+Result ManageProgramm::vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonDataTable>& procmon_data_table, str_t& data)
 {
 	for (auto& it_1 : processes)
 	{
 		for (auto& it_2 : it_1)
 		{
 			Result res_set_data;
-			if ((res_set_data = set_data_settings(procmon_setting_table, it_2, data)) != Result::successful)
+			if ((res_set_data = set_data_settings(procmon_data_table, it_2, data)) != Result::successful)
 				return res_set_data;
 		}
 	}
@@ -141,17 +137,17 @@ Result ManageProgramm::vec_to_str(const vec_t<vec_t<DataProcess>>& processes, co
 	return Result::successful;
 }
 
-Result ManageProgramm::update_data(const vec_t<ProcmonSettingsTable>& procmon_setting_table, const vec_t<vec_t<DataProcess>>& processes) 
+Result ManageProgramm::update_data(const vec_t<ProcmonDataTable>& procmon_data_table, const vec_t<vec_t<DataProcess>>& processes) 
 {
 	vec_t<ProcmonSettings> full_processes;
-	wstr_t data = L"|pid\t\t|name\t\t|time\t\t|memory\t\t|totalCPU\t\t|intervalCPU\t\t|\n";
+	str_t data = "|pid\t\t|name\t\t|time\t\t|memory\t\t|totalCPU\t\t|intervalCPU\t\t|\n";
 
 	Result res_vec_to_str;
-	if ((res_vec_to_str = vec_to_str(processes, procmon_setting_table, data)) != Result::successful)
+	if ((res_vec_to_str = vec_to_str(processes, procmon_data_table, data)) != Result::successful)
 		return res_vec_to_str;
 
 
-	std::wcout << data << std::endl;
+	std::cout << data << std::endl;
 	// TODO: file function
 
 	return Result::successful;
@@ -161,6 +157,9 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 {
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
+
+	vec_t<ProcmonDataTable> procmon_data_table;
+	Settings::set_table_settings(procmon_settings_table, procmon_settings);
 
 	vec_t<vec_t<DataProcess>> processes(max_threads);
     vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_process(max_threads);
@@ -177,7 +176,7 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
 		Result res_update_data;
-		if ((res_update_data = update_data(procmon_settings_table, processes)) != Result::successful)
+		if ((res_update_data = update_data(procmon_data_table, processes)) != Result::successful)
 			return res_update_data;
 
 		for (auto& vec : processes)
