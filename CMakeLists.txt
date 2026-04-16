@@ -16,7 +16,7 @@ add_executable(${PROJECT_NAME}
 	"${PATH_TO_SOURCE_FILES}/UserInterface.cpp"
 	"${PATH_TO_SOURCE_FILES}/FileUtility.cpp"
 	"${PATH_TO_SOURCE_FILES}/ParseUtility.cpp"
-	"${PATH_TO_SOURCE_FILES}/settings.cpp")
+	"${PATH_TO_SOURCE_FILES}/settings.cpp" "src/UpdateUtility.cpp" "includes/UpdateUtility.h")
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_TO_INCLUDE_FILES})

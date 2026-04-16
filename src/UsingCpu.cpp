@@ -20,8 +20,8 @@ Result UsingCpuProc::update(const DescriptorRAII& descriptor_process, DataProces
     if ((res = calculate(descriptor_process, process.work_time.work_time, procmon_settings)) == Result::failure) return Result::failure;
     else if (res == Result::initialization) _interval_using_cpu = 0;
 
-    process.interval_using_cpu = _interval_using_cpu;;
-    process.total_using_cpu = _total_using_cpu;
+    process.intervalCPU = _interval_using_cpu;;
+    process.totalCPU = _total_using_cpu;
 
     return Result::successful;
 }

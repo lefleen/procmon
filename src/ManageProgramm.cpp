@@ -90,76 +90,11 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 	return Result::successful;
 }
 
-Result ManageProgramm::update_config(vec_t<ProcmonSettingsTable>& procmon_settings_table)
-{
-	map_t<str_t, str_t> file_config{ };
-
-	Result res_file_load;
-	if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful)
-		return res_file_load;
-
-	Result res_set_config;
-	if ((res_set_config = CommandProcessor::Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
-		return Result::failure;
-
-	return Result::successful;
-}
-
-Result ManageProgramm::set_data_settings(const vec_t<ProcmonDataTable>& procmon_data_table, const DataProcess& process, str_t& data) 
-{
-	data += "|" + std::to_string(process.pid) + "\t\t|";
-	for (size_t index = 0; index < procmon_data_table.size(); ++index)
-	{
-		if ((*procmon_data_table[index].status))
-		{
-			//procmon_data_table[index].add_element(data, )
-			data += "\t\t|";
-		}
-		else data += "off\t\t|";
-	}
-	data += "\n";
-
-	return Result::successful;
-}
-
-Result ManageProgramm::vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonDataTable>& procmon_data_table, str_t& data)
-{
-	for (auto& it_1 : processes)
-	{
-		for (auto& it_2 : it_1)
-		{
-			Result res_set_data;
-			if ((res_set_data = set_data_settings(procmon_data_table, it_2, data)) != Result::successful)
-				return res_set_data;
-		}
-	}
-
-	return Result::successful;
-}
-
-Result ManageProgramm::update_data(const vec_t<ProcmonDataTable>& procmon_data_table, const vec_t<vec_t<DataProcess>>& processes) 
-{
-	vec_t<ProcmonSettings> full_processes;
-	str_t data = "|pid\t\t|name\t\t|time\t\t|memory\t\t|totalCPU\t\t|intervalCPU\t\t|\n";
-
-	Result res_vec_to_str;
-	if ((res_vec_to_str = vec_to_str(processes, procmon_data_table, data)) != Result::successful)
-		return res_vec_to_str;
-
-
-	std::cout << data << std::endl;
-	// TODO: file function
-
-	return Result::successful;
-}
 
 Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table)
 {
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
-
-	vec_t<ProcmonDataTable> procmon_data_table;
-	Settings::set_table_settings(procmon_settings_table, procmon_settings);
 
 	vec_t<vec_t<DataProcess>> processes(max_threads);
     vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_process(max_threads);
@@ -167,7 +102,7 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 	while (true)
 	{
 		Result res_update_config;
-		if ((res_update_config = update_config(procmon_settings_table)) != Result::successful)
+		if ((res_update_config = UpdateUtility::Config::update(procmon_settings_table)) != Result::successful)
 			return res_update_config;
 
 		if (start_threads(max_threads, processes, using_cpu_process, procmon_settings) == Result::failure)
@@ -176,7 +111,7 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
 		Result res_update_data;
-		if ((res_update_data = update_data(procmon_data_table, processes)) != Result::successful)
+		if ((res_update_data = UpdateUtility::Data::update(procmon_settings_table, processes)) != Result::successful)
 			return res_update_data;
 
 		for (auto& vec : processes)

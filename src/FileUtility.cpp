@@ -24,7 +24,7 @@ Result FileUtility::save_config_in_file(const vec_t<ProcmonSettingsTable>& procm
     return Result::successful;
 }
 
-Result FileUtility::parse_config_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& data, map_t<str_t, str_t>& output_data)
+Result FileUtility::parse_config_line(const str_t& data, map_t<str_t, str_t>& output_data)
 {
     size_t start_line = 0;
 
@@ -98,7 +98,7 @@ Result FileUtility::load_config(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
     Result res_load_parameters;
     str_t data_file = str_t(buffer, REAL_BUFFER_SIZE);
-    if ((res_load_parameters = parse_config_line(procmon_settings_table, data_file, output_data)) != Result::successful)
+    if ((res_load_parameters = parse_config_line(data_file, output_data)) != Result::successful)
         return res_load_parameters;
 
     return Result::successful;

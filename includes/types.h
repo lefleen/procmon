@@ -35,6 +35,17 @@ using vec_t = std::vector<T>;
 template <class Key, class Type>
 using map_t = std::map<Key, Type>;
 
+enum class MetricType
+{
+	pid,
+	name,
+	time,
+	memory,
+	totalCPU,
+	intervalCPU,
+	undefined_metric
+};
+
 struct my_tm
 {
 	time_t num_days = 0;

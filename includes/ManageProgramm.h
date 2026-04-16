@@ -8,6 +8,8 @@
 #include "settings.h"
 #include "FileUtility.h"
 #include "CommandProcessor.h"
+#include "UpdateUtility.h"
+
 #include <iostream>
 
 #ifdef _WIN32
@@ -29,14 +31,6 @@ namespace ManageProgramm
 	Result get_information_about_processes(const parameters_process& params, size_t max_threads, size_t num_thread, vec_t<DataProcess>& processes, map_t<DWORD, UsingCpuProc>& using_cpu_process, const ProcmonSettings& procmon_settings);
 
 	Result start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process, const ProcmonSettings& procmon_settings);
-
-	Result update_config(vec_t<ProcmonSettingsTable>& procmon_settings_table);
-
-	Result vec_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonDataTable>& procmon_setting_table, str_t& data);
-
-	Result update_data(const vec_t<ProcmonDataTable>& procon_settings, const vec_t<vec_t<DataProcess>>& processes);
-
-	Result set_data_settings(const vec_t<ProcmonDataTable>& procmon_setting_table, const DataProcess& process, str_t& data);
 
 	Result start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table);
 }

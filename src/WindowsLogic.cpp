@@ -27,14 +27,14 @@ Result ProcmonLogic::NameProc::get(const DescriptorRAII& descriptor_process, DWO
 	if (EnumProcessModules(descriptor_process.get(), &hmodule_process, sizeof(hmodule_process),
 		&count_bytes_needed))
 	{
-		wchar_t process_name[256];
+		char process_name[256];
 
 		// Получение имени
 		size_t len = 0;
-		if ((len = GetModuleBaseNameW(descriptor_process.get(), hmodule_process, process_name,
+		if ((len = GetModuleBaseName(descriptor_process.get(), hmodule_process, process_name,
 			256)) == 0) return Result::failure;
 
-		current_process.name = wstr_t(process_name, len);
+		current_process.name = process_name;
 
 		return Result::successful;
 	}
@@ -153,7 +153,7 @@ Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, D
 
 	if (memory <= 0) return Result::failure;
 
-	process.using_memory = memory;
+	process.memory = memory;
 
 	return Result::successful;
 }

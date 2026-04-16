@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "types.h"
 #include "settings.h"
 #include "UserInterface.h"

@@ -7,17 +7,12 @@
 class DataProcess
 {
 public:
-#ifdef _WIN32
-	wstr_t name = L"";
-#elif defined __linux__
-    str_t name = "";
-#endif
-
     DWORD pid = 0;
+	str_t name = "";
 	my_tm work_time = { };
-	long double using_memory = 0;
-	double total_using_cpu = 0;
-	double interval_using_cpu = 0;
+	long double memory = 0;
+	double totalCPU = 0;
+	double intervalCPU = 0;
 
 	Result update(DescriptorRAII& descriptor_process, const parameters_process& params, const ProcmonSettings& procmon_settings);
 

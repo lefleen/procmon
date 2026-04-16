@@ -80,7 +80,7 @@ Result CommandProcessor::Command::Set::array_data(vec_t<ProcmonSettingsTable>& p
     Result res;
     for (auto& itr : file_config)
     {
-        if((res = manage(procmon_settings_table, itr.first, itr.second)) != Result::successful)
+        if ((res = manage(procmon_settings_table, itr.first, itr.second)) != Result::successful)
             return Result::failure;
     }
 
@@ -92,7 +92,7 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
     for (auto& it : procmon_settings_table)
     {
         if (it.name == metrick)
-        {
+        {   
             if (setting == "on") *it.status = true;
             else if (setting == "off") *it.status = false;
             else return Result::invalid_arguments;

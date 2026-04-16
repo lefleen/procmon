@@ -30,5 +30,5 @@ namespace FileUtility
 
     Result save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file);
 
-    Result parse_config_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& data, map_t<str_t, str_t>& output_data);
+    Result parse_config_line(const str_t& data, map_t<str_t, str_t>& output_data);
 }
