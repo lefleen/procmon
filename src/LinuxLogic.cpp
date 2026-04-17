@@ -181,7 +181,7 @@ Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, D
 
     num_bytes = num_pages * num_bytes_in_page;
 
-    process.using_memory = num_bytes;
+    process.memory = num_bytes;
 
     return Result::successful;
 }

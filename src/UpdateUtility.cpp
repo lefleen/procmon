@@ -140,6 +140,9 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 
 Result UpdateUtility::Data::convert_column_data_to_str(const vec_t<ColumnData>& column_data, str_t& data) 
 {
+    const size_t size_one_param = 20;
+    std::stringstream s_data;
+
 	for (auto& it : column_data)
 	{
 		if (it.metric_type == MetricType::name) 
@@ -147,6 +150,8 @@ Result UpdateUtility::Data::convert_column_data_to_str(const vec_t<ColumnData>& 
 
 		}
 	}
+
+    return Result::successful;
 }
 
 Result UpdateUtility::Data::convert_container_processes_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettingsTable>& procmon_settings_table, str_t& data)

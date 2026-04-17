@@ -81,8 +81,8 @@ Result FileUtility::load_config(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 #elif defined (__linux__)
     int REAL_BUFFER_SIZE = 0;
 
-    descriptor_file = open(file_name, O_CREAT | O_RDWR, 00777);
-    if (descriptor_file.get() == EEXIST)
+    descriptor_file = open(file_name, O_CREAT | O_RDWR | O_EXCL, 00777);
+    if (errno == EEXIST)
     {
         Result res_save_base_parameters;
         if ((res_save_base_parameters = save_config_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
