@@ -16,6 +16,7 @@ struct ProcmonSettingsTable
     bool* status;
     str_t name = "";
     MetricType metric_type;
+    int table_index = -1; 
 };
 
 void set_table_settings(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettings& procmon_settings);
