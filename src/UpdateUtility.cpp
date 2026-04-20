@@ -19,7 +19,7 @@ void UpdateUtility::Data::Setters::set_off(const vec_t<DataProcess>& process, ve
 {
 	vec_t <str_t> data;
 
-	for (auto& it : container_column_data)
+	for (auto& it : process)
 	{
 		data.push_back("off");
 	}
@@ -31,7 +31,7 @@ void UpdateUtility::Data::Setters::set_pid(const vec_t<DataProcess>& process, ve
 {
 	vec_t <str_t> data;
 
-	for (const auto &it : process)
+	for (auto &it : process)
 	{
 		data.push_back(std::to_string(it.pid));
 	}
@@ -101,7 +101,7 @@ void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<DataProcess>& pro
 
 Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_settings_table, vec_t<ColumnData>& container_column_data, const vec_t<DataProcess>& process, str_t& data)
 {
-	/*Setters::set_pid(process, container_column_data);
+	Setters::set_pid(process, container_column_data);
 
 	for (auto& it : procmon_settings_table)
 	{
@@ -133,7 +133,7 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 		{
 			Setters::set_off(process, container_column_data, it.metric_type, it.table_index);
 		}
-	}*/
+	}
 
 	return Result::successful;
 }

@@ -4,6 +4,7 @@
 
 struct ProcmonSettings
 {
+    bool pid = true;
     bool name = true;
     bool time = true;
     bool memory = true;
