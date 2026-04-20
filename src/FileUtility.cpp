@@ -84,7 +84,7 @@ Result FileUtility::load_config(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     descriptor_file = open(file_name, O_CREAT | O_RDWR | O_EXCL, 00777);
     if (descriptor_file.get() == -1 && errno == EEXIST)
     {
-        descriptor_file = open(file_name, O_CREAT | O_RDWR | O_EXCL, 00777);
+        descriptor_file = open(file_name, O_RDWR, 00777);
         if(descriptor_file.get() == -1)
             return Result::failure;
 
