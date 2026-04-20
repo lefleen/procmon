@@ -76,8 +76,11 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 	for (size_t num_thread = 0; num_thread < max_threads; ++num_thread)
 	{
 		threads[num_thread] = std::thread([&params, max_threads, num_thread, &processes, &using_cpu_process, &procmon_settings]() {
-			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread], procmon_settings) == Result::failure) 
-                clear_thread_resources(processes[num_thread], using_cpu_process[num_thread]);
+			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread], procmon_settings) == Result::failure)
+			{
+				clear_thread_resources(processes[num_thread], using_cpu_process[num_thread]);
+				return Result::failure;
+			}
 		});
 	}
 
@@ -101,21 +104,21 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 
 	while (true)
 	{
-		/*Result res_update_config;
+		Result res_update_config;
 		if ((res_update_config = UpdateUtility::Config::update(procmon_settings_table)) != Result::successful)
-			return res_update_config;*/
+			return res_update_config;
 
 		if (start_threads(max_threads, processes, using_cpu_process, procmon_settings) == Result::failure)
 			return Result::failure;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
 		Result res_update_data;
 		if ((res_update_data = UpdateUtility::Data::update(procmon_settings_table, processes)) != Result::successful)
 			return res_update_data;
-
+		
 		for (auto& vec : processes)
 			vec.clear();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
 	return Result::successful;
