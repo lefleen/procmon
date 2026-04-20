@@ -165,15 +165,12 @@ Result UpdateUtility::Data::convert_container_processes_to_str(const vec_t<vec_t
 			return res_set_data;
 	}
 
-
-
 	return Result::successful;
 }
 
 Result UpdateUtility::Data::update(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<vec_t<DataProcess>>& processes)
 {
 	vec_t<ProcmonSettings> full_processes;
-	str_t data = "|pid\t\t|name\t\t|time\t\t|memory\t\t|totalCPU\t\t|intervalCPU\t\t|\n";
 
 	Result res_vec_to_str;
 	if ((res_vec_to_str = convert_container_processes_to_str(processes, procmon_settings_table, data)) != Result::successful)
