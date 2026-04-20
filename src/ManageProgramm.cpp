@@ -101,9 +101,9 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 
 	while (true)
 	{
-		Result res_update_config;
+		/*Result res_update_config;
 		if ((res_update_config = UpdateUtility::Config::update(procmon_settings_table)) != Result::successful)
-			return res_update_config;
+			return res_update_config;*/
 
 		if (start_threads(max_threads, processes, using_cpu_process, procmon_settings) == Result::failure)
 			return Result::failure;

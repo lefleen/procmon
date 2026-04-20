@@ -101,11 +101,11 @@ void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<DataProcess>& pro
 
 Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_settings_table, vec_t<ColumnData>& container_column_data, const vec_t<DataProcess>& process, str_t& data)
 {
-	Setters::set_pid(process, container_column_data);
+	/*Setters::set_pid(process, container_column_data);
 
 	for (auto& it : procmon_settings_table)
 	{
-		/*if (*it.status)
+		if (*it.status)
 		{
 			if (it.metric_type == MetricType::name)
 			{
@@ -132,8 +132,8 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 		else
 		{
 			Setters::set_off(process, container_column_data, it.metric_type, it.table_index);
-		}*/
-	}
+		}
+	}*/
 
 	return Result::successful;
 }
