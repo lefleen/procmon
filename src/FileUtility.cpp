@@ -1,5 +1,7 @@
 #include "FileUtility.h"
 
+#include <iostream>
+
 Result FileUtility::Universal::save_data_in_file(const DescriptorRAII& descriptor_file, const str_t& data)
 {
 #ifdef _WIN32
@@ -174,7 +176,6 @@ Result FileUtility::Data::manage(str_t& data, const int param)
     else if (param == save_data_process_file)
     {
         str_t file_name = "processes_data";
-        str_t data = "";
 
         Result res_save;
         if ((res_save = Universal::save(descriptor_file, data, file_name.c_str())) != Result::successful)

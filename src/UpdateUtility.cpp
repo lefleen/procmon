@@ -191,7 +191,8 @@ void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnDa
 	{
 		size_t it_data_size = it_data.size();
 
-		for (size_t index_pos_string = pos, index_line_data = 0; index_line_data < it_data_size && index_pos_string < data.size(); ++index_pos_string, ++index_line_data)
+		data[pos] = '|';
+		for (size_t index_pos_string = pos + 1, index_line_data = 0; index_line_data < it_data_size && index_pos_string < data.size(); ++index_pos_string, ++index_line_data)
 			data[index_pos_string] = it_data[index_line_data];
 
 		pos += line_len;
