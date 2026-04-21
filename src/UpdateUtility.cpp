@@ -15,7 +15,7 @@ Result UpdateUtility::Config::update(vec_t<ProcmonSettingsTable>& procmon_settin
 	return Result::successful;
 }
 
-void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const MetricType metric_type, const int table_index)
+void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const MetricType metric_type, const int index_in_table)
 {
 	vec_t <str_t> data;
 
@@ -27,12 +27,13 @@ void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& proc
 		}
 	}
 
-	container_column_data.push_back({ metric_type, data,  table_index });
+	container_column_data.push_back({ metric_type, data,  index_in_table });
 }
 
 void UpdateUtility::Data::Setters::set_pid(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
+	const int index_in_table = 0;
 
 	for (auto& it_processes : processes)
 	{
@@ -42,12 +43,13 @@ void UpdateUtility::Data::Setters::set_pid(const vec_t<vec_t<DataProcess>>& proc
 		}
 	}
 
-	container_column_data.push_back({ MetricType::pid, data, 0 });
+	container_column_data.push_back({ MetricType::pid, data, index_in_table });
 }
 
 void UpdateUtility::Data::Setters::set_name(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
+	const int index_in_table = 1;
 
 	for (auto& it_processes : processes)
 	{
@@ -57,12 +59,13 @@ void UpdateUtility::Data::Setters::set_name(const vec_t<vec_t<DataProcess>>& pro
 		}
 	}
 
-	container_column_data.push_back({ MetricType::name, data, 1 });
+	container_column_data.push_back({ MetricType::name, data, index_in_table });
 }
 
 void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
+	const int index_in_table = 2;
 
 	for (auto& it_processes : processes)
 	{
@@ -72,12 +75,13 @@ void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& pro
 		}
 	}
 
-	container_column_data.push_back({ MetricType::time, data, 2 });
+	container_column_data.push_back({ MetricType::time, data, index_in_table });
 }
 
 void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
+	const int index_in_table = 3;
 
 	for (auto& it_processes : processes)
 	{
@@ -87,12 +91,13 @@ void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& p
 		}
 	}
 
-	container_column_data.push_back({ MetricType::memory, data, 3 });
+	container_column_data.push_back({ MetricType::memory, data, index_in_table });
 }
 
 void UpdateUtility::Data::Setters::set_totalCPU(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
+	const int index_in_table = 4;
 
 	for (auto& it_processes : processes)
 	{
@@ -102,12 +107,13 @@ void UpdateUtility::Data::Setters::set_totalCPU(const vec_t<vec_t<DataProcess>>&
 		}
 	}
 
-	container_column_data.push_back({ MetricType::totalCPU, data, 4 });
+	container_column_data.push_back({ MetricType::totalCPU, data, index_in_table });
 }
 
 void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
+	const int index_in_table = 5;
 
 	for (auto& it_processes : processes)
 	{
@@ -117,7 +123,7 @@ void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<vec_t<DataProcess
 		}
 	}
 
-	container_column_data.push_back({ MetricType::intervalCPU, data, 5 });
+	container_column_data.push_back({ MetricType::intervalCPU, data, index_in_table });
 }
 
 Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_settings_table, vec_t<ColumnData>& container_column_data, const vec_t<vec_t<DataProcess>>& processes, str_t& data)
