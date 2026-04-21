@@ -140,6 +140,18 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 	return Result::successful;
 }
 
+void insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& data)
+{
+	std::stringstream s_data;
+
+	for (size_t index = 0; index < num_lines; ++index)
+	{
+		s_data << std::setw(line_len) << "\n";
+	}
+
+	data = s_data.str();
+}
+
 void first_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const size_t size_one_param)
 {
 	for (auto& it : procmon_settings_table) 
