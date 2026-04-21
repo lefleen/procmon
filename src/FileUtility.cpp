@@ -1,11 +1,7 @@
 #include "FileUtility.h"
 
-Result FileUtility::save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file)
+Result FileUtility::save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file, str_t& data)
 {
-    str_t data = "";
-
-    ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data);
-
 #ifdef _WIN32
     DWORD count_bytes = data.size() * sizeof(char);
     DWORD REAL_SIZE = 0;
@@ -108,7 +104,7 @@ Result FileUtility::load_config(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     return Result::successful;
 }
 
-Result FileUtility::save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, const char* file_name)
+Result FileUtility::save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, str_t& data, const char* file_name)
 {
 #ifdef _WIN32
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
@@ -125,7 +121,7 @@ Result FileUtility::save(const vec_t<ProcmonSettingsTable>& procmon_settings_tab
 #endif
 
     Result res_save;
-    if ((res_save = save_config_in_file(procmon_settings_table, descriptor_file)) != Result::successful)
+    if ((res_save = save_config_in_file(procmon_settings_table, descriptor_file, data)) != Result::successful)
         return res_save;
 
     return Result::successful;
@@ -135,19 +131,26 @@ Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings
 {
     DescriptorRAII descriptor_file{ };
 
-    const char* file_name = "procmon_config";
-
     if (param == load_config_file)
     {
+        const char* file_name = "procmon_config";
+
         Result res_load;
         if ((res_load = load_config(procmon_settings_table, descriptor_file, file_config, file_name)) != Result::successful)
             return res_load;
     }
     else if (param == save_config_file)
-
     {
+        const char* file_name = "procmon_config";
+
+        str_t data;
+
+        Result res_convert_to_str;
+        if((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data)) != Result::successful)
+            return Result::failure;
+
         Result res_save;
-        if ((res_save = save(procmon_settings_table, descriptor_file, file_name)) != Result::successful)
+        if ((res_save = save(procmon_settings_table, descriptor_file, data, file_name)) != Result::successful)
             return res_save;
     }
     else return Result::failure;

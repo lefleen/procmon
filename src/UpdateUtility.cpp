@@ -245,5 +245,6 @@ Result UpdateUtility::Data::update(const vec_t<ProcmonSettingsTable>& procmon_se
 		return res_vec_to_str;
 
 
+
 	return Result::successful;
 }

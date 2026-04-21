@@ -26,9 +26,9 @@ namespace FileUtility
 
     Result load_config(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
 
-    Result save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, const char* file_name);
+    Result save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, str_t& data, const char* file_name);
 
-    Result save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file);
+    Result save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file, str_t& data);
 
     Result parse_config_line(const str_t& data, map_t<str_t, str_t>& output_data);
 }

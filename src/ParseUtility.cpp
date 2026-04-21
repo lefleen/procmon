@@ -59,7 +59,6 @@ Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSetti
         if (*it.status == true) out += "on";
         else out += "off";
         out += ";\n";
-
     }
 
     return Result::successful;
