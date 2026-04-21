@@ -25,6 +25,17 @@ namespace UpdateUtility
 
 	namespace Data
 	{
+		namespace StringUtility 
+		{
+			void insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& data);
+
+			void first_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const size_t size_one_param);
+
+			void data_insert(str_t& data, const ColumnData& container, size_t line_len, const size_t size_one_param);
+
+			Result fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_data_process, str_t& data);
+		}
+
 		namespace Setters 
 		{
 			void set_off(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const MetricType metric_type, const int table_index);

@@ -161,7 +161,7 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 	return Result::successful;
 }
 
-void insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& data)
+void UpdateUtility::Data::StringUtility::insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& data)
 {
 	std::stringstream s_data;
 	s_data << data;
@@ -174,7 +174,7 @@ void insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& 
 	data = s_data.str();
 }
 
-void first_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const size_t size_one_param)
+void UpdateUtility::Data::StringUtility::first_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const size_t size_one_param)
 {
 	for (auto& it : procmon_settings_table) 
 	{
@@ -183,7 +183,7 @@ void first_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& 
 	s_data << "\n";
 }
 
-void data_insert(str_t& data, const ColumnData& container, size_t line_len, const size_t size_one_param)
+void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnData& container, size_t line_len, const size_t size_one_param)
 {
 	size_t pos = line_len + size_one_param * container.index_in_table;
 
@@ -198,7 +198,7 @@ void data_insert(str_t& data, const ColumnData& container, size_t line_len, cons
 	}
 }
 
-Result fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_data_process, str_t& data)
+Result UpdateUtility::Data::StringUtility::fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_data_process, str_t& data)
 {
 	const size_t size_one_param = 20;
 	std::stringstream s_data;
@@ -229,7 +229,7 @@ Result UpdateUtility::Data::convert_container_processes_to_str(const vec_t<vec_t
 		return res_set_data;
 
 	Result res_fill_table;
-	if ((res_fill_table = fill_table(procmon_settings_table, container_column_data, data)) == Result::successful)
+	if ((res_fill_table = StringUtility::fill_table(procmon_settings_table, container_column_data, data)) == Result::successful)
 		return res_fill_table;
 
 	return Result::successful;
@@ -244,7 +244,9 @@ Result UpdateUtility::Data::update(const vec_t<ProcmonSettingsTable>& procmon_se
 	if ((res_vec_to_str = convert_container_processes_to_str(processes, procmon_settings_table, data)) != Result::successful)
 		return res_vec_to_str;
 
-
+	Result res_file_manage;
+	if((res_file_manage = FileUtility::Data::manage(data, FileUtility::save_data_process_file)) != Result::successful)
+		return res_file_manage;
 
 	return Result::successful;
 }

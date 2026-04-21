@@ -18,17 +18,26 @@ namespace FileUtility
     const int load_config_file = 100;
     const int save_config_file = 200;
     const int save_data_process_file = 300;
+    const int load_data_process_file = 400;
 
     namespace Config
     {
+        Result load(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
+
+        Result parse_data_line(const str_t& data, map_t<str_t, str_t>& output_data);
+
         Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param);
     }
 
-    Result load_config(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
+    namespace Data 
+    {
+        Result manage(str_t& data, const int param);
+    }
 
-    Result save(const vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, str_t& data, const char* file_name);
+    namespace Universal
+    { 
+        Result save_data_in_file(const DescriptorRAII& descriptor_file, const str_t& data);
 
-    Result save_config_in_file(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const DescriptorRAII& descriptor_file, str_t& data);
-
-    Result parse_config_line(const str_t& data, map_t<str_t, str_t>& output_data);
+        Result save(DescriptorRAII& descriptor_file, const str_t& data, const char* file_name);
+    }
 }
