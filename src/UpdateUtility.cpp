@@ -191,6 +191,10 @@ Result fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, con
 
 	const size_t line_len = s_data.str().length();
 
+	if (container_data_process.size() > 0)
+		insert_lines_in_data(container_data_process[0].data.size(), line_len, data);
+	else return Result::failure;
+
 	for (auto& it : container_data_process)
 	{
 		data_insert(s_data, it, line_len, size_one_param);
