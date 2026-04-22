@@ -7,7 +7,7 @@ Result UpdateUtility::Config::update(vec_t<ProcmonSettingsTable>& procmon_settin
 	Result res_file_load;
 	if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful)
 		return res_file_load;
-
+	
 	Result res_set_config;
 	if ((res_set_config = CommandProcessor::Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
 		return Result::failure;
@@ -15,9 +15,36 @@ Result UpdateUtility::Config::update(vec_t<ProcmonSettingsTable>& procmon_settin
 	return Result::successful;
 }
 
+void UpdateUtility::Data::Setters::get_length_param(MetricType metric_type, size_t& length)
+{
+	switch (metric_type)
+	{
+	case MetricType::pid: length = 6; 
+		break;
+
+	case MetricType::name: length = 40;
+		break;
+
+	case MetricType::time: length = 20;
+		break;
+
+	case MetricType::memory: length = 20;
+		break;
+
+	case MetricType::tCPU: length = 4;
+		break;
+
+	case MetricType::iCPU: length = 4;
+		break;
+	}
+}
+
 void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const MetricType metric_type, const int index_in_table)
 {
 	vec_t <str_t> data;
+	size_t length = 0;
+
+	get_length_param(metric_type, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -27,13 +54,16 @@ void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& proc
 		}
 	}
 
-	container_column_data.push_back({ metric_type, data,  index_in_table });
+	container_column_data.push_back({ metric_type, data,  index_in_table, length });
 }
 
 void UpdateUtility::Data::Setters::set_pid(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 0;
+	size_t length = 0;
+
+	get_length_param(MetricType::pid, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -43,13 +73,16 @@ void UpdateUtility::Data::Setters::set_pid(const vec_t<vec_t<DataProcess>>& proc
 		}
 	}
 
-	container_column_data.push_back({ MetricType::pid, data, index_in_table });
+	container_column_data.push_back({ MetricType::pid, data, index_in_table, length });
 }
 
 void UpdateUtility::Data::Setters::set_name(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 1;
+	size_t length = 0;
+
+	get_length_param(MetricType::name, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -59,13 +92,16 @@ void UpdateUtility::Data::Setters::set_name(const vec_t<vec_t<DataProcess>>& pro
 		}
 	}
 
-	container_column_data.push_back({ MetricType::name, data, index_in_table });
+	container_column_data.push_back({ MetricType::name, data, index_in_table, length });
 }
 
 void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 2;
+	size_t length = 0;
+
+	get_length_param(MetricType::time, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -75,13 +111,16 @@ void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& pro
 		}
 	}
 
-	container_column_data.push_back({ MetricType::time, data, index_in_table });
+	container_column_data.push_back({ MetricType::time, data, index_in_table, length });
 }
 
 void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 3;
+	size_t length = 0;
+
+	get_length_param(MetricType::memory, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -91,13 +130,16 @@ void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& p
 		}
 	}
 
-	container_column_data.push_back({ MetricType::memory, data, index_in_table });
+	container_column_data.push_back({ MetricType::memory, data, index_in_table, length });
 }
 
 void UpdateUtility::Data::Setters::set_totalCPU(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 4;
+	size_t length = 0;
+
+	get_length_param(MetricType::tCPU, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -107,13 +149,16 @@ void UpdateUtility::Data::Setters::set_totalCPU(const vec_t<vec_t<DataProcess>>&
 		}
 	}
 
-	container_column_data.push_back({ MetricType::totalCPU, data, index_in_table });
+	container_column_data.push_back({ MetricType::tCPU, data, index_in_table, length });
 }
 
 void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 5;
+	size_t length = 0;
+
+	get_length_param(MetricType::iCPU, length);
 
 	for (auto& it_processes : processes)
 	{
@@ -123,7 +168,7 @@ void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<vec_t<DataProcess
 		}
 	}
 
-	container_column_data.push_back({ MetricType::intervalCPU, data, index_in_table });
+	container_column_data.push_back({ MetricType::iCPU, data, index_in_table, length });
 }
 
 Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_settings_table, vec_t<ColumnData>& container_column_data, const vec_t<vec_t<DataProcess>>& processes, str_t& data)
@@ -148,11 +193,11 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 			{
 				Setters::set_memory(processes, container_column_data);
 			}
-			else if (it.metric_type == MetricType::totalCPU)
+			else if (it.metric_type == MetricType::tCPU)
 			{
 				Setters::set_totalCPU(processes, container_column_data);
 			}
-			else if (it.metric_type == MetricType::intervalCPU)
+			else if (it.metric_type == MetricType::iCPU)
 			{
 				Setters::set_intervalCPU(processes, container_column_data);
 			}
@@ -180,48 +225,57 @@ void UpdateUtility::Data::StringUtility::insert_lines_in_data(const size_t num_l
 	data = s_data.str();
 }
 
-void UpdateUtility::Data::StringUtility::first_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const size_t size_one_param)
+void UpdateUtility::Data::StringUtility::name_metrics_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data)
 {
-	for (auto& it : procmon_settings_table) 
+	for (int index = 0; index < procmon_settings_table.size(); ++index)
 	{
-		s_data << std::setw(size_one_param) << std::left << ("|" + it.name);
+		s_data << std::setw(container_column_data[index].length_one_param) << std::left << ("|" + procmon_settings_table[index].name);
 	}
 	s_data << "\n";
 }
 
-void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnData& container, size_t line_len, const size_t size_one_param)
+void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnData& container, const size_t line_len, const size_t previous_pos_sum)
 {
-	size_t pos = line_len + size_one_param * container.index_in_table;
+	size_t pos = line_len + previous_pos_sum;
 
 	for (auto& it_data : container.data)
 	{
 		size_t it_data_size = it_data.size();
 
 		data[pos] = '|';
-		for (size_t index_pos_string = pos + 1, index_line_data = 0; index_line_data < it_data_size && index_pos_string < data.size(); ++index_pos_string, ++index_line_data)
+		for (size_t index_pos_string = pos + 1, index_line_data = 0; index_line_data < it_data_size; ++index_pos_string, ++index_line_data)
+		{
 			data[index_pos_string] = it_data[index_line_data];
+		}
 
 		pos += line_len;
 	}
 }
 
-Result UpdateUtility::Data::StringUtility::fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_data_process, str_t& data)
+Result UpdateUtility::Data::StringUtility::fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data, str_t& data)
 {
-	const size_t size_one_param = 20;
 	std::stringstream s_data;
 
-	first_insert(s_data, procmon_settings_table, size_one_param);
+	name_metrics_insert(s_data, procmon_settings_table, container_column_data);
 	data = s_data.str();
 
-	const size_t line_len = s_data.str().length();
+	const size_t line_len = data.length();
+	size_t previous_pos_sum = 0;
+	size_t previous_index = 0;
 
-	if (container_data_process.size() > 0)
-		insert_lines_in_data(container_data_process[0].data.size(), line_len, data);
+	if (container_column_data.size() > 0)
+		insert_lines_in_data(container_column_data[0].data.size(), line_len, data);
 	else return Result::failure;
 
-	for (auto& it : container_data_process)
+	for (auto& it : container_column_data)
 	{
-		data_insert(data, it, line_len, size_one_param);
+		if (previous_index > it.index_in_table)
+			return Result::failure;
+
+		data_insert(data, it, line_len, previous_pos_sum);
+		previous_pos_sum += it.length_one_param;
+
+		previous_index = it.index_in_table;
 	}
 
 	return Result::successful;
@@ -230,11 +284,11 @@ Result UpdateUtility::Data::StringUtility::fill_table(const vec_t<ProcmonSetting
 Result UpdateUtility::Data::convert_container_processes_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettingsTable>& procmon_settings_table, str_t& data)
 {
 	vec_t<ColumnData> container_column_data;
-
+	
 	Result res_set_data;
 	if ((res_set_data = set_data_settings(procmon_settings_table, container_column_data, processes, data)) != Result::successful)
 		return res_set_data;
-
+	
 	Result res_fill_table;
 	if ((res_fill_table = StringUtility::fill_table(procmon_settings_table, container_column_data, data)) == Result::successful)
 		return res_fill_table;
@@ -250,7 +304,7 @@ Result UpdateUtility::Data::update(const vec_t<ProcmonSettingsTable>& procmon_se
 	Result res_vec_to_str;
 	if ((res_vec_to_str = convert_container_processes_to_str(processes, procmon_settings_table, data)) != Result::successful)
 		return res_vec_to_str;
-
+	
 	Result res_file_manage;
 	if((res_file_manage = FileUtility::Data::manage(data, FileUtility::save_data_process_file)) != Result::successful)
 		return res_file_manage;

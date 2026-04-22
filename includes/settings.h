@@ -16,7 +16,7 @@ struct ProcmonSettingsTable
 {
     bool* status;
     str_t name = "";
-    MetricType metric_type;
+    MetricType metric_type = MetricType::undefined_metric;
     int table_index = -1; 
 };
 

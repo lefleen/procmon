@@ -83,7 +83,7 @@ Result CommandProcessor::Command::Set::array_data(vec_t<ProcmonSettingsTable>& p
         if ((res = manage(procmon_settings_table, itr.first, itr.second)) != Result::successful)
             return Result::failure;
     }
-
+    
     return Result::successful;
 }
 

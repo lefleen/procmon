@@ -41,8 +41,8 @@ enum class MetricType
 	name,
 	time,
 	memory,
-	totalCPU,
-	intervalCPU,
+	tCPU,
+	iCPU,
 	undefined_metric
 };
 
