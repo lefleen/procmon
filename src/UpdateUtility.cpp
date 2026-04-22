@@ -19,22 +19,22 @@ void UpdateUtility::Data::Setters::get_length_param(MetricType metric_type, size
 {
 	switch (metric_type)
 	{
-	case MetricType::pid: length = 6; 
+	case MetricType::pid: length = 7; 
 		break;
 
-	case MetricType::name: length = 40;
+	case MetricType::name: length = 41;
 		break;
 
-	case MetricType::time: length = 20;
+	case MetricType::time: length = 15;
 		break;
 
 	case MetricType::memory: length = 20;
 		break;
 
-	case MetricType::tCPU: length = 4;
+	case MetricType::tCPU: length = 5;
 		break;
 
-	case MetricType::iCPU: length = 4;
+	case MetricType::iCPU: length = 5;
 		break;
 	}
 }
@@ -50,7 +50,7 @@ void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& proc
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back("off");
+			data.push_back("|off");
 		}
 	}
 
@@ -69,7 +69,7 @@ void UpdateUtility::Data::Setters::set_pid(const vec_t<vec_t<DataProcess>>& proc
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back(std::to_string(it_cur_process.pid));
+			data.push_back("|" + std::to_string(it_cur_process.pid));
 		}
 	}
 
@@ -88,7 +88,7 @@ void UpdateUtility::Data::Setters::set_name(const vec_t<vec_t<DataProcess>>& pro
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back(it_cur_process.name);
+			data.push_back("|" + it_cur_process.name);
 		}
 	}
 
@@ -107,7 +107,7 @@ void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& pro
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back(std::to_string(it_cur_process.work_time.work_time));
+			data.push_back("|" + std::to_string(it_cur_process.work_time.work_time));
 		}
 	}
 
@@ -126,7 +126,12 @@ void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& p
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back(std::to_string(it_cur_process.memory));
+			double rounded = std::round(it_cur_process.memory * 100.0) / 100.0;
+			std::stringstream s_data;
+
+			s_data << std::fixed << std::setprecision(2) << rounded;
+
+			data.push_back("|" + s_data.str());
 		}
 	}
 
@@ -145,7 +150,12 @@ void UpdateUtility::Data::Setters::set_totalCPU(const vec_t<vec_t<DataProcess>>&
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back(std::to_string(it_cur_process.totalCPU));
+			double rounded = std::round(it_cur_process.totalCPU * 100.0) / 100.0;
+			std::stringstream s_data;
+
+			s_data << std::fixed << std::setprecision(2) << rounded;
+
+			data.push_back("|" + s_data.str());
 		}
 	}
 
@@ -164,7 +174,12 @@ void UpdateUtility::Data::Setters::set_intervalCPU(const vec_t<vec_t<DataProcess
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			data.push_back(std::to_string(it_cur_process.intervalCPU));
+			double rounded = std::round(it_cur_process.intervalCPU * 100.0) / 100.0;
+			std::stringstream s_data;
+
+			s_data << std::fixed << std::setprecision(2) << rounded;
+
+			data.push_back("|" + s_data.str());
 		}
 	}
 
@@ -242,8 +257,7 @@ void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnDa
 	{
 		size_t it_data_size = it_data.size();
 
-		data[pos] = '|';
-		for (size_t index_pos_string = pos + 1, index_line_data = 0; index_line_data < it_data_size; ++index_pos_string, ++index_line_data)
+		for (size_t index_pos_string = pos, index_line_data = 0; index_line_data < it_data_size; ++index_pos_string, ++index_line_data)
 		{
 			data[index_pos_string] = it_data[index_line_data];
 		}
