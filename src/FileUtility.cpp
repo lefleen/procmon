@@ -116,7 +116,7 @@ Result FileUtility::Universal::save(DescriptorRAII& descriptor_file, const str_t
 {
 #ifdef _WIN32
     descriptor_file = CreateFile(file_name, GENERIC_WRITE | GENERIC_READ, 0,
-        NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (descriptor_file.get() == INVALID_HANDLE_VALUE)
         return Result::failure;
