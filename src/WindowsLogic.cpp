@@ -189,7 +189,8 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 
 Result ProcmonLogic::AllData::get_all_data_process(DescriptorRAII& descriptor_process, const parameters_process& params, DataProcess& process, const ProcmonSettings& procmon_settings)
 {
-    if (ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid) == Result::failure) return Result::failure; 
+    if (ProcmonLogic::DescriptorProc::get(descriptor_process, process.pid) == Result::failure) 
+		return Result::failure; 
 
 	if (procmon_settings.name)
 		if (ProcmonLogic::NameProc::get(descriptor_process, params.count_bytes_needed, process) == Result::failure) 
