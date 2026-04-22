@@ -52,13 +52,19 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 
 		current_process.pid = params.pids_processes[index];
 
-		if (current_process.update(descriptor_process, params, procmon_settings) == Result::failure) continue;
-		if (using_cpu_process[current_process.pid].update(descriptor_process, current_process, procmon_settings) == Result::failure) continue;
+		Result res_update_process;
+		if ((res_update_process = current_process.update(descriptor_process, params, procmon_settings)) != Result::successful) 
+			continue;
+
+		Result res_update_cpu;
+		if ((res_update_cpu = using_cpu_process[current_process.pid].update(descriptor_process, current_process, procmon_settings)) != Result::successful) 
+			continue;
 
 		processes.push_back(current_process);
 	}
 
 	clear_using_cpu_vec(using_cpu_process, params.pids_processes, start_point, end_point);
+
 	return Result::successful;
 }
 
@@ -99,11 +105,12 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
 
-	vec_t<vec_t<DataProcess>> processes(max_threads);
     vec_t<map_t<DWORD, UsingCpuProc>> using_cpu_process(max_threads);
 
 	while (true)
 	{
+		vec_t<vec_t<DataProcess>> processes(max_threads);
+
 		Result res_update_config;
 		if ((res_update_config = UpdateUtility::Config::update(procmon_settings_table)) != Result::successful)
 			return res_update_config;
@@ -114,9 +121,6 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 		Result res_update_data;
 		if ((res_update_data = UpdateUtility::Data::update(procmon_settings_table, processes)) != Result::successful)
 			return res_update_data;
-		
-		for (auto& vec : processes)
-			vec.clear();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }

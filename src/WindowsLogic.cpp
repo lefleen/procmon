@@ -193,15 +193,15 @@ Result ProcmonLogic::AllData::get_all_data_process(DescriptorRAII& descriptor_pr
 		return Result::failure; 
 
 	if (procmon_settings.name)
-		if (ProcmonLogic::NameProc::get(descriptor_process, params.count_bytes_needed, process) == Result::failure) 
+		if (ProcmonLogic::NameProc::get(descriptor_process, params.count_bytes_needed, process) == Result::failure)
 			return Result::failure;
 
-    if(procmon_settings.time)
-		if (ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure) 
+	if(procmon_settings.time)
+		if (ProcmonLogic::TimeProc::get(descriptor_process, process) == Result::failure)
 			return Result::failure;
-	
+
 	if(procmon_settings.memory)
-		if (ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure) 
+		if (ProcmonLogic::MemoryProc::get(descriptor_process, process) == Result::failure)
 			return Result::failure;
 
 	return Result::successful;
