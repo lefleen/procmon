@@ -304,7 +304,7 @@ Result UpdateUtility::Data::convert_container_processes_to_str(const vec_t<vec_t
 		return res_set_data;
 	
 	Result res_fill_table;
-	if ((res_fill_table = StringUtility::fill_table(procmon_settings_table, container_column_data, data)) == Result::successful)
+	if ((res_fill_table = StringUtility::fill_table(procmon_settings_table, container_column_data, data)) != Result::successful)
 		return res_fill_table;
 
 	return Result::successful;
