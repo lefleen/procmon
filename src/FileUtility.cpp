@@ -128,7 +128,14 @@ Result FileUtility::Universal::save(DescriptorRAII& descriptor_file, const str_t
         return Result::failure;
 
 #elif defined (__linux__)
-    descriptor_file = open(file_name, O_RDWR | O_TRUNC, 00777);
+    descriptor_file = open(file_name, O_CREAT | O_RDWR | O_EXCL | O_TRUNC, 00777);
+
+    if (descriptor_file.get() == -1 && errno == EEXIST)
+    {
+        descriptor_file = open(file_name, O_RDWR | O_TRUNC, 00777);
+        if(descriptor_file.get() == -1)
+            return Result::failure;
+    }
     if (descriptor_file.get() == -1)
         return Result::failure;
 
