@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <math.h>
 
 #include "CommandProcessor.h"
 #include "FileUtility.h"
