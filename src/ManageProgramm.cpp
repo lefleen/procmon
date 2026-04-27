@@ -85,7 +85,7 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 			if (get_information_about_processes(params, max_threads, num_thread, processes[num_thread], using_cpu_process[num_thread], procmon_settings) == Result::failure)
 			{
 				clear_thread_resources(processes[num_thread], using_cpu_process[num_thread]);
-				return Result::failure;
+				return;
 			}
 		});
 	}

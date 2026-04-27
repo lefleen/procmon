@@ -90,19 +90,22 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
         descriptor_file = open(file_name, O_RDWR, 00777);
         if(descriptor_file.get() == -1)
             return Result::failure;
+    }
+    else 
+    {
+        if(descriptor_file.get() == -1)
+            return Result::failure;
 
         str_t data = "";
-
+    
         Result res_convert_to_str;
-        if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data)) != Result::successful)
-            return Result::failure;
+            if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data)) != Result::successful)
+                return Result::failure;
 
         Result res_save_base_parameters;
         if ((res_save_base_parameters = FileUtility::Universal::save_data_in_file(descriptor_file, data)) != Result::successful)
             return res_save_base_parameters;
     }
-    if (descriptor_file.get() == -1)
-        return Result::failure;
 
     if ((REAL_BUFFER_SIZE = read(descriptor_file.get(), buffer, BUFFER_SIZE)) == -1)
         return Result::failure;
@@ -128,14 +131,8 @@ Result FileUtility::Universal::save(DescriptorRAII& descriptor_file, const str_t
         return Result::failure;
 
 #elif defined (__linux__)
-    descriptor_file = open(file_name, O_CREAT | O_RDWR | O_EXCL | O_TRUNC, 00777);
+    descriptor_file = open(file_name, O_CREAT | O_RDWR | O_TRUNC, 00777);
 
-    if (descriptor_file.get() == -1 && errno == EEXIST)
-    {
-        descriptor_file = open(file_name, O_RDWR | O_TRUNC, 00777);
-        if(descriptor_file.get() == -1)
-            return Result::failure;
-    }
     if (descriptor_file.get() == -1)
         return Result::failure;
 
