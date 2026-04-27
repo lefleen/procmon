@@ -27,6 +27,15 @@ namespace UpdateUtility
 
 	namespace Data
 	{
+        const int WIDTH_SPECIAL_INFORMATION = 1;
+        const int WIDTH_PID = 6;
+        const int WIDTH_NAME = 40;
+        const int WIDTH_TIME = 15;
+        const int WIDTH_MEMORY = 20;
+        const int WIDTH_tCPU = 4;
+        const int WIDTH_iCPU = 4;
+
+
 		namespace StringUtility 
 		{
 			void insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& data);
