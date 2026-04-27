@@ -22,7 +22,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
     Result res_set_array_data;
     if ((res_set_array_data = Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
-        return Result::successful;
+        return res_set_array_data;
 
     file_config.clear();
 
