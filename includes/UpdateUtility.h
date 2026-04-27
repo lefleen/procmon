@@ -32,8 +32,8 @@ namespace UpdateUtility
         const int WIDTH_NAME = 40;
         const int WIDTH_TIME = 15;
         const int WIDTH_MEMORY = 20;
-        const int WIDTH_tCPU = 4;
-        const int WIDTH_iCPU = 4;
+        const int WIDTH_tCPU = 6;
+        const int WIDTH_iCPU = 6;
 
 
 		namespace StringUtility 
