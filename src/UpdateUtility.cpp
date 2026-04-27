@@ -256,9 +256,10 @@ void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnDa
 	for (auto& it_data : container.data)
 	{
 		size_t it_data_size = it_data.size();
+        size_t data_size = data.size();
 
         data[pos] = '|';
-		for (size_t index_pos_string = pos + 1, index_line_data = 0; index_line_data < it_data_size; ++index_pos_string, ++index_line_data)
+		for (size_t index_pos_string = pos + 1, index_line_data = 0; index_line_data < it_data_size && index_pos_string < data_size; ++index_pos_string, ++index_line_data)
 		{
 			data[index_pos_string] = it_data[index_line_data];
 		}
