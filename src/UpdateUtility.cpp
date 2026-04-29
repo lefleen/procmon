@@ -107,21 +107,27 @@ void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& pro
 	{
 		for (auto& it_cur_process : it_processes)
 		{
+            double rounded;
+            std::stringstream s_data;
+
             switch(procmon_settings.time_view_setting)
             {
-            case TimeViewSettings::seconds: data.push_back(std::to_string(it_cur_process.work_time.num_seconds)); 
-                break;
+                case TimeViewSettings::seconds: rounded = std::round(it_cur_process.work_time.num_seconds); 
+                    break;
 
-            case TimeViewSettings::minutes: data.push_back(std::to_string(it_cur_process.work_time.num_minutes)); 
-                break;
+                case TimeViewSettings::minutes: rounded = std::round(it_cur_process.work_time.num_minutes); 
+                    break;
 
-            case TimeViewSettings::hours: data.push_back(std::to_string(it_cur_process.work_time.num_hours)); 
-                break;
+                case TimeViewSettings::hours: rounded = std::round(it_cur_process.work_time.num_hours); 
+                    break;
 
-            case TimeViewSettings::days: data.push_back(std::to_string(it_cur_process.work_time.num_days));
-               break;
+                case TimeViewSettings::days: rounded = std::round(it_cur_process.work_time.num_days);
+                    break;
             }
-		}
+
+            s_data << std::fixed << std::setprecision(2) << rounded;
+            data.push_back(s_data.str());
+   		}
 	}
 
 	container_column_data.push_back({ MetricType::time, data, index_in_table, length });
