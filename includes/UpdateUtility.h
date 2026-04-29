@@ -59,7 +59,7 @@ namespace UpdateUtility
 
 			void set_time(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const ProcmonSettings& procmon_settings);
 
-			void set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data);
+			void set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data,const ProcmonSettings& procmon_settings);
 
 			void set_totalCPU(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data);
 

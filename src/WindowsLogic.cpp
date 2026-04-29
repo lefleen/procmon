@@ -144,9 +144,26 @@ Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, D
 
 	if (memory <= 0) return Result::failure;
 
-	process.memory = memory;
+    my_mem my_memory = {};
+
+    bytes_to_my_mem(memory, my_mem);
+
+	process.memory = my_memory;
 
 	return Result::successful;
+}
+
+void ProcmonLogic::MemoryProc::bytes_to_my_mem(const long double input_mem, my_mem& output_mem)
+{
+    output_mem.bytes = input_mem;
+
+    output_mem.k_bytes = output_mem.bytes / 1024;
+
+    output_mem.m_bytes = output_mem.k_bytes / 1024;
+    
+    output_mem.g_bytes = output_mem.m_bytes / 1024;
+    
+    output_mem.t_bytes = output_mem.g_bytes / 1024;
 }
 
 Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params)

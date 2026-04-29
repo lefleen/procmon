@@ -142,7 +142,6 @@ Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, D
 
     long double num_pages = 0;
     long double num_bytes_in_page = sysconf(_SC_PAGESIZE);
-    long double num_kbytes = 0;
     long double num_bytes = 0;
     if(static_cast<long>(num_bytes_in_page == -1)) return Result::failure;
     char buffer[BUFFER_SIZE];
@@ -169,11 +168,27 @@ Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, D
 
     num_bytes = num_pages * num_bytes_in_page;
 
-    process.memory = num_bytes;
+    my_mem my_memory = {};
+
+    bytes_to_my_mem(num_bytes, my_memory);
+
+    process.memory = my_memory;
 
     return Result::successful;
 }
 
+void ProcmonLogic::MemoryProc::bytes_to_my_mem(const long double input_mem, my_mem& output_mem)
+{
+    output_mem.bytes = input_mem;
+
+    output_mem.k_bytes = output_mem.bytes / 1024;
+
+    output_mem.m_bytes = output_mem.k_bytes / 1024;
+
+    output_mem.g_bytes = output_mem.m_bytes / 1024;
+
+    output_mem.t_bytes = output_mem.g_bytes / 1024;
+}
 
 bool ProcmonLogic::Manage::_isdigit(const str_t& str_pid)
 {

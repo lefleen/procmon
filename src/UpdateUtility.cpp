@@ -107,25 +107,26 @@ void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& pro
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-            double rounded;
+            double rounded = 0;
             std::stringstream s_data;
 
             switch(procmon_settings.time_view_setting)
             {
-                case TimeViewSettings::seconds: rounded = std::round(it_cur_process.work_time.num_seconds); 
+                case TimeViewSettings::seconds: rounded = std::round(it_cur_process.work_time.num_seconds * 100.0) / 100.0; 
                     break;
 
-                case TimeViewSettings::minutes: rounded = std::round(it_cur_process.work_time.num_minutes); 
+                case TimeViewSettings::minutes: rounded = std::round(it_cur_process.work_time.num_minutes * 100.0) / 100.0; 
                     break;
 
-                case TimeViewSettings::hours: rounded = std::round(it_cur_process.work_time.num_hours); 
+                case TimeViewSettings::hours: rounded = std::round(it_cur_process.work_time.num_hours * 100.0) / 100.0; 
                     break;
 
-                case TimeViewSettings::days: rounded = std::round(it_cur_process.work_time.num_days);
+                case TimeViewSettings::days: rounded = std::round(it_cur_process.work_time.num_days * 100.0) / 100.0;
                     break;
             }
 
             s_data << std::fixed << std::setprecision(2) << rounded;
+
             data.push_back(s_data.str());
    		}
 	}
@@ -133,7 +134,7 @@ void UpdateUtility::Data::Setters::set_time(const vec_t<vec_t<DataProcess>>& pro
 	container_column_data.push_back({ MetricType::time, data, index_in_table, length });
 }
 
-void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data)
+void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const ProcmonSettings& procmon_settings)
 {
 	vec_t <str_t> data;
 	const int index_in_table = 3;
@@ -145,8 +146,26 @@ void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& p
 	{
 		for (auto& it_cur_process : it_processes)
 		{
-			double rounded = std::round(it_cur_process.memory * 100.0) / 100.0;
-			std::stringstream s_data;
+			double rounded = 0;
+            std::stringstream s_data;
+
+            switch(procmon_settings.memory_view_setting)
+            {
+                case MemoryViewSettings::bytes : rounded = std::round(it_cur_process.memory.bytes * 100.0) / 100.0; 
+                    break;
+
+                case MemoryViewSettings::k_bytes : rounded = std::round(it_cur_process.memory.k_bytes * 100.0) / 100.0; 
+                    break;
+
+                case MemoryViewSettings::m_bytes : rounded = std::round(it_cur_process.memory.m_bytes * 100.0) / 100.0; 
+                    break;
+
+                case MemoryViewSettings::g_bytes : rounded = std::round(it_cur_process.memory.g_bytes * 100.0) / 100.0; 
+                    break;
+
+                case MemoryViewSettings::t_bytes : rounded = std::round(it_cur_process.memory.t_bytes * 100.0) / 100.0; 
+                    break;
+            }
 
 			s_data << std::fixed << std::setprecision(2) << rounded;
 
@@ -225,7 +244,7 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 			}
 			else if (it.metric_type == MetricType::memory)
 			{
-				Setters::set_memory(processes, container_column_data);
+				Setters::set_memory(processes, container_column_data, procmon_settings);
 			}
 			else if (it.metric_type == MetricType::tCPU)
 			{

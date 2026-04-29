@@ -10,7 +10,7 @@ public:
     DWORD pid = 0;
 	str_t name = "";
 	my_tm work_time = { };
-	long double memory = 0;
+	my_mem memory = { };
 	double totalCPU = 0;
 	double intervalCPU = 0;
 

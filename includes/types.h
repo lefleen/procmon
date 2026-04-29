@@ -63,6 +63,15 @@ enum class MemoryViewSettings
     t_bytes
 };
 
+struct my_mem
+{
+    double bytes = 0;
+    double k_bytes = 0;
+    double m_bytes = 0;
+    double g_bytes = 0;
+    double t_bytes = 0;
+};
+
 struct my_tm
 {
 	double num_days = 0;
