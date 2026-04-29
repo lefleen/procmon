@@ -1,15 +1,15 @@
 #include "UpdateUtility.h"
 
-Result UpdateUtility::Config::update(vec_t<ProcmonSettingsTable>& procmon_settings_table)
+Result UpdateUtility::Config::update(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view)
 {
 	map_t<str_t, str_t> file_config{ };
 
 	Result res_file_load;
-	if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful)
+	if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::load_config_file)) != Result::successful)
 		return res_file_load;
 	
 	Result res_set_config;
-	if ((res_set_config = CommandProcessor::Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
+	if ((res_set_config = CommandProcessor::Command::Set::array_data(procmon_settings_table, procmon_settings_view, file_config)) != Result::successful)
 		return Result::failure;
 
 	return Result::successful;
@@ -151,19 +151,19 @@ void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& p
 
             switch(procmon_settings.memory_view_setting)
             {
-                case MemoryViewSettings::bytes : rounded = std::round(it_cur_process.memory.bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::B : rounded = std::round(it_cur_process.memory.bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::k_bytes : rounded = std::round(it_cur_process.memory.k_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::KiB : rounded = std::round(it_cur_process.memory.k_bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::m_bytes : rounded = std::round(it_cur_process.memory.m_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::MiB : rounded = std::round(it_cur_process.memory.m_bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::g_bytes : rounded = std::round(it_cur_process.memory.g_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::GiB : rounded = std::round(it_cur_process.memory.g_bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::t_bytes : rounded = std::round(it_cur_process.memory.t_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::TiB : rounded = std::round(it_cur_process.memory.t_bytes * 100.0) / 100.0; 
                     break;
             }
 
@@ -228,6 +228,9 @@ Result UpdateUtility::Data::set_data_settings(const vec_t<ProcmonSettingsTable>&
 {
 	for (auto& it : procmon_settings_table)
 	{
+		if (it.metric_type == MetricType::time_view || it.metric_type == MetricType::memory_view)
+			continue;
+
 		if (*it.status)
 		{
 			if (it.metric_type == MetricType::pid)
@@ -282,6 +285,9 @@ void UpdateUtility::Data::StringUtility::name_metrics_insert(std::stringstream& 
 {
 	for (int index = 0; index < procmon_settings_table.size(); ++index)
 	{
+		if (procmon_settings_table[index].metric_type == MetricType::time_view || procmon_settings_table[index].metric_type == MetricType::memory_view)
+			continue;
+
 		s_data << std::setw(container_column_data[index].length_one_param) << std::left << ("|" + procmon_settings_table[index].name);
 	}
 	s_data << "\n";

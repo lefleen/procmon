@@ -1,6 +1,6 @@
 #include "CommandProcessor.h"
 
-Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[])
+Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, const int argc, const char* argv[])
 { 
     size_t size = argc - 1;
     if (size == 0)
@@ -17,11 +17,11 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     map_t<str_t, str_t> file_config;
 
     Result res_file_load;
-    if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::load_config_file)) != Result::successful) 
+    if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::load_config_file)) != Result::successful) 
         return res_file_load;
 
     Result res_set_array_data;
-    if ((res_set_array_data = Command::Set::array_data(procmon_settings_table, file_config)) != Result::successful)
+    if ((res_set_array_data = Command::Set::array_data(procmon_settings_table, procmon_settings_view, file_config)) != Result::successful)
         return res_set_array_data;
 
     file_config.clear();
@@ -47,7 +47,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
         {
             Result res;
 
-            if ((res = Command::Set::manage(procmon_settings_table, metrick, setting)) != Result::successful)
+            if ((res = Command::Set::manage(procmon_settings_table, procmon_settings_view, metrick, setting)) != Result::successful)
                 return res;
 
             if((res = Command::Get::manage(procmon_settings_table, metrick)) != Result::successful)
@@ -68,34 +68,49 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     Result res_file_save;
     if (option == "set")
     {
-        if ((res_file_save = FileUtility::Config::manage(procmon_settings_table, file_config, FileUtility::save_config_file)) != Result::successful)
+        if ((res_file_save = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::save_config_file)) != Result::successful)
             return res_file_save;
     }
 
     return Result::successful;
 }
 
-Result CommandProcessor::Command::Set::array_data(vec_t<ProcmonSettingsTable>& procmon_settings_table, const map_t<str_t, str_t>& file_config)
+Result CommandProcessor::Command::Set::array_data(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, const map_t<str_t, str_t>& file_config)
 {
     Result res;
-    for (auto& itr : file_config)
+    for (auto& it : file_config)
     {
-        if ((res = manage(procmon_settings_table, itr.first, itr.second)) != Result::successful)
+        if ((res = manage(procmon_settings_table, procmon_settings_view, it.first, it.second)) != Result::successful)
             return res;
     }
     
     return Result::successful;
 }
 
-Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick, const str_t& setting)
+Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, const str_t& metrick, const str_t& setting)
 {
     for (auto& it : procmon_settings_table)
     {
         if (it.name == metrick)
         {   
-            if (setting == "on") *it.status = true;
-            else if (setting == "off") *it.status = false;
-            else return Result::invalid_arguments;
+            if (it.name == "time_view")
+            {
+                Result res_view_time;
+                if((res_view_time = ParseUtility::set_settings_view_time_in_procmon_settings(setting, *procmon_settings_view.time_view_settings)) != Result::successful)
+                    return res_view_time;
+            }
+            else if (it.name == "memory_view")
+            {
+                Result res_view_mem;
+                if((res_view_mem = ParseUtility::set_settings_view_memory_in_procmon_settings(setting, *procmon_settings_view.memory_view_settings)) != Result::successful)
+                    return res_view_mem;;
+            }
+            else
+            {
+                if (setting == "on") *it.status = true;
+                else if (setting == "off") *it.status = false;
+                else return Result::invalid_arguments;
+            }
             return Result::successful;
         }
     }

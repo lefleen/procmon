@@ -100,7 +100,7 @@ Result ManageProgramm::start_threads(size_t max_threads, vec_t<vec_t<DataProcess
 }
 
 
-Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table)
+Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, ProcmonSettingsView& procmon_settings_view, vec_t<ProcmonSettingsTable>& procmon_settings_table)
 {
 	size_t max_threads = std::thread::hardware_concurrency() / 2;
 	if (max_threads == 0) max_threads = 1;
@@ -112,7 +112,7 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 		vec_t<vec_t<DataProcess>> processes(max_threads);
 		
 		Result res_update_config;
-		if ((res_update_config = UpdateUtility::Config::update(procmon_settings_table)) != Result::successful)
+		if ((res_update_config = UpdateUtility::Config::update(procmon_settings_table, procmon_settings_view)) != Result::successful)
 			return res_update_config;
 
 		if (start_threads(max_threads, processes, using_cpu_process, procmon_settings) == Result::failure)

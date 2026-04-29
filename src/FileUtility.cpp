@@ -49,7 +49,7 @@ Result FileUtility::Config::parse_data_line(const str_t& data, map_t<str_t, str_
     return Result::successful;
 }
 
-Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name)
+Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name)
 {
     const int BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
@@ -68,15 +68,12 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
         str_t data = "";
 
         Result res_convert_to_str;
-        if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data)) != Result::successful)
+        if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, procmon_settings_view, data)) != Result::successful)
             return Result::failure;
 
         Result res_save_base_parameters;
         if ((res_save_base_parameters = Universal::save_data_in_file(descriptor_file, data)) != Result::successful)
             return res_save_base_parameters;
-
-        if (lseek(descriptor_file.get(), 0, SEEK_SET) == static_cast<off_t>(-1))
-                return Result::failure;
 
         return Result::successful;
     }
@@ -108,6 +105,9 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
         Result res_save_base_parameters;
         if ((res_save_base_parameters = FileUtility::Universal::save_data_in_file(descriptor_file, data)) != Result::successful)
             return res_save_base_parameters;
+
+        if (lseek(descriptor_file.get(), 0, SEEK_SET) == static_cast<off_t>(-1))
+            return Result::failure;
     }
 
     if ((REAL_BUFFER_SIZE = read(descriptor_file.get(), buffer, BUFFER_SIZE)) == -1)
@@ -148,7 +148,7 @@ Result FileUtility::Universal::save(DescriptorRAII& descriptor_file, const str_t
     return Result::successful;
 }
 
-Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param)
+Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, map_t<str_t, str_t>& file_config, const int param)
 {
     DescriptorRAII descriptor_file{ };
 
@@ -157,7 +157,7 @@ Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings
         const char* file_name = "procmon_config";
 
         Result res_load;
-        if ((res_load = load(procmon_settings_table, descriptor_file, file_config, file_name)) != Result::successful)
+        if ((res_load = load(procmon_settings_table, procmon_settings_view, descriptor_file, file_config, file_name)) != Result::successful)
             return res_load;
     }
     else if (param == save_config_file)
@@ -166,7 +166,7 @@ Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings
         str_t data = "";
 
         Result res_convert_to_str;
-        if((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data)) != Result::successful)
+        if((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, procmon_settings_view, data)) != Result::successful)
             return Result::failure;
 
         Result res_save;

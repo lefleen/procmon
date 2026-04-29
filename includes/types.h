@@ -43,6 +43,8 @@ enum class MetricType
 	memory,
 	tCPU,
 	iCPU,
+    time_view,
+    memory_view,
 	undefined_metric
 };
 
@@ -56,11 +58,11 @@ enum class TimeViewSettings
 
 enum class MemoryViewSettings
 {
-    bytes,
-    k_bytes,
-    m_bytes,
-    g_bytes,
-    t_bytes
+    B,
+    KiB,
+    MiB,
+    GiB,
+    TiB
 };
 
 struct my_mem

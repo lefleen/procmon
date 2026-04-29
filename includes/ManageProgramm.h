@@ -32,5 +32,5 @@ namespace ManageProgramm
 
 	Result start_threads(size_t max_threads, vec_t<vec_t<DataProcess>>& processes, vec_t<map_t<DWORD, UsingCpuProc>>& using_cpu_process, const ProcmonSettings& procmon_settings);
 
-	Result start_programm(ProcmonSettings& procmon_settings, vec_t<ProcmonSettingsTable>& procmon_settings_table);
+	Result start_programm(ProcmonSettings& procmon_settings, ProcmonSettingsView& procmon_settings_view, vec_t<ProcmonSettingsTable>& procmon_settings_table);
 }

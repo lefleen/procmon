@@ -6,10 +6,12 @@ int main(int argc, const char* argv[])
 {
     Result res;
     ProcmonSettings procmon_settings = { };
+    ProcmonSettingsView procmon_settings_view = { };
     vec_t<ProcmonSettingsTable> procmon_settings_table = { };
     set_table_settings(procmon_settings_table, procmon_settings);
+    set_table_view_settings(procmon_settings_view, procmon_settings);
 
-    if ((res = CommandProcessor::manage(procmon_settings_table, argc, argv)) == Result::failure) return -1;
+    if ((res = CommandProcessor::manage(procmon_settings_table, procmon_settings_view, argc, argv)) == Result::failure) return -1;
     else if (res == Result::invalid_arguments)
         return -1;
     else if (res != Result::no_arguments)
@@ -18,7 +20,7 @@ int main(int argc, const char* argv[])
     int count = 0;
 
 	for (; count <= 5; ++count)
-		if (ManageProgramm::start_programm(procmon_settings, procmon_settings_table) == Result::successful) break;
+		if (ManageProgramm::start_programm(procmon_settings, procmon_settings_view, procmon_settings_table) == Result::successful) break;
 	if (count == 6) return -1;
 	return 0;
 }

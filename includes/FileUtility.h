@@ -22,11 +22,11 @@ namespace FileUtility
 
     namespace Config
     {
-        Result load(vec_t<ProcmonSettingsTable>& procmon_settings_table, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
+        Result load(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, DescriptorRAII& descriptor_file, map_t<str_t, str_t>& output_data, const char* file_name);
 
         Result parse_data_line(const str_t& data, map_t<str_t, str_t>& output_data);
 
-        Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, map_t<str_t, str_t>& file_config, const int param);
+        Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, map_t<str_t, str_t>& file_config, const int param);
     }
 
     namespace Data 

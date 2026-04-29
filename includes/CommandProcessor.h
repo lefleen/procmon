@@ -10,15 +10,15 @@
 
 namespace CommandProcessor
 {
-    Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[]);
+    Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, const int argc, const char* argv[]);
 
     namespace Command
     {
         namespace Set
         {
-            Result array_data(vec_t<ProcmonSettingsTable>& procmon_settings_table, const map_t<str_t, str_t>& file_config);
+            Result array_data(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, const map_t<str_t, str_t>& file_config);
 
-            Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick, const str_t& setting);
+            Result manage(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view, const str_t& metrick, const str_t& setting);
         }
 
         namespace Get

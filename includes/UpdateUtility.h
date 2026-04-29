@@ -22,7 +22,7 @@ namespace UpdateUtility
 {
 	namespace Config
 	{
-		Result update(vec_t<ProcmonSettingsTable>& procmon_settings_table);
+		Result update(vec_t<ProcmonSettingsTable>& procmon_settings_table, ProcmonSettingsView& procmon_settings_view);
 	}
 
 	namespace Data
