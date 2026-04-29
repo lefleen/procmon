@@ -146,7 +146,7 @@ Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, D
 
     my_mem my_memory = {};
 
-    bytes_to_my_mem(memory, my_mem);
+    bytes_to_my_mem(memory, my_memory);
 
 	process.memory = my_memory;
 

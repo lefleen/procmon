@@ -38,6 +38,8 @@ namespace ProcmonLogic
 	namespace MemoryProc
 	{
 		Result get(const DescriptorRAII& descriptor_process, DataProcess& process);
+
+        void bytes_to_my_mem(const long double input_mem, my_mem& output_mem);
 	}
 
 	namespace Manage
