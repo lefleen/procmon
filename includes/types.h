@@ -65,11 +65,10 @@ enum class MemoryViewSettings
 
 struct my_tm
 {
-	time_t num_days = 0;
-	time_t num_hours = 0;
-	time_t num_minutes = 0;
-	time_t num_seconds = 0;
-	time_t work_time = 0;
+	double num_days = 0;
+	double num_hours = 0;
+	double num_minutes = 0;
+	double num_seconds = 0;
 };
 
 #ifdef _WIN32

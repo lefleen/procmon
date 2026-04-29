@@ -17,7 +17,7 @@ Result UsingCpuProc::update(const DescriptorRAII& descriptor_process, DataProces
 {
     Result res = Result::successful;
 
-    if ((res = calculate(descriptor_process, process.work_time.work_time, procmon_settings)) == Result::failure) return Result::failure;
+    if ((res = calculate(descriptor_process, process.work_time.num_seconds, procmon_settings)) == Result::failure) return Result::failure;
     else if (res == Result::initialization) _interval_using_cpu = 0;
 
     process.intervalCPU = _interval_using_cpu;;
@@ -167,17 +167,20 @@ Result UsingCpuProc::calculate(const DescriptorRAII& descriptor_process, double 
 	if (num_cores == 0) num_cores = 1;
 
 	// ОБщее использоание CPU
-    Result res;
-    if(procmon_settings.total_cpu && procmon_settings.time)
-	    if (calculate_total_using_cpu(num_cores, descriptor_process, work_time_process) == Result::failure)
-		    return Result::failure;
+    if(procmon_settings.time && procmon_settings.interval_cpu)
+    {
+        if(procmon_settings.total_cpu && procmon_settings.time)
+	        if (calculate_total_using_cpu(num_cores, descriptor_process, work_time_process) == Result::failure)
+		        return Result::failure;
+    }
 
 	// За определенный интервал времени
     if (procmon_settings.interval_cpu)
     {
-        if ((res = calculating_interval_using_cpu(num_cores, descriptor_process)) == Result::failure)
+        Result res_calculate_interval;
+        if ((res_calculate_interval = calculating_interval_using_cpu(num_cores, descriptor_process)) == Result::failure)
             return Result::failure;
-        else if (res == Result::initialization)
+        else if (res_calculate_interval == Result::initialization)
             return Result::initialization;
     }
 

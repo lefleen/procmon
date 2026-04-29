@@ -107,27 +107,15 @@ Result ProcmonLogic::TimeProc::get_work_time_proc(const long double work_time_sy
 
 Result ProcmonLogic::TimeProc::seconds_to_my_tm(long double input_time, struct my_tm& output_time)
 {
-    long _input_time = input_time;
-    if(input_time - _input_time >= 0.5) _input_time += 1;
+    output_time.num_seconds = input_time;
 
-    output_time.work_time = input_time;
+    output_time.num_minutes = output_time.num_seconds / 60;
 
-    auto chrono_seconds = std::chrono::seconds(_input_time);
+    output_time.num_hours = output_time.num_minutes / 60;
 
-    auto num_days = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) / 24;
-    output_time.num_days = num_days.count();
-
-    auto num_hours = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) % 24;
-    output_time.num_hours = num_hours.count();
-
-    auto num_minutes = std::chrono::duration_cast<std::chrono::minutes>(chrono_seconds) % 60;
-    output_time.num_minutes = num_minutes.count();
-
-    auto num_seconds = std::chrono::duration_cast<std::chrono::seconds>(chrono_seconds) % 60;
-    output_time.num_seconds = num_seconds.count();
+    output_time.num_days = output_time.num_hours / 24;
 
     return Result::successful;
-
 }
 
 Result ProcmonLogic::TimeProc::get(const DescriptorRAII& descriptor_process, DataProcess& process)

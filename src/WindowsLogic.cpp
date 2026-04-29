@@ -99,22 +99,13 @@ Result ProcmonLogic::TimeProc::calculate_work_time_process(time_t& work_time_pro
 	// Преобразование времени в правильные форма
 Result ProcmonLogic::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
 {
-	// Всё количество секунд
-	output_time.work_time = input_time;
-
-	auto chrono_seconds = std::chrono::seconds(input_time);
+    output_time.num_seconds = input_time;
 	// Количество дней
-	auto num_days = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) / 24;
-	output_time.num_days = num_days.count();
+	output_time.num_minutes = output_time.num_seconds / 60;
 
-	auto num_hours = std::chrono::duration_cast<std::chrono::hours>(chrono_seconds) % 24;
-	output_time.num_hours = num_hours.count();
+	output_time.num_hours = output_time.num_minutes / 60;
 
-	auto num_minutes = std::chrono::duration_cast<std::chrono::minutes>(chrono_seconds) % 60;
-	output_time.num_minutes = num_minutes.count();
-
-	auto num_seconds = std::chrono::duration_cast<std::chrono::seconds>(chrono_seconds) % 60;
-	output_time.num_seconds = num_seconds.count();
+	output_time.num_days = output_time.num_hours / 24;
 
 	return Result::successful;
 }
