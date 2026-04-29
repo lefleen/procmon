@@ -94,11 +94,8 @@ Result ParseUtility::set_settings_view_memory_in_string(const MemoryViewSettings
     }
 };
 
-#include <iostream>
 Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, str_t& out)
 {
-    out = "";
-    std::cout << "OK" << std::endl;
     for (auto& it : procmon_settings_table)
     {
         out += it.name + ":";
@@ -121,6 +118,7 @@ Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSetti
         }
         out += ";\n";
     }
+
     return Result::successful;
 }
 
