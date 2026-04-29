@@ -119,7 +119,7 @@ Result ManageProgramm::start_programm(ProcmonSettings& procmon_settings, vec_t<P
 			return Result::failure;
 
 		Result res_update_data;
-		if ((res_update_data = UpdateUtility::Data::update(procmon_settings_table, processes)) != Result::successful)
+		if ((res_update_data = UpdateUtility::Data::update(procmon_settings_table, processes, procmon_settings)) != Result::successful)
 			return res_update_data;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));

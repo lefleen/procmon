@@ -57,7 +57,7 @@ namespace UpdateUtility
 
 			void set_name(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data);
 
-			void set_time(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data);
+			void set_time(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const ProcmonSettings& procmon_settings);
 
 			void set_memory(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data);
 
@@ -66,10 +66,10 @@ namespace UpdateUtility
 			void set_intervalCPU(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data);
 		}
 
-		Result convert_container_processes_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettingsTable>& procmon_setting_table, str_t& data);
+		Result convert_container_processes_to_str(const vec_t<vec_t<DataProcess>>& processes, const vec_t<ProcmonSettingsTable>& procmon_setting_table, str_t& data, const ProcmonSettings& procmon_settings);
 
-		Result set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_setting_table, vec_t<ColumnData>& container_column_data, const vec_t<vec_t<DataProcess>>& processes, str_t& data);
+		Result set_data_settings(const vec_t<ProcmonSettingsTable>& procmon_setting_table, vec_t<ColumnData>& container_column_data, const vec_t<vec_t<DataProcess>>& processes, str_t& data, const ProcmonSettings& procmon_settings);
 
-		Result update(const vec_t<ProcmonSettingsTable>& procon_settings, const vec_t<vec_t<DataProcess>>& processes);
+		Result update(const vec_t<ProcmonSettingsTable>& procon_settings, const vec_t<vec_t<DataProcess>>& processes, const ProcmonSettings& procmon_settings);
 	}
 }
