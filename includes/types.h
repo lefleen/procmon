@@ -46,6 +46,23 @@ enum class MetricType
 	undefined_metric
 };
 
+enum class TimeViewSettings
+{
+    seconds,
+    minutes,
+    hours,
+    days
+};
+
+enum class MemoryViewSettings
+{
+    bytes,
+    k_bytes,
+    m_bytes,
+    g_bytes,
+    t_bytes
+};
+
 struct my_tm
 {
 	time_t num_days = 0;
