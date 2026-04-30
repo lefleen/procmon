@@ -75,7 +75,7 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
         if ((res_save_base_parameters = Universal::save_data_in_file(descriptor_file, data)) != Result::successful)
             return res_save_base_parameters;
 
-        if(SetFilePointe(descriptor_file.get(), NULL, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+        if(SetFilePointer(descriptor_file.get(), 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
             return Result::failure;
     }
 
