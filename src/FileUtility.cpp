@@ -69,13 +69,14 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
 
         Result res_convert_to_str;
         if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, procmon_settings_view, data)) != Result::successful)
-            return Result::failure;
+            return res_convert_to_str;
 
         Result res_save_base_parameters;
         if ((res_save_base_parameters = Universal::save_data_in_file(descriptor_file, data)) != Result::successful)
             return res_save_base_parameters;
 
-        return Result::successful;
+        if(SetFilePointe(descriptor_file.get(), NULL, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+            return Result::failure;
     }
 
     if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_BUFFER_SIZE, NULL))
