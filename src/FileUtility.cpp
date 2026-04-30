@@ -99,7 +99,7 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
         str_t data = "";
     
         Result res_convert_to_str;
-            if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, data)) != Result::successful)
+            if ((res_convert_to_str = ParseUtility::convert_procmon_settings_to_string(procmon_settings_table, procmon_settings_view, data)) != Result::successful)
                 return Result::failure;
 
         Result res_save_base_parameters;

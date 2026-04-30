@@ -68,7 +68,9 @@ Result ParseUtility::set_setting_view_time_in_string(const TimeViewSettings& tim
     default: 
         return Result::failure;
     }
-};
+    
+    return Result::successful;
+}
 
 Result ParseUtility::set_settings_view_memory_in_string(const MemoryViewSettings& memory_view_settings, str_t& out) 
 {
@@ -92,7 +94,9 @@ Result ParseUtility::set_settings_view_memory_in_string(const MemoryViewSettings
     default: 
         return Result::failure;
     }
-};
+
+    return Result::successful;
+}
 
 Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, str_t& out)
 {
@@ -134,6 +138,8 @@ Result ParseUtility::set_settings_view_time_in_procmon_settings(const str_t& set
         time_view_settings = TimeViewSettings::days;
     else
         return Result::failure;
+
+    return Result::successful;
 }
 
 Result ParseUtility::set_settings_view_memory_in_procmon_settings(const str_t& setting, MemoryViewSettings& memory_view_settings)
@@ -150,4 +156,6 @@ Result ParseUtility::set_settings_view_memory_in_procmon_settings(const str_t& s
         memory_view_settings = MemoryViewSettings::TiB;
     else
         return Result::failure;
+
+    return Result::successful;
 }
