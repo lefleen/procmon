@@ -54,7 +54,6 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
                 return res;
 
             if (setting == "off" && metrick == "time");
-                
         }
         else if (option == "get")
         {    

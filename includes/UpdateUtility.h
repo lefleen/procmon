@@ -32,23 +32,32 @@ namespace UpdateUtility
         const int WIDTH_NAME = 40;
         const int WIDTH_TIME = 15;
         const int WIDTH_MEMORY = 20;
-        const int WIDTH_tCPU = 6;
-        const int WIDTH_iCPU = 6;
+        const int WIDTH_tCPU = 7;
+        const int WIDTH_iCPU = 7;
 
 
 		namespace StringUtility 
 		{
 			void insert_lines_in_data(const size_t num_lines, const size_t line_len, str_t& data);
 
-			void name_metrics_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data);
+			void name_metrics_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data, const ProcmonSettings& procmon_settings);
 
 			void data_insert(str_t& data, const ColumnData& container, const size_t line_len, const size_t previous_pos_sum);
 
-			Result fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_data_process, str_t& data);
+			Result fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_data_process, str_t& data, const ProcmonSettings& procmon_settings);
 		}
 
 		namespace Setters 
 		{
+            namespace InsertFormat
+            {
+                void manage(str_t& data, const MetricType& metric_type, const ProcmonSettings& procmon_settings);
+
+                void memory(str_t& data, const MemoryViewSettings& memory_view_setting);
+
+                void time(str_t& data, const TimeViewSettings& time_view_setting);
+            }
+
 			void get_length_param(MetricType metric_type, size_t& length);
 
 			void set_off(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const MetricType metric_type, const int table_index);

@@ -39,6 +39,57 @@ void UpdateUtility::Data::Setters::get_length_param(MetricType metric_type, size
 	}
 }
 
+void UpdateUtility::Data::Setters::InsertFormat::time(str_t& data, const TimeViewSettings& time_view_setting)
+{
+    switch(time_view_setting)
+    {
+        case TimeViewSettings::seconds: data = "(S)";
+            break;
+
+        case TimeViewSettings::minutes: data = "(M)";
+            break;
+
+        case TimeViewSettings::hours: data = "(H)";
+            break;
+
+        case TimeViewSettings::days: data = "(D)";
+            break;
+    }
+}
+
+void UpdateUtility::Data::Setters::InsertFormat::memory(str_t& data, const MemoryViewSettings& memory_view_setting)
+{
+    switch(memory_view_setting)
+    {
+        case MemoryViewSettings::B: data = "(B)";
+            break;
+
+        case MemoryViewSettings::KiB: data = "(KiB)";
+            break;                                  
+
+        case MemoryViewSettings::MiB: data = "(MiB)";
+            break;                                    
+
+        case MemoryViewSettings::GiB: data = "(GiB)";
+            break;                                    
+
+        case MemoryViewSettings::TiB: data = "(TiB)";
+            break;                                    
+    }
+}
+
+void UpdateUtility::Data::Setters::InsertFormat::manage(str_t& data, const MetricType& metric_type, const ProcmonSettings& procmon_settings)
+{
+    if(metric_type == MetricType::time)
+        time(data, procmon_settings.time_view_setting);
+    else if(metric_type == MetricType::memory)
+        memory(data, procmon_settings.memory_view_setting);
+    else if(metric_type == MetricType::tCPU || metric_type == MetricType::iCPU)
+        data = "(%)";
+    else 
+        data = "";
+}
+
 void UpdateUtility::Data::Setters::set_off(const vec_t<vec_t<DataProcess>>& processes, vec_t<ColumnData>& container_column_data, const MetricType metric_type, const int index_in_table)
 {
 	vec_t <str_t> data;
@@ -151,19 +202,19 @@ void UpdateUtility::Data::Setters::set_memory(const vec_t<vec_t<DataProcess>>& p
 
             switch(procmon_settings.memory_view_setting)
             {
-                case MemoryViewSettings::B : rounded = std::round(it_cur_process.memory.bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::B: rounded = std::round(it_cur_process.memory.bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::KiB : rounded = std::round(it_cur_process.memory.k_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::KiB: rounded = std::round(it_cur_process.memory.k_bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::MiB : rounded = std::round(it_cur_process.memory.m_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::MiB: rounded = std::round(it_cur_process.memory.m_bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::GiB : rounded = std::round(it_cur_process.memory.g_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::GiB: rounded = std::round(it_cur_process.memory.g_bytes * 100.0) / 100.0; 
                     break;
 
-                case MemoryViewSettings::TiB : rounded = std::round(it_cur_process.memory.t_bytes * 100.0) / 100.0; 
+                case MemoryViewSettings::TiB: rounded = std::round(it_cur_process.memory.t_bytes * 100.0) / 100.0; 
                     break;
             }
 
@@ -281,14 +332,19 @@ void UpdateUtility::Data::StringUtility::insert_lines_in_data(const size_t num_l
 	data = s_data.str();
 }
 
-void UpdateUtility::Data::StringUtility::name_metrics_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data)
+void UpdateUtility::Data::StringUtility::name_metrics_insert(std::stringstream& s_data, const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data, const ProcmonSettings& procmon_settings)
 {
+    str_t data;
+    str_t format = "";
+
 	for (int index = 0; index < procmon_settings_table.size(); ++index)
 	{
 		if (procmon_settings_table[index].metric_type == MetricType::time_view || procmon_settings_table[index].metric_type == MetricType::memory_view)
 			continue;
 
-		s_data << std::setw(container_column_data[index].length_one_param) << std::left << ("|" + procmon_settings_table[index].name);
+        Setters::InsertFormat::manage(format, procmon_settings_table[index].metric_type, procmon_settings);
+
+		s_data << std::setw(container_column_data[index].length_one_param) << std::left << ("|" + procmon_settings_table[index].name + format);
 	}
 	s_data << "\n";
 }
@@ -312,14 +368,14 @@ void UpdateUtility::Data::StringUtility::data_insert(str_t& data, const ColumnDa
 	}
 }
 
-Result UpdateUtility::Data::StringUtility::fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data, str_t& data)
+Result UpdateUtility::Data::StringUtility::fill_table(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const vec_t<ColumnData>& container_column_data, str_t& data, const ProcmonSettings& procmon_settings)
 {
 	std::stringstream s_data;
 
-	name_metrics_insert(s_data, procmon_settings_table, container_column_data);
+	name_metrics_insert(s_data, procmon_settings_table, container_column_data, procmon_settings);
 	data = s_data.str();
+    const size_t line_len = data.size();
 
-	const size_t line_len = data.length();
 	size_t previous_pos_sum = 0;
 	size_t previous_index = 0;
 
@@ -350,7 +406,7 @@ Result UpdateUtility::Data::convert_container_processes_to_str(const vec_t<vec_t
 		return res_set_data;
 	
 	Result res_fill_table;
-	if ((res_fill_table = StringUtility::fill_table(procmon_settings_table, container_column_data, data)) != Result::successful)
+	if ((res_fill_table = StringUtility::fill_table(procmon_settings_table, container_column_data, data, procmon_settings)) != Result::successful)
 		return res_fill_table;
 
 	return Result::successful;
