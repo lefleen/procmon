@@ -103,13 +103,13 @@ Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSetti
     for (auto& it : procmon_settings_table)
     {
         out += it.name + ":";
-        if (it.name == "time_view")
+        if (it.metric_type == MetricType::time_view)
         {
             Result res_set_time;
             if((res_set_time = set_setting_view_time_in_string(*procmon_settings_view.time_view_settings, out)) != Result::successful)
                 return res_set_time;
         }
-        else if (it.name == "memory_view")
+        else if (it.metric_type == MetricType::memory_view)
         {
             Result res_set_mem;
             if((res_set_mem = set_settings_view_memory_in_string(*procmon_settings_view.memory_view_settings, out)) != Result::successful)
