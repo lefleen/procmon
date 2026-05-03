@@ -117,7 +117,16 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
     return Result::invalid_arguments;
 }
 
-Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick)
+Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metric)
 {
+    if(metric == "data")
+    {
+        str_t data = "";
+
+        Result res_load_data;
+        if((res_load_data = FileUtility::Data::manage(data, FileUtility::load_data_process_file)) != Result::successful)
+            return res_load_data;
+    }
+
     return Result::successful;
 }

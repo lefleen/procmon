@@ -107,7 +107,7 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
         if ((res_save_base_parameters = FileUtility::Universal::save_data_in_file(descriptor_file, data)) != Result::successful)
             return res_save_base_parameters;
 
-        if (lseek(descriptor_file.get(), 0, SEEK_SET) == static_cast<off_t>(-1))
+        if (lseek(descriptor_file.get(), 0, SEEK_SET) == -1)
             return Result::failure;
     }
 
@@ -128,10 +128,10 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
 Result FileUtility::Data::load(DescriptorRAII& descriptor_file, str_t& data, const char* file_name)
 {
     int BUFFER_SIZE = 1024;
-    char buffer[BUFFER_SIZE];
+    char* buffer = new char[BUFFER_SIZE];
 
 #ifdef _WIN32
-    DWORD REAL_BUFFER_SIZE = 0;
+    DWORD REAL_BUFFER_SIZE = BUFFER_SIZE;
      
     descriptor_file = CreateFile(file_name, GENERIC_READ, 0,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -141,14 +141,18 @@ Result FileUtility::Data::load(DescriptorRAII& descriptor_file, str_t& data, con
     
     while(BUFFER_SIZE == REAL_BUFFER_SIZE)
     {
-        if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_BUFFER_SIZE, NULL))
+        BUFFER_SIZE *= 2;
+        buffer = new char[BUFFER_SIZE];
+
+        if(SetFilePointer(descriptor_file.get(), 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
             return Result::failure;
 
-        BUFFER_SIZE *= 2;
+        if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_BUFFER_SIZE, NULL))
+            return Result::failure;
     }
 
 #elif defined (__linux__)
-    int REAL_BUFFER_SIZE = 0;
+    int REAL_BUFFER_SIZE = BUFFER_SIZE;
 
     descriptor_file = open(file_name, O_RDONLY, 00777);
 
@@ -157,10 +161,16 @@ Result FileUtility::Data::load(DescriptorRAII& descriptor_file, str_t& data, con
 
     while(BUFFER_SIZE == REAL_BUFFER_SIZE)
     {
+        BUFFER_SIZE *= 2;
+        buffer = new char[BUFFER_SIZE];
+
+        if (lseek(descriptor_file.get(), 0, SEEK_SET) == -1)
+            return Result::failure;
+
         if ((REAL_BUFFER_SIZE = read(descriptor_file.get(), buffer, BUFFER_SIZE)) == -1) 
             return Result::failure;
 
-        BUFFER_SIZE *= 2;
+        std::cout << REAL_BUFFER_SIZE << "\t" <<  BUFFER_SIZE << std::endl;
     }
 
 #endif
@@ -232,9 +242,9 @@ Result FileUtility::Data::manage(str_t& data, const int param)
     {
         str_t file_name = "processes_data";
 
-        Result res_save;
-        if ((res_save = Universal::save(descriptor_file, data, file_name.c_str())) != Result::successful)
-            return res_save;
+        Result res_load;
+        if ((res_load = load(descriptor_file, data, file_name.c_str())) != Result::successful)
+            return res_load;
     }
     else if (param == save_data_process_file)
     {
