@@ -23,8 +23,7 @@ namespace ManageProgramm
     template<typename... T>
     void clear_thread_resources(T&... containers);
 
-	Result clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, const vec_t<DWORD>& pids_processes,
-		size_t start_point, size_t end_point);
+	Result clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, const vec_t<DWORD>& pids_processes, size_t start_point, size_t end_point, const size_t max_threads);
 
 	Result calculate_start_end_points(const unsigned int max_threads, size_t num_thread, const DWORD count_processes, size_t& start_point, size_t& end_point);
 
