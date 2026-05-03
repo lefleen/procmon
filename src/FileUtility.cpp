@@ -136,7 +136,7 @@ Result FileUtility::Data::load(DescriptorRAII& descriptor_file, str_t& data, con
     descriptor_file = CreateFile(file_name, GENERIC_READ, 0,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-    if (descriptor_file.get() == INVALID_HANDLE_VALUE || GetLastError() == ERROR_FILE_NOT_FOUND)
+    if (descriptor_file.get() == INVALID_HANDLE_VALUE)
         return Result::failure;;
     
     while(BUFFER_SIZE == REAL_BUFFER_SIZE)
