@@ -6,11 +6,11 @@ void ManageProgramm::clear_thread_resources(T&... containers)
     (containers.clear(), ...);
 }
 
-Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, const vec_t<DWORD>& pids_processes, size_t start_point, size_t end_point)
+Result ManageProgramm::clear_using_cpu_vec(map_t<DWORD, UsingCpuProc>& using_cpu_processes, const vec_t<DWORD>& pids_processes, size_t start_point, size_t end_point, const unsigned int max_threads)
 {
 	map_t<DWORD, UsingCpuProc> _using_cpu_processes;
 
-	for (size_t index = start_point; index < end_point; ++index)
+	for (size_t index = start_point; index < end_point; index += max_threads)
 	{
 		DWORD pid = pids_processes[index];
 		_using_cpu_processes[pid] = std::move(using_cpu_processes[pid]);
@@ -57,7 +57,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
 		processes.push_back(current_process);
 	}
 
-	clear_using_cpu_vec(using_cpu_process, params.pids_processes, start_point, end_point);
+	clear_using_cpu_vec(using_cpu_process, params.pids_processes, start_point, end_point, max_threads);
 
 	return Result::successful;
 }
