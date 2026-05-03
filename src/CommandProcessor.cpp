@@ -92,13 +92,13 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
     {
         if (it.name == metrick)
         {   
-            if (it.name == "time_view")
+            if (it.metric_type == MetricType::time_view)
             {
                 Result res_view_time;
                 if((res_view_time = ParseUtility::set_settings_view_time_in_procmon_settings(setting, *procmon_settings_view.time_view_settings)) != Result::successful)
                     return res_view_time;
             }
-            else if (it.name == "memory_view")
+            else if (it.metric_type == MetricType::memory_view)
             {
                 Result res_view_mem;
                 if((res_view_mem = ParseUtility::set_settings_view_memory_in_procmon_settings(setting, *procmon_settings_view.memory_view_settings)) != Result::successful)

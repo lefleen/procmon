@@ -125,6 +125,50 @@ Result FileUtility::Config::load(vec_t<ProcmonSettingsTable>& procmon_settings_t
     return Result::successful;
 }
 
+Result FileUtility::Data::load(DescriptorRAII& descriptor_file, str_t& data, const char* file_name)
+{
+    int BUFFER_SIZE = 1024;
+    char buffer[BUFFER_SIZE];
+
+#ifdef _WIN32
+    DWORD REAL_BUFFER_SIZE = 0;
+     
+    descriptor_file = CreateFile(file_name, GENERIC_READ, 0,
+        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (descriptor_file.get() == INVALID_HANDLE_VALUE || GetLastError() == ERROR_FILE_NOT_FOUND)
+        return Result::failure;;
+    
+    while(BUFFER_SIZE == REAL_BUFFER_SIZE)
+    {
+        if (!ReadFile(descriptor_file.get(), (void*)(buffer), BUFFER_SIZE, &REAL_BUFFER_SIZE, NULL))
+            return Result::failure;
+
+        BUFFER_SIZE *= 2;
+    }
+
+#elif defined (__linux__)
+    int REAL_BUFFER_SIZE = 0;
+
+    descriptor_file = open(file_name, O_RDONLY, 00777);
+
+    if(descriptor_file.get() == -1)
+        return Result::failure;
+
+    while(BUFFER_SIZE == REAL_BUFFER_SIZE)
+    {
+        if ((REAL_BUFFER_SIZE = read(descriptor_file.get(), buffer, BUFFER_SIZE)) == -1) 
+            return Result::failure;
+
+        BUFFER_SIZE *= 2;
+    }
+
+#endif
+    data = str_t(buffer, REAL_BUFFER_SIZE);
+
+    return Result::successful;
+}
+
 Result FileUtility::Universal::save(DescriptorRAII& descriptor_file, const str_t& data, const char* file_name)
 {
 #ifdef _WIN32
@@ -174,7 +218,8 @@ Result FileUtility::Config::manage(vec_t<ProcmonSettingsTable>& procmon_settings
         if ((res_save = Universal::save(descriptor_file, data, file_name.c_str())) != Result::successful)
             return res_save;
     }
-    else return Result::failure;
+    else 
+        return Result::failure;
 
     return Result::successful;
 }
@@ -185,7 +230,11 @@ Result FileUtility::Data::manage(str_t& data, const int param)
 
     if (param == load_data_process_file)
     {
+        str_t file_name = "processes_data";
 
+        Result res_save;
+        if ((res_save = Universal::save(descriptor_file, data, file_name.c_str())) != Result::successful)
+            return res_save;
     }
     else if (param == save_data_process_file)
     {

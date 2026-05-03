@@ -31,6 +31,8 @@ namespace FileUtility
 
     namespace Data 
     {
+        Result load(DescriptorRAII& descriptor_file, str_t& data, const char* file_name);
+
         Result manage(str_t& data, const int param);
     }
 
