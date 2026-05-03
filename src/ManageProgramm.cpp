@@ -36,7 +36,7 @@ Result ManageProgramm::get_information_about_processes(const parameters_process&
     size_t start_point = 0;
     size_t end_point = 0;
 	calculate_start_end_points(max_threads, num_thread, params.count_processes, start_point, end_point);
-    size_t num_elements = count_processes / max_threads + 1; 
+    size_t num_elements = params.count_processes / max_threads + 1; 
 	processes.reserve(num_elements);
 
 	for (size_t index = start_point; index < end_point; index += max_threads)
