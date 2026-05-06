@@ -6,7 +6,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     if (size == 0)
     {
         Result res_get_manage;
-        if ((res_get_manage = Command::Get::manage(procmon_settings_table, "all")) != Result::successful)
+       if ((res_get_manage = Command::Get::manage(procmon_settings_table, procmon_settings_view, "all")) != Result::successful)
             return res_get_manage;
 
         return Result::no_arguments;
@@ -57,7 +57,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
             if ((res = Command::Set::manage(procmon_settings_table, procmon_settings_view, metric, setting)) != Result::successful)
                 return res;
 
-            if((res = Command::Get::manage(procmon_settings_table, metric)) != Result::successful)
+            if((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
                 return res;
 
             if (setting == "off" && metric == "time");
@@ -68,7 +68,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
         {    
             Result res;
 
-            if ((res = Command::Get::manage(procmon_settings_table, metric)) != Result::successful)
+            if ((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
                 return res;
         }
     }
@@ -139,18 +139,103 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
     return Result::invalid_arguments;
 }
 
-Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metric)
+Result CommandProcessor::Command::Get::get_view_time_and_memory(const ProcmonSettingsView& procmon_settings_view, str_t& time_view, str_t& memory_view)
+{   
+    Result res_time_view;
+    if((res_time_view = ParseUtility::set_setting_view_time_in_string(*procmon_settings_view.time_view_settings, time_view)) != Result::successful)
+    {
+        UserInterface::Errors::show("", Result::invalid_arguments);
+        return res_time_view;
+    }
+    
+    Result res_memory_view;
+    if((res_memory_view = ParseUtility::set_setting_view_time_in_string(*procmon_settings_view.time_view_settings, memory_view)) != Result::successful)
+    {
+        UserInterface::Errors::show("", Result::invalid_arguments);
+            return res_memory_view;
+    }
+
+    return Result::successful;    
+}
+
+Result CommandProcessor::Command::Get::data()
+{
+    str_t data = "";
+    
+    Result res_load_data;
+    if((res_load_data = FileUtility::Data::manage(data, FileUtility::load_data_process_file)) != Result::successful)
+    {
+        UserInterface::Errors::show("", Result::err_load_data);
+            return res_load_data;
+    }
+
+    UserInterface::Data::get(data);
+
+    return Result::successful;
+}
+
+Result CommandProcessor::Command::Get::all(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view)
+{
+    str_t time_view = "";
+    str_t memory_view = "";
+
+    Result res_view_format;
+    if((res_view_format = get_view_time_and_memory(procmon_settings_view, time_view, memory_view)) != Result::successful)
+        Result res_view_format;
+
+    UserInterface::Metrics::all(procmon_settings_table, time_view, memory_view);
+
+    return Result::successful;
+}
+Result CommandProcessor::Command::Get::one(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, const str_t& metric)
+{
+    str_t time_view = "";
+    str_t memory_view = "";
+
+    Result res_view_format;
+    if((res_view_format = get_view_time_and_memory(procmon_settings_view, time_view, memory_view)) != Result::successful)
+        return res_view_format;
+
+    bool is_valid_metric = false;
+
+    for(auto& it : procmon_settings_table)
+    {
+        if(it.name == metric)
+        {
+            UserInterface::Metrics::one(it, it.metric_type, time_view, memory_view);
+
+            is_valid_metric = true;
+            break;
+        }
+    }
+    if(!is_valid_metric)
+    {
+        UserInterface::Errors::show("", Result::invalid_arguments);
+        return Result::failure;
+    }
+
+    return Result::successful;
+}
+
+Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, const str_t& metric)
 {
     if(metric == "data")
     {
-        str_t data = "";
-
-        Result res_load_data;
-        if((res_load_data = FileUtility::Data::manage(data, FileUtility::load_data_process_file)) != Result::successful)
-        {
-            UserInterface::Errors::show("", Result::err_load_data);
-            return res_load_data;
-        }
+        Result res_get_data;
+        if((res_get_data = data()) != Result::successful)
+            return res_get_data;
+    }
+    else if(metric == "all") 
+    {
+        Result res_get_all;
+        if((res_get_all = all(procmon_settings_table, procmon_settings_view)) != Result::successful)
+            return Result::successful;
+    }
+    else 
+    {
+       Result res_get_one;
+       if((res_get_one = one(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
+           return res_get_one;
     }
 
     return Result::successful;

@@ -23,7 +23,15 @@ namespace CommandProcessor
 
         namespace Get
         {
-            Result manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const str_t& metrick);
+            Result get_view_time_and_memory(const ProcmonSettingsView& procmon_settings_view, str_t& time_view, str_t& memory_view);
+
+            Result data();
+
+            Result all(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view);
+
+            Result one(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, const str_t& metric);
+
+            Result manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, const str_t& metrick);
         }
     }
 }
