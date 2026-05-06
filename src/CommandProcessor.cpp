@@ -11,8 +11,6 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
         return Result::no_arguments;
     }
-    else if (size < 0)
-        return Result::failure;
 
     map_t<str_t, str_t> file_config;
 
@@ -60,7 +58,8 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
             if((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
                 return res;
 
-            if (setting == "off" && metric == "time");
+            if (setting == "off" && metric == "time")
+                UserInterface::Assert::time();
 
             status_set = true;
         }
@@ -149,7 +148,7 @@ Result CommandProcessor::Command::Get::get_view_time_and_memory(const ProcmonSet
     }
     
     Result res_memory_view;
-    if((res_memory_view = ParseUtility::set_setting_view_time_in_string(*procmon_settings_view.time_view_settings, memory_view)) != Result::successful)
+    if((res_memory_view = ParseUtility::set_settings_view_memory_in_string(*procmon_settings_view.memory_view_settings, memory_view)) != Result::successful)
     {
         UserInterface::Errors::show("", Result::invalid_arguments);
             return res_memory_view;
@@ -181,7 +180,7 @@ Result CommandProcessor::Command::Get::all(const vec_t<ProcmonSettingsTable>& pr
 
     Result res_view_format;
     if((res_view_format = get_view_time_and_memory(procmon_settings_view, time_view, memory_view)) != Result::successful)
-        Result res_view_format;
+        return res_view_format;
 
     UserInterface::Metrics::all(procmon_settings_table, time_view, memory_view);
 
