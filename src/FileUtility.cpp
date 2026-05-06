@@ -36,10 +36,10 @@ Result FileUtility::Config::parse_data_line(const str_t& data, map_t<str_t, str_
 
         size_t end_metrick = line.find(":", 0);
         size_t end_setting = line.find(";", end_metrick + 1);
+        if (end_setting == str_t::npos || end_metrick == str_t::npos) break;
 
         str_t metrick = line.substr(0, end_metrick);
         str_t setting = line.substr(end_metrick + 1, end_setting - end_metrick - 1);
-        if (end_setting == str_t::npos || end_metrick == str_t::npos) break;
 
         start_line = end_line + 1;
 

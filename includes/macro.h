@@ -7,7 +7,11 @@ enum class Result
     initialization,
     no_arguments,
     invalid_arguments,
-    off_calculate_metrick
+    off_calculate_metrick,
+    err_load_config,
+    err_save_config,
+    err_load_data,
+    parse_command_line
 };
 
 constexpr int  macCreateTimeProcess = 1001;

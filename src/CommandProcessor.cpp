@@ -19,7 +19,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     Result res_file_load;
     if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::load_config_file)) != Result::successful) 
     {
-        UserInterface::Errors::show("open file 'procmon_config'", res_file_load);
+        UserInterface::Errors::show("", res_file_load);
         return res_file_load;
     }
 
@@ -34,6 +34,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     str_t option = "";
     str_t metric = "";
     str_t setting = "";
+    bool status_set = false;
 
     while (index < size)
     {
@@ -41,7 +42,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
         if ((res_parse_string = ParseUtility::parse_command_line(procmon_settings_table, argc, argv, option, metric, setting, index)) != Result::successful)
         {
-            UserInterface::Errors::show("parse command line", res_parse_string);
+            UserInterface::Errors::show("", res_parse_string);
             return res_parse_string;
         }
 
@@ -60,6 +61,8 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
                 return res;
 
             if (setting == "off" && metric == "time");
+
+            status_set = true;
         }
         else if (option == "get")
         {    
@@ -71,11 +74,11 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     }
 
     Result res_file_save;
-    if (option == "set")
+    if (status_set)
     {
         if ((res_file_save = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::save_config_file)) != Result::successful)
         {
-            UserInterface::Errors::show("open file 'processes data'", res_file_save);
+            UserInterface::Errors::show("", res_file_save);
             return res_file_save;
         }
     }
@@ -106,7 +109,7 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
                 Result res_view_time;
                 if((res_view_time = ParseUtility::set_settings_view_time_in_procmon_settings(setting, *procmon_settings_view.time_view_settings)) != Result::successful)
                 {
-                    UserInterface::Errors::show(("undefined format: " + setting), res_view_time);
+                    UserInterface::Errors::show(setting, Result::invalid_arguments);
                     return res_view_time;
                 }
             }
@@ -115,8 +118,8 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
                 Result res_view_mem;
                 if((res_view_mem = ParseUtility::set_settings_view_memory_in_procmon_settings(setting, *procmon_settings_view.memory_view_settings)) != Result::successful)
                 {
-                    UserInterface::Errors::show(("undefined format: " + setting), res_view_mem);
-                    return res_view_mem;;
+                    UserInterface::Errors::show(setting, Result::invalid_arguments);
+                    return res_view_mem;
                 }
             }
             else
@@ -125,7 +128,7 @@ Result CommandProcessor::Command::Set::manage(vec_t<ProcmonSettingsTable>& procm
                 else if (setting == "off") *it.status = false;
                 else 
                 {
-                    UserInterface::Errors::show(("undefined format: " + setting), Result::invalid_arguments);
+                    UserInterface::Errors::show(setting, Result::invalid_arguments);
                     return Result::invalid_arguments;
                 }
             }
@@ -145,7 +148,7 @@ Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>&
         Result res_load_data;
         if((res_load_data = FileUtility::Data::manage(data, FileUtility::load_data_process_file)) != Result::successful)
         {
-            UserInterface::Errors::show("open file 'processes data'", res_load_data);
+            UserInterface::Errors::show("", res_load_data);
             return res_load_data;
         }
     }
