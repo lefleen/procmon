@@ -1,5 +1,35 @@
 #include "UserInterface.h"
 
+void UserInterface::Commands::set()
+{
+
+}
+
+void UserInterface::Commands::get()
+{
+
+}
+
+void UserInterface::Commands::help()
+{
+
+}
+
+void UserInterface::Metrics::all(const ProcmonSettings& procmon_settings)
+{
+
+}
+
+void UserInterface::Metrics::one(const ProcmonSettings& procmon_settings, const MetricType& metric_type)
+{
+
+}
+
+void UserInterface::Assert::time()
+{
+
+}
+
 void UserInterface::Errors::show(const str_t& what, const Result res)
 {
     str_t full_err = "";
