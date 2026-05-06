@@ -228,7 +228,7 @@ Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>&
     {
         Result res_get_all;
         if((res_get_all = all(procmon_settings_table, procmon_settings_view)) != Result::successful)
-            return Result::successful;
+            return res_get_all;
     }
     else 
     {
