@@ -18,7 +18,7 @@ void UserInterface::Errors::show(const str_t& what, const Result res)
         case Result::err_load_data: full_err = "load file 'processes_data' ";
             break;
 
-        case Result::parse_command_line: full_err = "parse command line ";
+        case Result::err_parse_command_line: full_err = "parse command line ";
             break;
 
         default: full_err = "undefined error ";

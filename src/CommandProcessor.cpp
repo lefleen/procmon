@@ -19,7 +19,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     Result res_file_load;
     if ((res_file_load = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::load_config_file)) != Result::successful) 
     {
-        UserInterface::Errors::show("", res_file_load);
+        UserInterface::Errors::show("", Result::err_load_config);
         return res_file_load;
     }
 
@@ -42,7 +42,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
         if ((res_parse_string = ParseUtility::parse_command_line(procmon_settings_table, argc, argv, option, metric, setting, index)) != Result::successful)
         {
-            UserInterface::Errors::show("", res_parse_string);
+            UserInterface::Errors::show("", Result::err_parse_command_line);
             return res_parse_string;
         }
 
@@ -78,7 +78,7 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
     {
         if ((res_file_save = FileUtility::Config::manage(procmon_settings_table, procmon_settings_view, file_config, FileUtility::save_config_file)) != Result::successful)
         {
-            UserInterface::Errors::show("", res_file_save);
+            UserInterface::Errors::show("", Result::err_save_config);
             return res_file_save;
         }
     }
@@ -148,7 +148,7 @@ Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>&
         Result res_load_data;
         if((res_load_data = FileUtility::Data::manage(data, FileUtility::load_data_process_file)) != Result::successful)
         {
-            UserInterface::Errors::show("", res_load_data);
+            UserInterface::Errors::show("", Result::err_load_data);
             return res_load_data;
         }
     }

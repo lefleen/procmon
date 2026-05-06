@@ -11,7 +11,7 @@ enum class Result
     err_load_config,
     err_save_config,
     err_load_data,
-    parse_command_line
+    err_parse_command_line
 };
 
 constexpr int  macCreateTimeProcess = 1001;
