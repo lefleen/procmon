@@ -10,7 +10,7 @@ Result ParseUtility::convert_char_to_string(vec_t<str_t>& res, const int argc, c
     return Result::successful;
 }
 
-Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[], str_t& option, str_t& metrick, str_t& setting, size_t& index)
+Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[], str_t& option, str_t& metric, str_t& setting, size_t& index)
 {
     vec_t<str_t> args(argc - 1);
 
@@ -24,13 +24,18 @@ Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_set
     if (option == "help")
     {
         index += 1;
+        if(args[index] != "")
+        {
+            metric = args[index];
+            index += 1;
+        }
     }
     else if (option == "set")
     {
         if (index + 2 >= size)
             return Result::invalid_arguments;
 
-        metrick = args[index + 1];
+        metric = args[index + 1];
         setting = args[index + 2];
 
         index += 3;
@@ -40,7 +45,7 @@ Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_set
         if (index + 1 >= size)
             return Result::invalid_arguments;
 
-        metrick = args[index + 1];
+        metric = args[index + 1];
 
         index += 2;
     }

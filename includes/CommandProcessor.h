@@ -33,5 +33,10 @@ namespace CommandProcessor
 
             Result manage(const vec_t<ProcmonSettingsTable>& procmon_settings_table, const ProcmonSettingsView& procmon_settings_view, const str_t& metrick);
         }
+
+        namespace Help
+        {
+            Result manage(const str_t& setting);
+        }
     }
 }

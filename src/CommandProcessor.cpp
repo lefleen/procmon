@@ -46,7 +46,10 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
         if (option == "help")
         {
-            
+            Result res_help_manage;
+
+            if((res_help_manage = Command::Help::manage(metric)) != Result::successful)
+                return res_help_manage;
         }
         else if (option == "set")
         {
@@ -235,6 +238,23 @@ Result CommandProcessor::Command::Get::manage(const vec_t<ProcmonSettingsTable>&
        Result res_get_one;
        if((res_get_one = one(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
            return res_get_one;
+    }
+
+    return Result::successful;
+}
+
+Result CommandProcessor::Command::Help::manage(const str_t& setting)
+{
+    if(setting == "")
+        UserInterface::Commands::help();
+    else if(setting == "set")
+        UserInterface::Commands::set();
+    else if(setting == "get")
+        UserInterface::Commands::get();
+    else
+    {
+        UserInterface::Errors::show("", Result::invalid_arguments);
+        return Result::invalid_arguments;
     }
 
     return Result::successful;

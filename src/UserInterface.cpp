@@ -2,7 +2,7 @@
 
 void UserInterface::Commands::set()
 {
-    std::cout << "The command 'set' allow set on or off calculate metrics and also set format view metric\n\n";
+    std::cout << "\nThe command 'set' allow set on or off calculate metrics and also set format view metric\n\n";
     std::cout << "Calculate metrics:\n";
     std::cout << "\t[name], [time], [memory], [iCPU] (interval CPU), [tCPU] (total CPU).\n";
     std::cout << "settings: [on], [off]\n\n";
@@ -18,7 +18,7 @@ void UserInterface::Commands::set()
 
 void UserInterface::Commands::get()
 {
-    std::cout << "The command 'get' allow show procmon config or data processes\n\n";
+    std::cout << "\nThe command 'get' allow show procmon config or data processes\n\n";
     std::cout << "Show calculate and view settings:\n";
     std::cout << "\t[name], [time], [memory], [iCPU] (interval CPU), [tCPU] (total CPU), [time_view], [memory_view].\n";
     std::cout << "\tshow data processes: [data]\n\n";
@@ -32,12 +32,11 @@ void UserInterface::Commands::get()
 
 void UserInterface::Commands::help()
 {
-    std::cout << "procmon (hereinafter referred to as the utility) is a cross-platform console utility intended for process monitoring. This utility collects information about running processes and displays the main process metrics, such as CPU usage, memory usage, and other important metrics. It is also worth noting the provided ability to configure the displayed and calculated metrics for your own tasks and goals. It is planned to continue developing the utility further by adding new functions to it, such as creating logs, that is, recording all previous metrics over a certain period of time.\n";
+    std::cout << "\n\tprocmon (hereinafter referred to as the utility) is a cross-platform console utility intended for process monitoring. This utility collects information about running processes and displays the main process metrics, such as CPU usage, memory usage, and other important metrics. It is also worth noting the provided ability to configure the displayed and calculated metrics for your own tasks and goals. It is planned to continue developing the utility further by adding new functions to it, such as creating logs, that is, recording all previous metrics over a certain period of time.\n\n";
     std::cout << "Commands:\n";
-    std::cout << "\t[set]";
-    std::cout << "\t[get]";
+    std::cout << "\t[set], [get]";
     std::cout << "\n\nFor more details write:\n";
-    std::cout << "\tprocmon help [command]";
+    std::cout << "\tprocmon help [command]\n\n";
 }
 
 void UserInterface::Data::get(const str_t& data)
