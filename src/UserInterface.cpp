@@ -34,7 +34,7 @@ void UserInterface::Commands::help()
 {
     std::cout << "\n\tprocmon (hereinafter referred to as the utility) is a cross-platform console utility intended for process monitoring. This utility collects information about running processes and displays the main process metrics, such as CPU usage, memory usage, and other important metrics. It is also worth noting the provided ability to configure the displayed and calculated metrics for your own tasks and goals. It is planned to continue developing the utility further by adding new functions to it, such as creating logs, that is, recording all previous metrics over a certain period of time.\n\n";
     std::cout << "Commands:\n";
-    std::cout << "\t[set], [get]";
+    std::cout << "\t[help], [set], [get]";
     std::cout << "\n\nFor more details write:\n";
     std::cout << "\tprocmon help [command]\n\n";
 }
