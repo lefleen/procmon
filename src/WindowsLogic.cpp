@@ -1,12 +1,9 @@
 #include "WindowsLogic.h"
 
-// Получение ID
 Result ProcmonLogic::DescriptorProc::get(DescriptorRAII& descriptor_process, DWORD pid_process)
 {
-	// Проверка PID процесса на существование
 	if (pid_process != 0)
 	{
-		// Хэндл процесса
 		descriptor_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
 			FALSE, pid_process);
 
@@ -18,10 +15,8 @@ Result ProcmonLogic::DescriptorProc::get(DescriptorRAII& descriptor_process, DWO
 	return Result::failure;
 }
 
-	// Получени имени процесса класса
 Result ProcmonLogic::NameProc::get(const DescriptorRAII& descriptor_process, DWORD count_bytes_needed, DataProcess& current_process)
 {
-	// Хэндл модуля процесса
 	HMODULE hmodule_process = { };
 
 	if (EnumProcessModules(descriptor_process.get(), &hmodule_process, sizeof(hmodule_process),
@@ -29,7 +24,6 @@ Result ProcmonLogic::NameProc::get(const DescriptorRAII& descriptor_process, DWO
 	{
 		char process_name[256];
 
-		// Получение имени
 		size_t len = 0;
 		if ((len = GetModuleBaseName(descriptor_process.get(), hmodule_process, process_name,
 			256)) == 0) return Result::failure;
@@ -42,7 +36,6 @@ Result ProcmonLogic::NameProc::get(const DescriptorRAII& descriptor_process, DWO
 	return Result::failure;
 }
 
-	// FILETIME в time_t
 Result ProcmonLogic::TimeProc::filetime_to_time_t(time_t& time, const process_time f_time)
 {
 	ULARGE_INTEGER ull;
@@ -57,7 +50,6 @@ Result ProcmonLogic::TimeProc::filetime_to_time_t(time_t& time, const process_ti
 	return Result::successful;
 }
 
-	// Получение FILETIME в формате time_t
 Result ProcmonLogic::TimeProc::get_create_time_process(const DescriptorRAII& descriptor_process, time_t& create_time_process, const int choose)
 {
 	process_time creation_ftime_process = { };
@@ -67,7 +59,6 @@ Result ProcmonLogic::TimeProc::get_create_time_process(const DescriptorRAII& des
 
 	if (!GetProcessTimes(descriptor_process.get(), &creation_ftime_process, &exit_ftime_process, &kernel_ftime_process, &user_ftime_process)) return Result::failure;
 
-	// Преобразование в системное время
 	switch (choose)
 	{
 	case macCreateTimeProcess: if (filetime_to_time_t(create_time_process, creation_ftime_process) == Result::failure) return Result::failure; break;
@@ -80,7 +71,6 @@ Result ProcmonLogic::TimeProc::get_create_time_process(const DescriptorRAII& des
 	return Result::successful;
 }
 
-	// Время работы процесса
 Result ProcmonLogic::TimeProc::calculate_work_time_process(time_t& work_time_process, const time_t create_time_process)
 {
 
@@ -88,7 +78,6 @@ Result ProcmonLogic::TimeProc::calculate_work_time_process(time_t& work_time_pro
 
 	if (current_time == -1) return Result::failure;
 
-	// Разность времени текущего и времени старта
 	work_time_process = current_time - create_time_process;
 
 	if (work_time_process <= 0) return  Result::failure;
@@ -96,11 +85,10 @@ Result ProcmonLogic::TimeProc::calculate_work_time_process(time_t& work_time_pro
 	return Result::successful;
 }
 
-	// Преобразование времени в правильные форма
 Result ProcmonLogic::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& output_time)
 {
     output_time.num_seconds = input_time;
-	// Количество дней
+	
 	output_time.num_minutes = output_time.num_seconds / 60;
 
 	output_time.num_hours = output_time.num_minutes / 60;
@@ -110,22 +98,18 @@ Result ProcmonLogic::TimeProc::time_t_to_my_tm(time_t input_time, struct my_tm& 
 	return Result::successful;
 }
 
-	// Получение времени работы процесса
 Result ProcmonLogic::TimeProc::get(const DescriptorRAII& descriptor_process, DataProcess& process)
 {
 	my_tm tm_work_time_process = { };
 	time_t create_time_process = 0;
 	time_t work_time_process = { };
 
-	// Время в формате time_t
 	if (get_create_time_process(descriptor_process, create_time_process, macCreateTimeProcess) == Result::failure)
 		return Result::failure;
 
-	// Время работы процесса
 	if (calculate_work_time_process(work_time_process, create_time_process) == Result::failure)
 		return Result::failure;
 
-	// time_t в my_tm
 	time_t_to_my_tm(work_time_process, tm_work_time_process);
 
 	process.work_time = tm_work_time_process;
@@ -133,7 +117,6 @@ Result ProcmonLogic::TimeProc::get(const DescriptorRAII& descriptor_process, Dat
 	return Result::successful;
 }
 
-	// Получение ОЗУ процессора
 Result ProcmonLogic::MemoryProc::get(const DescriptorRAII& descriptor_process, DataProcess& process)
 {
 	PROCESS_MEMORY_COUNTERS pmc = { };
@@ -171,16 +154,13 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
 	size_t size = 128;
 	params.pids_processes.resize(size);
 
-	// Получение PID
 	while (true)
 	{
 		if (!EnumProcesses(params.pids_processes.data(), static_cast<DWORD>(params.pids_processes.size()) * sizeof(DWORD), &params.count_bytes_needed))
 			return Result::failure;
 
 		if (params.pids_processes.size() * sizeof(DWORD) != params.count_bytes_needed)
-		{
 			break;
-		}
 
 		size *= 2;
 		params.pids_processes.resize(size);		
@@ -189,7 +169,6 @@ Result ProcmonLogic::Manage::get_parameters_processes(parameters_process& params
     params.count_processes = params.count_bytes_needed / sizeof(DWORD);
     params.pids_processes.resize(params.count_processes);
 
-	// Если количество процессов равно 0
 	if (!params.count_processes) return Result::failure;
 
 	return Result::successful;

@@ -9,5 +9,3 @@ namespace ProcmonLogic
         Result parse_string(const int num_element, const str_t& file_data, str_t& res);
     }
 }
-
-

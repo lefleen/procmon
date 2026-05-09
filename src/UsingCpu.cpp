@@ -81,7 +81,6 @@ Result UsingCpuProc::get_time_using_cpu(const DescriptorRAII& descriptor_process
 	return Result::successful;
 }
 
-	// Загруженность процессора за всё время существования
 Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, const DescriptorRAII& descriptor_process, double work_time_process)
 {
 	ULARGE_INTEGER current_work_time = { };
@@ -102,7 +101,6 @@ Result UsingCpuProc::calculate_total_using_cpu(unsigned long num_cores, const De
 	return Result::successful;
 }
 
-	// Загруженность за конкретный интервал времени
 Result UsingCpuProc::calculating_interval_using_cpu(unsigned long num_cores, const DescriptorRAII& descriptor_process)
 {
 	double cpu_usage = 0;
@@ -162,11 +160,10 @@ Result UsingCpuProc::update_current_time()
 
 Result UsingCpuProc::calculate(const DescriptorRAII& descriptor_process, double work_time_process, const ProcmonSettings& procmon_settings)
 {
-	// Количество количества логических потоков
+	
 	unsigned long num_cores = std::thread::hardware_concurrency();
 	if (num_cores == 0) num_cores = 1;
 
-	// ОБщее использоание CPU
     if(procmon_settings.time && procmon_settings.interval_cpu)
     {
         if(procmon_settings.total_cpu && procmon_settings.time)
@@ -174,8 +171,7 @@ Result UsingCpuProc::calculate(const DescriptorRAII& descriptor_process, double 
 		        return Result::failure;
     }
 
-	// За определенный интервал времени
-    if (procmon_settings.interval_cpu)
+	if (procmon_settings.interval_cpu)
     {
         Result res_calculate_interval;
         if ((res_calculate_interval = calculating_interval_using_cpu(num_cores, descriptor_process)) == Result::failure)

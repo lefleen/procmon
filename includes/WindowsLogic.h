@@ -11,7 +11,6 @@
 
 namespace ProcmonLogic
 {
-	// Получение ID процесса
 	namespace DescriptorProc
 	{
 		Result get(DescriptorRAII& descriptor_process, DWORD pid_process);
