@@ -6,7 +6,7 @@ procmon is a cross-platform console utility intended for process monitoring. Thi
 
 ## Documentation
 
-[Architecture](docs/architecture.md) 
+[Architecture](doc/architecture.md) 
 
 ## Installation 
 
@@ -64,10 +64,10 @@ procmon set <metric> <setting>
 
 ### Available view settings:
 #### time_view:
-seconds
-minutes
-hours
-days
+- seconds
+- minutes
+- hours
+- days
 #### memory_view:
 - B
 - KiB

@@ -26,8 +26,10 @@ Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_set
 
     if (option == "help")
     {
-        if(size >= 2)
+        if(size == 2)
             metric = args[metric_index];
+        else if(size > 2)
+            return Result::invalid_arguments;
     }
     else if (option == "set")
     {
