@@ -2,18 +2,24 @@
 
 ## What is it? 
 
-procmon (hereinafter referred to as the utility) is a cross-platform console utility intended for process monitoring. This utility collects information about running processes and displays the main process metrics, such as CPU usage, memory usage, and other important metrics. It is also worth noting the provided ability to configure the displayed and calculated metrics for your own tasks and goals.
-It is planned to continue developing the utility further by adding new functions to it, such as creating logs, that is, recording all previous metrics over a certain period of time.
-
-## Development
-
-In future versions of the utility, it is planned to add: an interface for Terminal/BASH; a module for managing the utility settings. 
+procmon is a cross-platform console utility intended for process monitoring. This utility collects information about running processes and displays the main process metrics, such as CPU usage, memory usage, and other important metrics.
 
 ## Documentation
 
 [Architecture](docs/architecture.md) 
 
 ## Installation 
+
+### Supported platforms
+
+- Microsoft Windows
+- Linux
+
+### Requirements
+- CMake
+- C++ compiler
+
+### Compiling
 ```
 git clone https://github.com/lefleen/procmon.git
 cd procmon
@@ -21,6 +27,61 @@ cmake -S . -B build
 cmake --build build
 ```
 **Add the directory containing the executable file to your `PATH`.**
+
+## Usage
+```bash
+procmon help
+procmon help get
+procmon help set
+procmon get <metric>
+```
+### Available metrics:
+- all
+- name
+- time
+- memory
+- iCPU
+- tCPU
+- time_view
+- memory_view
+
+```bash
+procmon set <metric> <setting>
+```
+
+### Available metrics:
+- name
+- time
+- memory
+- iCPU
+- tCPU
+- time_view
+- memory_view
+
+### Available boolean settings:
+- on
+- off
+
+### Available view settings:
+#### time_view:
+seconds
+minutes
+hours
+days
+#### memory_view:
+- B
+- KiB
+- MiB
+- GiB
+- TiB
+
+Examples:
+```bash
+procmon get name
+
+procmon set name off
+procmon set time_view seconds
+```
 
 ## License
 
