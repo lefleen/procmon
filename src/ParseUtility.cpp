@@ -10,7 +10,7 @@ Result ParseUtility::convert_char_to_string(vec_t<str_t>& res, const int argc, c
     return Result::successful;
 }
 
-Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[], str_t& option, str_t& metric, str_t& setting, size_t& index)
+Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_settings_table, const int argc, const char* argv[], str_t& option, str_t& metric, str_t& setting)
 {
     vec_t<str_t> args(argc - 1);
 
@@ -18,36 +18,31 @@ Result ParseUtility::parse_command_line(vec_t<ProcmonSettingsTable>& procmon_set
         return Result::failure;
 
     const size_t size = args.size();
+    size_t option_index = 0;
+    size_t metric_index = 1;
+    size_t setting_index = 2;
 
-    option = args[index];
+    option = args[option_index];
 
     if (option == "help")
     {
-        index += 1;
         if(size >= 2)
-        {
-            metric = args[index];
-            index += 1;
-        }
+            metric = args[metric_index];
     }
     else if (option == "set")
     {
-        if (index + 2 >= size)
+        if (size != 3)
             return Result::invalid_arguments;
 
-        metric = args[index + 1];
-        setting = args[index + 2];
-
-        index += 3;
+        metric = args[metric_index];
+        setting = args[setting_index];
     }
-    else if (args[index] == "get")
+    else if (option == "get")
     {
-        if (index + 1 >= size)
+        if (size != 2)
             return Result::invalid_arguments;
 
-        metric = args[index + 1];
-
-        index += 2;
+        metric = args[metric_index];
     }
     else return Result::invalid_arguments;
 
@@ -131,7 +126,7 @@ Result ParseUtility::convert_procmon_settings_to_string(const vec_t<ProcmonSetti
     return Result::successful;
 }
 
-Result ParseUtility::set_settings_view_time_in_procmon_settings(const str_t& setting, TimeViewSettings& time_view_settings) 
+Result ParseUtility::set_settings_view_time_in_procmon_settings(const str_t& setting, TimeViewSettings& time_view_settings)
 {
     if (setting == "seconds")
         time_view_settings = TimeViewSettings::seconds;

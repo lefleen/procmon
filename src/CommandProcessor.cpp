@@ -27,52 +27,47 @@ Result CommandProcessor::manage(vec_t<ProcmonSettingsTable>& procmon_settings_ta
 
     file_config.clear();
 
-    size_t index = 0;
-
     str_t option = "";
     str_t metric = "";
     str_t setting = "";
     bool status_set = false;
 
-    while (index < size)
+    Result res_parse_string;
+
+    if ((res_parse_string = ParseUtility::parse_command_line(procmon_settings_table, argc, argv, option, metric, setting)) != Result::successful)
     {
-        Result res_parse_string;
+        UserInterface::Errors::show("", Result::err_parse_command_line);
+        return res_parse_string;
+    }
 
-        if ((res_parse_string = ParseUtility::parse_command_line(procmon_settings_table, argc, argv, option, metric, setting, index)) != Result::successful)
-        {
-            UserInterface::Errors::show("", Result::err_parse_command_line);
-            return res_parse_string;
-        }
+    if (option == "help")
+    {
+        Result res_help_manage;
 
-        if (option == "help")
-        {
-            Result res_help_manage;
+        if((res_help_manage = Command::Help::manage(metric)) != Result::successful)
+            return res_help_manage;
+    }
+    else if (option == "set")
+    {
+        Result res;
 
-            if((res_help_manage = Command::Help::manage(metric)) != Result::successful)
-                return res_help_manage;
-        }
-        else if (option == "set")
-        {
-            Result res;
+        if ((res = Command::Set::manage(procmon_settings_table, procmon_settings_view, metric, setting)) != Result::successful)
+            return res;
 
-            if ((res = Command::Set::manage(procmon_settings_table, procmon_settings_view, metric, setting)) != Result::successful)
-                return res;
+        if((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
+            return res;
 
-            if((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
-                return res;
+        if (setting == "off" && metric == "time")
+            UserInterface::Assert::time();
 
-            if (setting == "off" && metric == "time")
-                UserInterface::Assert::time();
+        status_set = true;
+    }
+    else if (option == "get")
+    {    
+        Result res;
 
-            status_set = true;
-        }
-        else if (option == "get")
-        {    
-            Result res;
-
-            if ((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
-                return res;
-        }
+        if ((res = Command::Get::manage(procmon_settings_table, procmon_settings_view, metric)) != Result::successful)
+            return res;
     }
 
     Result res_file_save;
